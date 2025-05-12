@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/actions/auth"
 import { redirect } from "next/navigation"
 import { VeterinaryHeader } from "./veterinary/components/veterinary-header"
 import { VeterinarySidebar } from "./veterinary/components/veterinary-sidebar"
+import ClientManifestHelper from "./page-client-manifest"
 
 export default async function VeterinaryLayout({
   children,
@@ -22,6 +23,7 @@ export default async function VeterinaryLayout({
       <div className="flex flex-1">
         <VeterinarySidebar />
         <main className="flex-1 overflow-y-auto">
+          <ClientManifestHelper />
           {children}
         </main>
       </div>
