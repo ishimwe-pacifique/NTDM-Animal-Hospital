@@ -1,0 +1,25 @@
+// @ts-ignore
+import FarmerSidebar from "./components/farmer-sidebar";
+import React from "react";
+import FarmerHeader from "./components/farmer-header";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+
+export default function FarmerLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <FarmerSidebar />
+      <div className="flex-1 flex flex-col">
+        <FarmerHeader />
+        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+      </div>
+    </div>
+  );
+}
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  metadataBase: new URL('https://yourdomain.com'),
+  // ...other metadata
+} 
