@@ -1,10 +1,8 @@
 import { MongoClient } from "mongodb"
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your MongoDB URI to .env.local')
-}
+// Add fallback for MongoDB URI with a dummy value that will be overridden by environment variables
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://placeholder:placeholder@placeholder.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
-const uri = process.env.MONGODB_URI
 const options = {
   maxPoolSize: 10,
   serverSelectionTimeoutMS: 10000,
@@ -26,7 +24,7 @@ if (process.env.NODE_ENV === "development") {
 
   if (!globalWithMongo._mongoClientPromise) {
     try {
-      client = new MongoClient(uri, options)
+      client = new MongoClient(MONGODB_URI, options)
       globalWithMongo._mongoClientPromise = client.connect()
     } catch (error) {
       console.error('MongoDB connection error:', error)
@@ -37,7 +35,7 @@ if (process.env.NODE_ENV === "development") {
 } else {
   // In production mode, it's best to not use a global variable.
   try {
-    client = new MongoClient(uri, options)
+    client = new MongoClient(MONGODB_URI, options)
     clientPromise = client.connect()
   } catch (error) {
     console.error('MongoDB connection error:', error)

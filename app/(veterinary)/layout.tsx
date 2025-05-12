@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getCurrentUser } from "@/lib/actions/auth"
 import { redirect } from "next/navigation"
 import { VeterinaryHeader } from "./veterinary/components/veterinary-header"

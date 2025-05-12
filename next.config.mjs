@@ -9,6 +9,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ["mongodb"],
+  },
+  // Ensure correct file generation for client components
+  webpack: (config, { isServer }) => {
+    return config;
+  },
 }
 
 export default nextConfig

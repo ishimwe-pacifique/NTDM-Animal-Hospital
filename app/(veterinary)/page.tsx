@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Users, MessageSquare, ClipboardList } from "lucide-react"
 
