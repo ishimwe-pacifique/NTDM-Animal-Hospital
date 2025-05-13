@@ -18,11 +18,11 @@ export default async function VeterinaryLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <VeterinaryHeader />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <VeterinarySidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           <ClientManifestHelper />
           {children}
         </main>

@@ -9,8 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  serverExternalPackages: ["mongodb"],
   experimental: {
-    serverComponentsExternalPackages: ["mongodb"],
     // Add experimental flag to help with client component resolution
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
     serverActions: {

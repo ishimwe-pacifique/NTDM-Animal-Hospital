@@ -9,9 +9,9 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex min-h-screen bg-gray-50">
       <FarmerSidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <FarmerHeader />
-        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

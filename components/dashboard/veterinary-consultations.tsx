@@ -140,48 +140,120 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
   const rejectedConsultations = consultations.filter(c => c.status === "rejected")
   const completedConsultations = consultations.filter(c => c.status === "completed")
 
+  // Card component for mobile view
+  const ConsultationCard = ({ consultation, showActions = true }: { consultation: Consultation, showActions?: boolean }) => (
+    <div className="border rounded-md p-4 mb-4 shadow-sm">
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h3 className="font-medium">{consultation.fullName}</h3>
+          <p className="text-sm text-gray-500">{consultation.phoneNumber}</p>
+        </div>
+        <Badge className={getStatusColor(consultation.status)}>
+          {consultation.status}
+        </Badge>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-3 text-sm">
+        <div className="font-medium">Animal:</div>
+        <div>{consultation.service}</div>
+        
+        <div className="font-medium">Symptoms:</div>
+        <div className="break-words">{consultation.type}</div>
+        
+        <div className="font-medium">Date:</div>
+        <div>{consultation.date}</div>
+      </div>
+      
+      <div className="flex flex-wrap gap-2 mt-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto"
+          onClick={() => viewConsultationDetails(consultation)}
+        >
+          View Details
+        </Button>
+        
+        {consultation.status === "pending" && showActions && (
+          <div className="flex flex-wrap gap-2 w-full mt-2">
+            <Button
+              variant="default"
+              size="sm"
+              className="flex-1"
+              onClick={() => initiateStatusUpdate(consultation, "accept")}
+              disabled={isUpdating}
+            >
+              Accept
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="flex-1"
+              onClick={() => initiateStatusUpdate(consultation, "reject")}
+              disabled={isUpdating}
+            >
+              Reject
+            </Button>
+          </div>
+        )}
+        
+        {consultation.status === "accepted" && showActions && (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full mt-2"
+            onClick={() => initiateStatusUpdate(consultation, "complete")}
+            disabled={isUpdating}
+          >
+            Mark Complete
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+
   const ConsultationTable = ({ consultations, showActions = true }: { consultations: Consultation[], showActions?: boolean }) => (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Farmer</TableHead>
-            <TableHead>Animal</TableHead>
-            <TableHead>Symptoms</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="whitespace-nowrap">Farmer</TableHead>
+            <TableHead className="whitespace-nowrap">Animal</TableHead>
+            <TableHead className="whitespace-nowrap">Symptoms</TableHead>
+            <TableHead className="whitespace-nowrap">Status</TableHead>
+            <TableHead className="whitespace-nowrap">Date</TableHead>
+            <TableHead className="whitespace-nowrap">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {consultations.map((consultation) => (
             <TableRow key={consultation._id}>
-              <TableCell>
+              <TableCell className="min-w-[150px]">
                 <div>
                   <div className="font-medium">{consultation.fullName}</div>
                   <div className="text-sm text-gray-500">{consultation.phoneNumber}</div>
                 </div>
               </TableCell>
-              <TableCell>{consultation.service}</TableCell>
+              <TableCell className="whitespace-nowrap">{consultation.service}</TableCell>
               <TableCell className="max-w-xs truncate">
                 {consultation.type}
               </TableCell>
-              <TableCell>
+              <TableCell className="whitespace-nowrap">
                 <Badge className={getStatusColor(consultation.status)}>
                   {consultation.status}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="whitespace-nowrap">
                 {consultation.date}
               </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
+              <TableCell className="min-w-[200px]">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => viewConsultationDetails(consultation)}
                   >
-                    View Details
+                    View
                   </Button>
                   {consultation.status === "pending" && showActions && (
                     <>
@@ -210,7 +282,7 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
                       onClick={() => initiateStatusUpdate(consultation, "complete")}
                       disabled={isUpdating}
                     >
-                      Mark Complete
+                      Complete
                     </Button>
                   )}
                 </div>
@@ -222,6 +294,43 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
     </div>
   )
 
+  const EmptyState = ({ status }: { status: string }) => (
+    <div className="text-center py-8 text-gray-500">
+      <Bell className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+      <p>No {status} consultations</p>
+    </div>
+  )
+
+  // Render different layout based on consultations and status
+  const renderConsultations = (consultations: Consultation[], status: string, showActions: boolean) => {
+    if (consultations.length === 0) {
+      return <EmptyState status={status} />;
+    }
+
+    return (
+      <>
+        {/* Mobile view (card layout) */}
+        <div className="md:hidden space-y-4">
+          {consultations.map((consultation) => (
+            <ConsultationCard 
+              key={consultation._id} 
+              consultation={consultation} 
+              showActions={showActions} 
+            />
+          ))}
+        </div>
+        
+        {/* Tablet and desktop view (table layout) */}
+        <div className="hidden md:block">
+          <ConsultationTable 
+            consultations={consultations} 
+            showActions={showActions} 
+          />
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
       <Card>
@@ -230,97 +339,52 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="pending" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="pending" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Pending ({pendingConsultations.length})
-              </TabsTrigger>
-              <TabsTrigger value="accepted" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Accepted ({acceptedConsultations.length})
-              </TabsTrigger>
-              <TabsTrigger value="rejected" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Rejected ({rejectedConsultations.length})
-              </TabsTrigger>
-              <TabsTrigger value="completed" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Completed ({completedConsultations.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto">
+              <TabsList className="w-full sm:w-auto">
+                <TabsTrigger value="pending" className="flex items-center gap-1 text-xs sm:text-sm sm:gap-2">
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="whitespace-nowrap">Pending ({pendingConsultations.length})</span>
+                </TabsTrigger>
+                <TabsTrigger value="accepted" className="flex items-center gap-1 text-xs sm:text-sm sm:gap-2">
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="whitespace-nowrap">Accepted ({acceptedConsultations.length})</span>
+                </TabsTrigger>
+                <TabsTrigger value="rejected" className="flex items-center gap-1 text-xs sm:text-sm sm:gap-2">
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="whitespace-nowrap">Rejected ({rejectedConsultations.length})</span>
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="flex items-center gap-1 text-xs sm:text-sm sm:gap-2">
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="whitespace-nowrap">Completed ({completedConsultations.length})</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
             
-            <TabsContent value="pending">
-              {pendingConsultations.length > 0 ? (
-                <ConsultationTable consultations={pendingConsultations} />
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>No pending consultations</p>
-                </div>
-              )}
+            <TabsContent value="pending" className="mt-4">
+              {renderConsultations(pendingConsultations, "pending", true)}
             </TabsContent>
             
-            <TabsContent value="accepted">
-              {acceptedConsultations.length > 0 ? (
-                <ConsultationTable consultations={acceptedConsultations} showActions={true} />
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>No accepted consultations</p>
-                </div>
-              )}
+            <TabsContent value="accepted" className="mt-4">
+              {renderConsultations(acceptedConsultations, "accepted", true)}
             </TabsContent>
             
-            <TabsContent value="rejected">
-              {rejectedConsultations.length > 0 ? (
-                <ConsultationTable consultations={rejectedConsultations} showActions={false} />
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>No rejected consultations</p>
-                </div>
-              )}
+            <TabsContent value="rejected" className="mt-4">
+              {renderConsultations(rejectedConsultations, "rejected", false)}
             </TabsContent>
             
-            <TabsContent value="completed">
-              {completedConsultations.length > 0 ? (
-                <ConsultationTable consultations={completedConsultations} showActions={false} />
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>No completed consultations</p>
-                </div>
-              )}
+            <TabsContent value="completed" className="mt-4">
+              {renderConsultations(completedConsultations, "completed", false)}
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      {/* Debug information */}
-      <div className="p-4 bg-gray-100 text-xs">
-        Selected consultation: {selectedConsultation ? selectedConsultation._id : 'none'}, 
-        Show feedback form: {showFeedbackForm ? 'yes' : 'no'}, 
-        Details dialog open: {isDetailsDialogOpen ? 'yes' : 'no'},
-        Feedback dialog open: {isFeedbackDialogOpen ? 'yes' : 'no'}
-      </div>
-
-      {/* Test button to verify dialog works */}
-      <div className="p-4">
-        <Button onClick={() => {
-          if (consultations.length > 0) {
-            viewConsultationDetails(consultations[0]);
-          }
-        }}>
-          Test Dialog
-        </Button>
-      </div>
-
-      {/* Consultation Details Dialog - Simplified logic */}
+      {/* Consultation Details Dialog */}
       <Dialog 
         open={isDetailsDialogOpen} 
         onOpenChange={setIsDetailsDialogOpen}
       >
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-11/12 max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle>Consultation Details</DialogTitle>
             <DialogDescription>
@@ -330,48 +394,49 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
           
           {selectedConsultation && (
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Farmer:</div>
-                <div className="col-span-2">{selectedConsultation.fullName}</div>
+                <div className="sm:col-span-2">{selectedConsultation.fullName}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Phone Number:</div>
-                <div className="col-span-2">{selectedConsultation.phoneNumber}</div>
+                <div className="sm:col-span-2">{selectedConsultation.phoneNumber}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Animal:</div>
-                <div className="col-span-2">{selectedConsultation.service}</div>
+                <div className="sm:col-span-2">{selectedConsultation.service}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Symptoms:</div>
-                <div className="col-span-2">{selectedConsultation.type}</div>
+                <div className="sm:col-span-2 break-words">{selectedConsultation.type}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Date:</div>
-                <div className="col-span-2">{selectedConsultation.date} {selectedConsultation.time}</div>
+                <div className="sm:col-span-2">{selectedConsultation.date} {selectedConsultation.time}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                 <div className="font-semibold">Status:</div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <Badge className={getStatusColor(selectedConsultation.status)}>
                     {selectedConsultation.status}
                   </Badge>
                 </div>
               </div>
               {selectedConsultation.feedback && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                   <div className="font-semibold">Feedback:</div>
-                  <div className="col-span-2">{selectedConsultation.feedback}</div>
+                  <div className="sm:col-span-2 break-words">{selectedConsultation.feedback}</div>
                 </div>
               )}
             </div>
           )}
           
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             {selectedConsultation?.status === "pending" && (
               <>
                 <Button 
-                  variant="default" 
+                  variant="default"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     setIsDetailsDialogOpen(false);
                     initiateStatusUpdate(selectedConsultation, "accept");
@@ -380,7 +445,8 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
                   Accept with Feedback
                 </Button>
                 <Button 
-                  variant="destructive" 
+                  variant="destructive"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     setIsDetailsDialogOpen(false);
                     initiateStatusUpdate(selectedConsultation, "reject");
@@ -392,7 +458,8 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
             )}
             {selectedConsultation?.status === "accepted" && (
               <Button 
-                variant="default" 
+                variant="default"
+                className="w-full sm:w-auto"
                 onClick={() => {
                   setIsDetailsDialogOpen(false);
                   initiateStatusUpdate(selectedConsultation, "complete");
@@ -402,18 +469,18 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
               </Button>
             )}
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline" className="w-full sm:w-auto">Close</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Feedback Form Dialog - Simplified state logic */}
+      {/* Feedback Form Dialog */}
       <Dialog 
         open={isFeedbackDialogOpen} 
         onOpenChange={setIsFeedbackDialogOpen}
       >
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-11/12 max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle>
               {actionType === "accept" ? "Accept Consultation" :
@@ -438,9 +505,10 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               type="submit"
+              className="w-full sm:w-auto"
               onClick={() => {
                 submitFeedback();
                 setIsFeedbackDialogOpen(false);
@@ -450,7 +518,8 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
               Submit
             </Button>
             <Button 
-              variant="outline" 
+              variant="outline"
+              className="w-full sm:w-auto"
               onClick={() => {
                 setIsFeedbackDialogOpen(false);
                 setFeedback("");
@@ -464,4 +533,4 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
       </Dialog>
     </>
   )
-} 
+}
