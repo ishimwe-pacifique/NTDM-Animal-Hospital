@@ -8,7 +8,7 @@ import { Suspense } from "react"
 
 export default function BodyWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isDashboard = pathname?.startsWith("/farmer") || pathname?.startsWith("/veterinary") || pathname?.startsWith("/trackdevice")
+  const isDashboard = pathname?.startsWith("/farmer") || pathname?.startsWith("/veterinary") || pathname?.startsWith("/trackdevice") || pathname?.startsWith("/maintenance")
 
   return (
     <Suspense>
