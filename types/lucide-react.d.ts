@@ -15,4 +15,14 @@ declare module 'lucide-react' {
   export const User: FC<IconProps>
   export const Home: FC<IconProps>
   export const Settings: FC<IconProps>
+  export const Menu: FC<IconProps>
+  export const Facebook: FC<IconProps>
+  export const Instagram: FC<IconProps>
+  export const Twitter: FC<IconProps>
+  export const MapPin: FC<IconProps>
+  export const Phone: FC<IconProps>
+  export const Mail: FC<IconProps>
+  export const Youtube: FC<IconProps>
+  export const Linkedin: FC<IconProps>
+  
 } 

@@ -7,7 +7,8 @@ import {
   Stethoscope, 
   Settings, 
   MessageSquare,
-  Bell
+  Bell,
+  Menu
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -100,7 +101,11 @@ export default function FarmerSidebar() {
                   onClick={toggleSidebar} 
                   className="p-1 rounded hover:bg-gray-100"
                 >
-                  <Settings className={`h-5 w-5 text-gray-500 transform transition-transform ${collapsed ? "rotate-180" : ""}`} />
+                  <Menu
+                  className={`h-5 w-5 text-gray-500 transform transition-transform duration-300 ease-in-out ${
+                  collapsed ? "rotate-180" : ""
+                  }`}
+                  />
                 </button>
               )}
             </div>

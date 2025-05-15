@@ -20,7 +20,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/ntdm_animal_hosipital?igsh=bjBuZW40YXpnN3Zm"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary transition-colors"
@@ -29,7 +29,7 @@ export default function Footer() {
                 <Instagram className="h-6 w-6" />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/niyonizeye.philicoless.35"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary transition-colors"
@@ -38,7 +38,7 @@ export default function Footer() {
                 <Facebook className="h-6 w-6" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/ntdm205028807?t=a4pYrh8HFfbCSN3NMoap0Q&s=09"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary transition-colors"
@@ -56,7 +56,7 @@ export default function Footer() {
                 <Youtube className="h-6 w-6" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/theophile-niyonizeye-44b291337?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary transition-colors"
@@ -111,15 +111,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start">
                 <MapPin className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
-                <span className="text-gray-400">123 Animal Care Road, Kigali, Rwanda</span>
+                <span className="text-gray-400">Nyagatare, Rwanda</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-6 w-6 text-primary mr-3" />
-                <span className="text-gray-400">+250 78 123 4567</span>
+                <span className="text-gray-400">+250 78 051 9960</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-6 w-6 text-primary mr-3" />
-                <span className="text-gray-400">info@ntdmhospital.rw</span>
+                <span className="text-gray-400">ntdm2050@gmail.com</span>
               </li>
             </ul>
           </div>

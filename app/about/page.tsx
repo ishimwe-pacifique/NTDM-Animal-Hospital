@@ -73,23 +73,30 @@ export default function AboutPage() {
               {
                 image:
                   "/WhatsApp Image 2025-03-28 at 12.07.22_620388c5.jpg",
-                name: "Dr. Jean Mugisha",
+                name: "Dr. Theophile Niyonizeye",
                 role: "Chief Veterinarian",
                 specialty: "Large Animal Medicine",
               },
               {
                 image:
                   "/NEW PHOTO.jpg",
-                name: "Dr. Alice Uwimana",
+                name: "Dr. Charline Rutagengwa",
                 role: "Senior Veterinarian",
                 specialty: "Small Animal Medicine",
               },
               {
                 image:
                   "/sano2.jpg",
-                name: "Eric Nshimiyimana",
+                name: "Dr. Gerard Sano",
                 role: "Technology Director",
                 specialty: "Animal Tracking Systems",
+              },
+                 {
+                image:
+                  "/WhatsApp Image 2025-05-15 at 15.48.58_74fbf054.jpg",
+                name: "Dr. Benithe Ikuzwe",
+                role: "Manageing Director",
+                specialty: "Veterinanry Technician",
               },
             ].map((member, index) => (
               <div key={index} className="salon-card text-center p-6">

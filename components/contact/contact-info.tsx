@@ -13,7 +13,7 @@ export default function ContactInfo() {
           <MapPin className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
             <h3 className="font-semibold mb-1">Address</h3>
-            <p className="text-gray-600">123 Animal Care Road, Kigali, Rwanda</p>
+            <p className="text-gray-600">Nyagatare, Rwanda</p>
           </div>
         </div>
 
@@ -21,7 +21,7 @@ export default function ContactInfo() {
           <Phone className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
             <h3 className="font-semibold mb-1">Phone</h3>
-            <p className="text-gray-600">+250 78 123 4567</p>
+            <p className="text-gray-600">+250 78 051 9960</p>
           </div>
         </div>
 
@@ -29,7 +29,7 @@ export default function ContactInfo() {
           <Mail className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
             <h3 className="font-semibold mb-1">Email</h3>
-            <p className="text-gray-600">info@ntdmhospital.rw</p>
+            <p className="text-gray-600">ntdm2050@gmail.com</p>
           </div>
         </div>
 
@@ -50,7 +50,7 @@ export default function ContactInfo() {
         <h3 className="font-semibold mb-3">Connect With Us</h3>
         <div className="flex space-x-4">
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/ntdm_animal_hosipital?igsh=bjBuZW40YXpnN3Zm"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gray-100 p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
@@ -59,7 +59,7 @@ export default function ContactInfo() {
             <Instagram className="h-5 w-5" />
           </a>
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/niyonizeye.philicoless.35"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gray-100 p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
@@ -68,7 +68,7 @@ export default function ContactInfo() {
             <Facebook className="h-5 w-5" />
           </a>
           <a
-            href="https://twitter.com"
+            href="https://x.com/ntdm205028807?t=a4pYrh8HFfbCSN3NMoap0Q&s=09"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gray-100 p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
@@ -86,7 +86,7 @@ export default function ContactInfo() {
             <Youtube className="h-5 w-5" />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/theophile-niyonizeye-44b291337?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gray-100 p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
