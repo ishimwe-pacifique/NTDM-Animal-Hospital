@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import {
   Calendar,
   ClipboardList,
+  Activity,
   Home,
   MessageSquare,
   Settings,
@@ -29,6 +30,11 @@ const sidebarNavItems = [
     title: "Patients",
     href: "/veterinary/patients",
     icon: Users,
+  },
+  {
+    title: "Tracking",
+    href: "/veterinary/tracking",
+    icon: Activity,
   },
   {
     title: "Consultations",
@@ -59,13 +65,13 @@ export function VeterinarySidebar() {
       // Auto-collapse on smaller desktop screens
       setCollapsed(window.innerWidth < 1280 && window.innerWidth >= 768)
     }
-    
+
     // Initial check
     checkScreenSize()
-    
+
     // Add listener for screen resize
     window.addEventListener('resize', checkScreenSize)
-    
+
     // Cleanup
     return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
@@ -88,12 +94,12 @@ export function VeterinarySidebar() {
             <span className="text-primary">Veterinary Portal</span>
           </Link>
         )}
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={toggleCollapsed}
           className={cn(
-            "h-8 w-8", 
+            "h-8 w-8",
             collapsed && "mx-auto"
           )}
         >

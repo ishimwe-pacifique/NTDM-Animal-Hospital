@@ -6,6 +6,7 @@ declare module 'lucide-react' {
     strokeWidth?: string | number
   }
   export const Calendar: FC<IconProps>
+  export const Activity: FC<IconProps>
   export const Users: FC<IconProps>
   export const Stethoscope: FC<IconProps>
   export const Clock: FC<IconProps>
