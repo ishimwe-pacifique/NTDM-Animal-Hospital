@@ -162,7 +162,7 @@ export default function Page() {
     <div className="bg-gray-50 min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <h1 className="text-3xl font-bold text-gray-800">🐾 Pet Health Monitor</h1>
+          <h1 className="text-3xl font-bold text-gray-800">🐾 Animal Health Monitor</h1>
           
           {/* Animal Selector */}
           <div className="flex flex-col md:flex-row gap-4">
@@ -221,7 +221,7 @@ export default function Page() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   value={newAnimal.name}
                   onChange={(e) => setNewAnimal({...newAnimal, name: e.target.value})}
-                  placeholder="Pet name"
+                  placeholder="Animal name"
                 />
               </div>
               <div>
