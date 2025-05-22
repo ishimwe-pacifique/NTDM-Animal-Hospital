@@ -37,7 +37,7 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-2 transition-transform hover:scale-105">
             <div className="w-15 h-15  overflow-hidden">
               <Image
-                src="/logo.png?height=40&width=40&text=NTDM"
+                src="/Group 2.svg?height=40&width=40&text=NTDM"
                 alt="NTDM Animal Hospital Logo"
                 width={100}
                 height={100}

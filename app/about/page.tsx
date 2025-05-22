@@ -94,8 +94,8 @@ export default function AboutPage() {
                  {
                 image:
                   "/WhatsApp Image 2025-05-15 at 15.48.58_74fbf054.jpg",
-                name: "Dr. Benithe Ikuzwe",
-                role: "Manageing Director",
+                name: "Dr. Benitte Ikuzwe",
+                role: "Managing Director",
                 specialty: "Veterinanry Technician",
               },
             ].map((member, index) => (
