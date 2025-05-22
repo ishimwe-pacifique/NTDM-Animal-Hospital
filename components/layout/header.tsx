@@ -35,16 +35,17 @@ export default function Header() {
       <div className="container-custom">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 transition-transform hover:scale-105">
-            <div className="w-15 h-15 rounded-full overflow-hidden">
+            <div className="w-15 h-15  overflow-hidden">
               <Image
-                src="/WhatsApp Image 2025-03-26 at 11.33.42_8c4bbe62.jpg?height=40&width=40&text=NTDM"
+                src="/logo.png?height=40&width=40&text=NTDM"
                 alt="NTDM Animal Hospital Logo"
-                width={40}
-                height={40}
-                className="rounded-full object-cover bg-primary text-white"
+                width={100}
+                height={100}
+                className=" object-cover"
+                style={{ boxShadow: "0 0 12px 2px white" }}
               />
             </div>
-            <span className="text-2xl font-bold gradient-text">NTDM Animal Hospital</span>
+            {/* <span className="text-2xl font-bold gradient-text">NTDM Animal Hospital</span> */}
           </Link>
 
           <nav className="hidden lg:flex items-center space-x-1">
