@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { registerUser, loginUser } from "@/lib/actions/auth"
-import { Home } from "lucide-react"
+import { Home, CheckCircle, Mail } from "lucide-react"
 
 type UserRole = "farmer" | "doctor" | "admin"
 
@@ -29,12 +30,32 @@ export default function RegisterForm() {
   const [sector, setSector] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [passwordError, setPasswordError] = useState("")
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
   const router = useRouter()
+
+  const validatePasswords = () => {
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match")
+      return false
+    }
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long")
+      return false
+    }
+    return true
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setPasswordError("")
+
+    // Validate passwords first
+    if (!validatePasswords()) {
+      setIsLoading(false)
+      return
+    }
 
     try {
       // Create form data for registration
@@ -59,22 +80,68 @@ export default function RegisterForm() {
         throw new Error(registerResult.message)
       }
 
-      // Automatically log in the user
-      const loginFormData = new FormData()
-      loginFormData.append("email", email)
-      loginFormData.append("password", password)
+      // Show success message
+      setRegistrationSuccess(true)
+      setSuccessMessage(registerResult.message)
       
-      const loginResult = await loginUser(loginFormData)
-      
-      if (!loginResult.success) {
-        throw new Error(loginResult.message)
-      }
     } catch (error) {
       console.error("Registration error:", error)
       setPasswordError(error instanceof Error ? error.message : "Registration failed")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Show success message after registration
+  if (registrationSuccess) {
+    return (
+      <Card className="w-full">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-6 w-6 text-green-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-green-600">Account Created Successfully!</CardTitle>
+          <CardDescription>Welcome to NTDM Animal Hospital</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="border-green-200 bg-green-50">
+            <Mail className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              {successMessage}
+            </AlertDescription>
+          </Alert>
+          
+          <div className="text-center space-y-3">
+            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+              <Mail className="h-4 w-4" />
+              <span>Please check your email inbox for a welcome message</span>
+            </div>
+            
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800 font-medium mb-2">
+                📧 Check Your Email
+              </p>
+              <p className="text-xs text-blue-700">
+                We've sent a welcome email to <strong>{email}</strong> with important information about your account and next steps.
+              </p>
+              <p className="text-xs text-blue-600 mt-2">
+                Don't forget to check your spam/junk folder if you don't see the email in your inbox.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="flex justify-center pt-4">
+            <Button
+              onClick={() => router.push("/login")}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Continue to Login
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

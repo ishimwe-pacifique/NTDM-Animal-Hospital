@@ -2,6 +2,7 @@
 import clientPromise from "../db"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { sendWelcomeEmail } from "../email" // Import the email function
 
 // Register a new user
 export async function registerUser(formData: FormData) {
@@ -53,9 +54,28 @@ export async function registerUser(formData: FormData) {
     // Insert user into database
     const result = await db.collection("users").insertOne(userData)
 
+    // Send welcome email after successful registration
+    try {
+      const emailResult = await sendWelcomeEmail(
+        userData.email as string,
+        userData.name as string,
+        userData.role
+      )
+      
+      if (emailResult.success) {
+        console.log(`Welcome email sent successfully to ${userData.email}`)
+      } else {
+        console.error(`Failed to send welcome email: ${emailResult.error}`)
+        // Note: We don't fail the registration if email fails
+      }
+    } catch (emailError) {
+      console.error("Email sending error:", emailError)
+      // Continue with successful registration even if email fails
+    }
+
     return {
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully! Welcome email sent to your inbox.",
       userId: result.insertedId.toString(),
     }
   } catch (error) {
