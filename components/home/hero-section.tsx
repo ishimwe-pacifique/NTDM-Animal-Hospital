@@ -27,7 +27,7 @@ export default function HeroSection() {
 
           <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
             Innovative solutions for livestock and pet owners. Advanced tracking, expert consultations, and
-            comprehensive care - all in one place.
+            comprehensive care - all in one place. HHhhhhhh
           </p>
 
           <div className="flex flex-wrap gap-4">
