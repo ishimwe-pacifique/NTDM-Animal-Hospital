@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  User, 
-  Stethoscope, 
-  Settings, 
+import {
+  Home,
+  User,
+  Stethoscope,
+  Settings,
   MessageSquare,
   Bell,
   Menu
@@ -17,20 +17,20 @@ export default function FarmerSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  
+
   // Check if mobile on initial load and resize
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
       setCollapsed(window.innerWidth < 1024);
     };
-    
+
     // Initial check
     checkIfMobile();
-    
+
     // Add resize listener
     window.addEventListener('resize', checkIfMobile);
-    
+
     // Cleanup
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
@@ -58,7 +58,7 @@ export default function FarmerSidebar() {
 
   // Mobile menu button visible only on small screens
   const mobileMenuButton = (
-    <button 
+    <button
       onClick={toggleMobileMenu}
       className="fixed bottom-4 left-4 md:hidden z-20 bg-green-600 text-white p-3 rounded-full shadow-lg"
     >
@@ -69,25 +69,25 @@ export default function FarmerSidebar() {
   return (
     <>
       {isMobile && mobileMenuButton}
-      
+
       {showSidebar && (
         <div className={`
-          ${isMobile ? "fixed inset-0 z-50" : "relative"} 
+          ${isMobile ? "fixed inset-0 z-50" : "sticky top-0 h-screen z-30"} 
           flex
         `}>
           {/* Overlay for mobile */}
           {isMobile && (
-            <div 
-              className="absolute inset-0 bg-black/30" 
+            <div
+              className="absolute inset-0 bg-black/30"
               onClick={() => setMobileOpen(false)}
             />
           )}
-          
+
           <nav className={`
             ${collapsed ? "w-16" : "w-64"} 
             ${isMobile ? "w-64 ml-0" : ""} 
             bg-white shadow-lg z-10 transition-all duration-300 
-            flex flex-col h-screen
+            flex flex-col h-full
             border-r border-gray-200
             relative
           `}>
@@ -97,33 +97,32 @@ export default function FarmerSidebar() {
                 <div className="font-bold text-green-700">Farmer Portal</div>
               )}
               {!isMobile && (
-                <button 
-                  onClick={toggleSidebar} 
+                <button
+                  onClick={toggleSidebar}
                   className="p-1 rounded hover:bg-gray-100"
                 >
                   <Menu
-                  className={`h-5 w-5 text-gray-500 transform transition-transform duration-300 ease-in-out ${
-                  collapsed ? "rotate-180" : ""
-                  }`}
+                    className={`h-5 w-5 text-gray-500 transform transition-transform duration-300 ease-in-out ${collapsed ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
               )}
             </div>
-            
+
             {/* Navigation items */}
             <ul className="space-y-1 pt-4 flex-1 overflow-y-auto">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-                
+
                 return (
                   <li key={item.href}>
-                    <Link 
+                    <Link
                       href={item.href}
                       className={`
                         flex items-center py-3 px-4 
                         ${collapsed && !isMobile ? "justify-center" : "space-x-3"} 
-                        ${isActive 
-                          ? "bg-green-50 text-green-700 border-l-4 border-green-600" 
+                        ${isActive
+                          ? "bg-green-50 text-green-700 border-l-4 border-green-600"
                           : "text-gray-600 hover:bg-gray-50"
                         }
                         transition
@@ -136,11 +135,11 @@ export default function FarmerSidebar() {
                 );
               })}
             </ul>
-            
+
             {/* Footer section */}
             <div className="p-4 border-t border-gray-100 text-xs text-gray-500">
               {!collapsed && (
-                <p>© 2023 Farmer Portal</p>
+                <p>© {new Date().getFullYear()} Farmer Portal</p>
               )}
             </div>
           </nav>
@@ -148,4 +147,4 @@ export default function FarmerSidebar() {
       )}
     </>
   );
-} 
+}
