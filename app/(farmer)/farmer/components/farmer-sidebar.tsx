@@ -11,6 +11,7 @@ import {
   Menu
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Activity } from "lucide-react";
 
 export default function FarmerSidebar() {
   const pathname = usePathname();
@@ -39,7 +40,7 @@ export default function FarmerSidebar() {
     { href: "/farmer", label: "Dashboard", icon: <Home className="h-5 w-5" /> },
     { href: "/farmer/animals", label: "Animals", icon: <User className="h-5 w-5" /> },
     { href: "/farmer/consultations", label: "Consultations", icon: <Stethoscope className="h-5 w-5" /> },
-    { href: "/farmer/tracking", label: "Tracking", icon: <Settings className="h-5 w-5" /> },
+    { href: "/farmer/tracking", label: "Tracking", icon: <Activity className="h-5 w-5" /> },
     { href: "/farmer/messages", label: "Messages", icon: <MessageSquare className="h-5 w-5" /> }
   ];
 
