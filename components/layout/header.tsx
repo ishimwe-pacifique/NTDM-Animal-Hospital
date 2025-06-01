@@ -20,6 +20,9 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
+  // Only force black nav items on Login and Register pages
+  const forceBlackNav = pathname === "/login" || pathname === "/register";
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
     window.addEventListener("scroll", handleScroll)
@@ -53,10 +56,16 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors hover:scale-105 transform ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 hover:scale-105 transform ${
                   pathname === item.href
-                    ? "text-white bg-primary shadow-md"
-                    : "text-gray-700 hover:text-white hover:bg-primary/80"
+                    ? isScrolled
+                      ? "text-white bg-primary shadow-md"
+                      : "text-white bg-primary shadow-md"
+                    : forceBlackNav
+                      ? "text-black hover:text-white hover:bg-primary/80"
+                      : isScrolled
+                        ? "text-black hover:text-white hover:bg-primary/80"
+                        : "text-white hover:bg-primary/80"
                 }`}
               >
                 {item.name}
@@ -89,10 +98,16 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`block px-4 py-3 rounded-full text-base font-medium mb-2 ${
+                className={`block px-4 py-3 rounded-full text-base font-medium mb-2 transition-colors duration-300 ${
                   pathname === item.href
-                    ? "text-white bg-primary shadow-md"
-                    : "text-gray-700 hover:text-white hover:bg-primary/80"
+                    ? isScrolled
+                      ? "text-white bg-primary shadow-md"
+                      : "text-white bg-primary shadow-md"
+                    : forceBlackNav
+                      ? "text-black hover:text-white hover:bg-primary/80"
+                      : isScrolled
+                        ? "text-black hover:text-white hover:bg-primary/80"
+                        : "text-white hover:bg-primary/80"
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >

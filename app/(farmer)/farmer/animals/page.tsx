@@ -12,7 +12,7 @@ import { Bell } from "lucide-react";
 
 export default async function AnimalsPage() {
   const currentUser = await getCurrentUser();
-  
+
   // Redirect if not logged in or not a farmer
   if (!currentUser || currentUser.role !== "farmer") {
     redirect("/login");
@@ -24,7 +24,12 @@ export default async function AnimalsPage() {
   return (
     <div className="space-y-6 p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Animals</h1>
+        <div>
+          <h1 className="text-2xl font-bold">My Animals</h1>
+          <p className="text-gray-600 text-sm mt-1">
+            Registered Animals: <span className="font-semibold">{animals.length}</span>
+          </p>
+        </div>
         <div className="flex space-x-2">
           <Button asChild size="sm">
             <Link href="/farmer/animals/add">Register New Animal</Link>
@@ -107,4 +112,4 @@ export default async function AnimalsPage() {
       </Card>
     </div>
   );
-} 
+}

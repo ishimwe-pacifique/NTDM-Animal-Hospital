@@ -17,7 +17,7 @@ export default function BlogBanner() {
 
       <div className="container-custom relative z-10">
         <div className="max-w-2xl text-white">
-          <h1 className="heading-xl mb-4">Our Blog</h1>
+          <h1 className="heading-xl mb-4 text-blue-600">Our Blog</h1>
           <p className="text-lg md:text-xl text-white/90">
             Expert insights, tips, and news on animal health, tracking, and care from our veterinarians.
           </p>

@@ -17,7 +17,7 @@ export default function ServicesBanner() {
 
       <div className="container-custom relative z-10">
         <div className="max-w-2xl text-white">
-          <h1 className="heading-xl mb-4">Our Services</h1>
+          <h1 className="heading-xl mb-4 text-blue-600">Our Services</h1>
           <p className="text-lg md:text-xl text-white/90">
             Discover our comprehensive range of animal health and management services designed for both livestock
             farmers and pet owners.
