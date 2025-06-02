@@ -15,7 +15,7 @@ const services = {
       price: 15000,
       duration: "Device + 3 months service",
       image:
-        "https://images.unsplash.com/photo-1581092921461-7d65ca45393a?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/tracking/track2.png",
     },
     {
       id: "t2",
@@ -42,7 +42,7 @@ const services = {
       price: 12000,
       duration: "Device + 3 months service",
       image:
-        "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/tracking/track3.png",
     },
   ],
   consultations: [
@@ -91,7 +91,7 @@ const services = {
       price: 7000,
       duration: "Results in 48 hours",
       image:
-        "https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/monitoring/vac2.jpg",
     },
     {
       id: "m2",
@@ -161,7 +161,7 @@ const services = {
         {
       id: "s5",
       name: "Porks",
-      description: "Adopt a healthy, vaccinated pet with ongoing veterinary support.",
+      description: "The Best pork Breed and veterinary support.",
       price: "Variable",
       duration: "Includes initial check-up",
       image:
