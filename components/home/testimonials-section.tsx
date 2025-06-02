@@ -9,8 +9,8 @@ const testimonials = [
     id: 1,
     name: "Jean Mutesi",
     role: "Livestock Farmer",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
+    // image:
+    //   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
     quote:
       "The tracking devices from NTDM have revolutionized how I manage my cattle. I can monitor their location and health status in real-time, which has significantly improved my farm's productivity.",
     rating: 5,
@@ -19,8 +19,8 @@ const testimonials = [
     id: 2,
     name: "Emmanuel Hakizimana",
     role: "Pet Owner",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
+    // image:
+    //   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
     quote:
       "The virtual consultations are incredibly convenient. When my dog was sick, I got expert advice within minutes without having to travel to the clinic. Highly recommend!",
     rating: 5,
@@ -29,8 +29,8 @@ const testimonials = [
     id: 3,
     name: "Alice Uwimana",
     role: "Poultry Farmer",
-    image:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
+    // image:
+    //   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
     quote:
       "The disease monitoring system helped me detect an outbreak early in my poultry farm. The quick response from NTDM's veterinarians saved most of my flock. Their service is invaluable.",
     rating: 4,
@@ -39,8 +39,8 @@ const testimonials = [
     id: 4,
     name: "Patrick Niyonzima",
     role: "Dairy Farmer",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
+    // image:
+    //   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
     quote:
       "I purchased my dairy cows through NTDM's marketplace and received healthy, high-yielding animals. Their follow-up care and support has been exceptional. My dairy production has increased by 30%!",
     rating: 5,
