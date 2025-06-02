@@ -2,6 +2,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
+const reviewImages = [
+  "/reviews/rev1.jpg",
+  "/reviews/rev2.png",
+  // "/reviews/review3.jpg",
+  // "/reviews/review4.jpg",
+  // Add more as needed
+]
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
@@ -47,11 +55,11 @@ export default function HeroSection() {
 
           <div className="mt-12 flex items-center space-x-4">
             <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
+              {reviewImages.map((src, i) => (
                 <div key={i} className="w-12 h-12 rounded-full border-2 border-white overflow-hidden">
                   <Image
-                    src={`https://randomuser.me/api/portraits/${i % 2 === 0 ? "women" : "men"}/${i + 60}.jpg`}
-                    alt={`Happy customer ${i}`}
+                    src={src}
+                    alt={`Happy customer ${i + 1}`}
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"
