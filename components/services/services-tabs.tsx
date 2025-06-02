@@ -53,7 +53,7 @@ const services = {
       price: 5000,
       duration: "30 min",
       image:
-        "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/consultations/cons1.png",
     },
     {
       id: "c2",
@@ -62,7 +62,7 @@ const services = {
       price: 3000,
       duration: "20 min",
       image:
-        "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/consultations/cons2.jpg",
     },
     {
       id: "c3",
@@ -80,7 +80,7 @@ const services = {
       price: 15000,
       duration: "2 hours + travel",
       image:
-        "https://images.unsplash.com/photo-1605152276897-4f618f831968?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/consultations/cons3.jpg",
     },
   ],
   monitoring: [
@@ -100,7 +100,7 @@ const services = {
       price: 10000,
       duration: "Annual program",
       image:
-        "https://images.unsplash.com/photo-1616093875201-d6bf4d8e3fb6?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/monitoring/vac1.png",
     },
     {
       id: "m3",
@@ -147,7 +147,7 @@ const services = {
       price: "Variable",
       duration: "Health guaranteed",
       image:
-        "https://images.unsplash.com/photo-1560926036-3b8b6d2e2e6a?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "/services/pet4.jpg",
     },
     {
       id: "s4",
@@ -157,6 +157,15 @@ const services = {
       duration: "Includes initial check-up",
       image:
         "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+        {
+      id: "s5",
+      name: "Porks",
+      description: "Adopt a healthy, vaccinated pet with ongoing veterinary support.",
+      price: "Variable",
+      duration: "Includes initial check-up",
+      image:
+        "/services/pet2.jpg",
     },
   ],
 }

@@ -1,3 +1,4 @@
+import { Video } from 'lucide-react';
 declare module 'lucide-react' {
   import { FC, SVGProps } from 'react'
   export interface IconProps extends SVGProps<SVGSVGElement> {
@@ -25,5 +26,5 @@ declare module 'lucide-react' {
   export const Mail: FC<IconProps>
   export const Youtube: FC<IconProps>
   export const Linkedin: FC<IconProps>
-  
+  export const Video: FC<IconProps>
 } 
