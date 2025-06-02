@@ -100,14 +100,8 @@ export default function Header() {
                 href={item.href}
                 className={`block px-4 py-3 rounded-full text-base font-medium mb-2 transition-colors duration-300 ${
                   pathname === item.href
-                    ? isScrolled
-                      ? "text-white bg-primary shadow-md"
-                      : "text-white bg-primary shadow-md"
-                    : forceBlackNav
-                      ? "text-black hover:text-white hover:bg-primary/80"
-                      : isScrolled
-                        ? "text-black hover:text-white hover:bg-primary/80"
-                        : "text-white hover:bg-primary/80"
+                    ? "text-white bg-primary shadow-md"
+                    : "text-black hover:text-white hover:bg-primary/80"
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
