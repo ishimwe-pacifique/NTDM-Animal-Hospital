@@ -12,8 +12,11 @@ const inter = Inter({
   variable: "--font-inter",
 })
 
-export const metadata: Metadata = {
-  title: "NTDM Animal Hospital - Track, Consult, and Care",
+export const metadata = {
+  title: "NTDM Animal Hospital",
+  icons: {
+    icon: "/logo/NTDM.png",
+  },
   description:
     "Leading animal hospital in Rwanda offering tracking devices, veterinary consultations, disease monitoring, and animal sales.",
   keywords: "animal hospital, veterinary care, animal tracking, disease monitoring, pet care, livestock management",
