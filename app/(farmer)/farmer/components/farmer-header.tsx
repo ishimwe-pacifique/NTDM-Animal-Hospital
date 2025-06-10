@@ -82,7 +82,7 @@ export default function FarmerHeader() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
-          <Link href="/farmer/dashboard" className="flex items-center space-x-3 group">
+          <Link href="/farmer" className="flex items-center space-x-3 group">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2 group-hover:bg-white/20 transition-all duration-200">
               <Cow className="h-6 w-6 text-white" />
             </div>
