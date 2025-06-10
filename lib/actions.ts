@@ -334,25 +334,43 @@ export async function getAnimals(ownerId?: string) {
 
 export async function getConsultations(doctorId?: string, farmerId?: string) {
   try {
-    const client = await clientPromise;
-    const db = client.db("ntdm_animal_hospital");
-    
+    const client = await clientPromise
+    const db = client.db("ntdm_animal_hospital")
+
     // Build query based on user role
-    let query = {};
-    
+    let query = {}
+
     if (doctorId) {
-      query = { doctor: doctorId };
+      query = { doctor: doctorId }
     } else if (farmerId) {
-      query = { farmerId };
+      query = { farmerId }
     }
-    
-    console.log("Fetching consultations with query:", query);
-    
-    const consultations = await db.collection("consultations").find(query).toArray();
-    
-    console.log(`Found ${consultations.length} consultations`);
-    
-    return consultations.map(c => ({
+
+    console.log("Fetching consultations with query:", query)
+
+    const consultations = await db.collection("consultations").find(query).toArray()
+
+    console.log(`Found ${consultations.length} consultations`)
+
+    // Get all unique doctor IDs from consultations
+    const doctorIds = [...new Set(consultations.map((c) => c.doctor).filter(Boolean))]
+
+    // Fetch doctor information for all doctor IDs
+    const doctors = await db
+      .collection("users")
+      .find({
+        _id: { $in: doctorIds.map((id) => new ObjectId(id)) },
+        role: "doctor",
+      })
+      .toArray()
+
+    // Create a map of doctor ID to doctor name for quick lookup
+    const doctorMap = new Map()
+    doctors.forEach((doctor) => {
+      doctorMap.set(doctor._id.toString(), doctor.name)
+    })
+
+    return consultations.map((c) => ({
       _id: c._id.toString(),
       fullName: c.fullName,
       phoneNumber: c.phoneNumber,
@@ -362,13 +380,13 @@ export async function getConsultations(doctorId?: string, farmerId?: string) {
       type: c.type,
       status: c.status.toLowerCase(), // Ensure status is lowercase to match component expectations
       createdAt: c.createdAt.toISOString(),
-      doctor: c.doctor,
+      doctor: doctorMap.get(c.doctor) || c.doctor || "-", // Use doctor name if found, otherwise use original value or "-"
       farmerId: c.farmerId || null,
-      feedback: c.feedback || null
-    }));
+      feedback: c.feedback || null,
+    }))
   } catch (error) {
-    console.error("Error fetching consultations:", error);
-    return [];
+    console.error("Error fetching consultations:", error)
+    return []
   }
 }
 
