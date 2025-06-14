@@ -5,9 +5,9 @@ import {
   Home,
   User,
   Stethoscope,
-  Settings,
+  // Settings,
   MessageSquare,
-  Bell,
+  // Bell,
   Menu
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -63,7 +63,7 @@ export default function FarmerSidebar() {
       onClick={toggleMobileMenu}
       className="fixed bottom-4 left-4 md:hidden z-20 bg-green-600 text-white p-3 rounded-full shadow-lg"
     >
-      <Bell className="h-6 w-6" />
+      <User className="h-6 w-6" />
     </button>
   );
 
