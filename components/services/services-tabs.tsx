@@ -167,7 +167,7 @@ const services = {
       price: 8000,
       duration: "30 day supply",
       image:
-        "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://th.bing.com/th/id/OIP.uvzZ5gbvONhZ_Iej4Q11TAHaEo?r=0&pid=ImgDet&w=199&h=124&c=7&dpr=1.5",
     },
     {
       id: "d2",
@@ -176,7 +176,7 @@ const services = {
       price: 12000,
       duration: "Various sizes available",
       image:
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://jpabs.org/800/600/http/images.jdmagicbox.com/comp/sangli/h1/9999px233.x233.130402132127.i2h1/catalogue/basawant-pharma-islampur-sangli-sangli-veterinary-medicine-retailers-ksnqys2.jpg",
     },
     {
       id: "d3",
@@ -185,7 +185,7 @@ const services = {
       price: 15000,
       duration: "10 doses",
       image:
-        "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://5.imimg.com/data5/FB/QY/MY-4841311/veterinary-vaccines-500x500.jpg",
     },
     {
       id: "d4",
