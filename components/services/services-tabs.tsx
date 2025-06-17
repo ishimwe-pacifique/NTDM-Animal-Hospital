@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ServiceCard from "@/components/services/service-card"
-import { Activity, Video, ShieldAlert, ShoppingBag } from "lucide-react"
+import { Activity, Video, ShieldAlert, ShoppingBag, Pill, Wheat, FileText } from "lucide-react"
 
 // Service data
 const services = {
@@ -14,8 +14,7 @@ const services = {
       description: "Real-time location tracking for your livestock with mobile app access.",
       price: 15000,
       duration: "Device + 3 months service",
-      image:
-        "/tracking/track2.png",
+      image: "/tracking/track2.png",
     },
     {
       id: "t2",
@@ -41,8 +40,7 @@ const services = {
       description: "Lightweight GPS collar for dogs and cats with geofencing alerts.",
       price: 12000,
       duration: "Device + 3 months service",
-      image:
-        "/tracking/track3.png",
+      image: "/tracking/track3.png",
     },
   ],
   consultations: [
@@ -52,8 +50,7 @@ const services = {
       description: "Comprehensive health check-up and consultation for any animal.",
       price: 5000,
       duration: "30 min",
-      image:
-        "/consultations/cons1.png",
+      image: "/consultations/cons1.png",
     },
     {
       id: "c2",
@@ -61,8 +58,7 @@ const services = {
       description: "Connect with our veterinarians remotely via video call.",
       price: 3000,
       duration: "20 min",
-      image:
-        "/consultations/cons2.jpg",
+      image: "/consultations/cons2.jpg",
     },
     {
       id: "c3",
@@ -79,8 +75,7 @@ const services = {
       description: "Our veterinarians come to your farm for on-site consultations and treatments.",
       price: 15000,
       duration: "2 hours + travel",
-      image:
-        "/consultations/cons3.jpg",
+      image: "/consultations/cons3.jpg",
     },
   ],
   monitoring: [
@@ -90,8 +85,7 @@ const services = {
       description: "Comprehensive testing for common livestock and pet diseases.",
       price: 7000,
       duration: "Results in 48 hours",
-      image:
-        "/monitoring/vac2.jpg",
+      image: "/monitoring/vac2.jpg",
     },
     {
       id: "m2",
@@ -99,8 +93,7 @@ const services = {
       description: "Scheduled vaccinations with reminders and health tracking.",
       price: 10000,
       duration: "Annual program",
-      image:
-        "/monitoring/vac1.png",
+      image: "/monitoring/vac1.png",
     },
     {
       id: "m3",
@@ -146,8 +139,7 @@ const services = {
       description: "Quality small ruminants for dairy or meat production.",
       price: "Variable",
       duration: "Health guaranteed",
-      image:
-        "/services/pet4.jpg",
+      image: "/services/pet4.jpg",
     },
     {
       id: "s4",
@@ -158,16 +150,162 @@ const services = {
       image:
         "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
-        {
+    {
       id: "s5",
       name: "Porks",
       description: "The Best pork Breed and veterinary support.",
       price: "Variable",
       duration: "Includes initial check-up",
-      image:
-        "/services/pet2.jpg",
+      image: "/services/pet2.jpg",
     },
   ],
+  drugs: [
+    {
+      id: "d1",
+      name: "Basic Veterinary Kit",
+      description: "Essential medications for common animal health issues.",
+      price: 8000,
+      duration: "30 day supply",
+      image:
+        "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "d2",
+      name: "Antibiotics Package",
+      description: "Wide range of antibiotics for bacterial infections in livestock.",
+      price: 12000,
+      duration: "Various sizes available",
+      image:
+        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "d3",
+      name: "Vaccines Package",
+      description: "Preventative vaccines for common livestock diseases.",
+      price: 15000,
+      duration: "10 doses",
+      image:
+        "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "d4",
+      name: "Pet Care Package",
+      description: "Medications and supplements specifically for dogs and cats.",
+      price: 6000,
+      duration: "Monthly supply",
+      image:
+        "https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "d5",
+      name: "Dewormers",
+      description: "Effective deworming medications for all types of animals.",
+      price: 5000,
+      duration: "10 treatments",
+      image:
+        "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+  ],
+  feeds: [
+    {
+      id: "f1",
+      name: "Premium Cattle Feed",
+      description: "High-nutrition feed for dairy and beef cattle.",
+      price: 8000,
+      duration: "50kg bag",
+      image:
+        "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "f2",
+      name: "Poultry Feed",
+      description: "Balanced feed for layers and broilers.",
+      price: 6000,
+      duration: "25kg bag",
+      image:
+        "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "f3",
+      name: "Goat & Sheep Feed",
+      description: "Specially formulated for small ruminants.",
+      price: 5500,
+      duration: "25kg bag",
+      image:
+        "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "f4",
+      name: "Organic Feed Supplement",
+      description: "Natural additives to boost animal health and productivity.",
+      price: 3000,
+      duration: "5kg package",
+      image:
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "f5",
+      name: "Pet Food",
+      description: "High-quality food for dogs and cats.",
+      price: 4000,
+      duration: "10kg bag",
+      image:
+        "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+  ],
+  government: [
+    {
+      id: "g1",
+      name: "Farm Registration Assistance",
+      description: "Help with all government farm registration requirements.",
+      price: 10000,
+      duration: "Complete package",
+      image:
+        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "g2",
+      name: "Export Certification",
+      description: "Preparation of all documents for animal product exports.",
+      price: 15000,
+      duration: "Per certification",
+      image:
+        "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "g3",
+      name: "Inspection Preparation",
+      description: "Get your farm ready for government inspections.",
+      price: 12000,
+      duration: "Includes follow-up",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "g4",
+      name: "Subsidy Application",
+      description: "Assistance with agricultural subsidy applications.",
+      price: 8000,
+      duration: "Per application",
+      image:
+        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      id: "g5",
+      name: "Disease Reporting",
+      description: "Proper documentation and reporting of notifiable diseases.",
+      price: 5000,
+      duration: "Per report",
+      image:
+        "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+  ],
+Ai: [
+
+  "Coming Soon"
+   
+],
+
 }
 
 export default function ServicesTabs() {
@@ -199,12 +337,30 @@ export default function ServicesTabs() {
               <ShoppingBag className="h-4 w-4" />
               <span>Animal Sales</span>
             </TabsTrigger>
+            <TabsTrigger value="drugs" className="flex items-center gap-2">
+              <Pill className="h-4 w-4" />
+              <span>Pharmacy</span>
+            </TabsTrigger>
+            <TabsTrigger value="feeds" className="flex items-center gap-2">
+              <Wheat className="h-4 w-4" />
+              <span>Feeds</span>
+            </TabsTrigger>
+            <TabsTrigger value="government" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              <span>Gov Support</span>
+            </TabsTrigger>
+           
+            <TabsTrigger value="Ai" className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              <span>AI-based disease prediction</span>
+            </TabsTrigger>
+
           </TabsList>
         </div>
 
         <TabsContent value="tracking" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getFilteredServices().map((service) => (
+            {services.tracking.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
@@ -229,6 +385,30 @@ export default function ServicesTabs() {
         <TabsContent value="sales" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.sales.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="drugs" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.drugs.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="feeds" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.feeds.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="government" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.government.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>

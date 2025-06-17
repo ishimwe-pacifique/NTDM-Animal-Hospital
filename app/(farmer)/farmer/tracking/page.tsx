@@ -199,7 +199,7 @@ export default function PetTrackingPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    {apiResponse?.channel.name || "Pet Health Monitor"}
+                    {apiResponse?.channel.name || "Caw Health Monitor"}
                   </h1>
                   <p className="text-gray-600 mt-1">Real-time health and location tracking</p>
                 </div>
