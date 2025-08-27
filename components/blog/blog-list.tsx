@@ -94,7 +94,7 @@ export default function BlogList() {
               <p className="text-gray-600 line-clamp-3 mb-4">{post.excerpt}</p>
             </CardContent>
             <CardFooter className="px-6 pb-6 pt-0">
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full bg-transparent">
                 <Link href={`/blog/${post.id}`}>Read More</Link>
               </Button>
             </CardFooter>

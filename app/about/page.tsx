@@ -98,6 +98,15 @@ export default function AboutPage() {
                 role: "Managing Director",
                 specialty: "Veterinanry Technician",
               },
+
+                  {
+                image:
+                  "/Supervisor.jpg",
+                name: "Dr. Richard GASHURURU",
+                role: "Supervisor",
+                specialty: "Veterinary Mentorship",
+              },
+
             ].map((member, index) => (
               <div key={index} className="salon-card text-center p-6">
                 <div className="relative w-40 h-40 rounded-full overflow-hidden mx-auto mb-4">
