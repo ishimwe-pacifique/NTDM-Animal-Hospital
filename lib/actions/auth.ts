@@ -10,7 +10,7 @@ export async function registerUser(formData: FormData) {
     const client = await clientPromise
     const db = client.db("ntdm_animal_hospital") // Explicitly specify database name
 
-    const role = formData.get("role") as "farmer" | "doctor" | "admin"
+    const role = formData.get("role") as "farmer" | "doctor" | "admin" | "superadmin"
 
     // Create base user data
     const userData = {
@@ -19,6 +19,7 @@ export async function registerUser(formData: FormData) {
       password: formData.get("password"), // In a real app, this would be hashed
       phone: formData.get("phone"),
       role,
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -42,6 +43,11 @@ export async function registerUser(formData: FormData) {
         district: formData.get("district"),
         sector: formData.get("sector"),
         animals: [],
+      })
+    } else if (role === "superadmin") {
+      Object.assign(userData, {
+        permissions: ["manage_users", "view_consultations", "manage_system"],
+        lastLoginAt: null,
       })
     }
 
@@ -106,6 +112,15 @@ export async function loginUser(formData: FormData) {
       return { success: false, message: "Invalid email or password" }
     }
 
+    // Check if user account is suspended or inactive
+    if (user.status === "suspended") {
+      return { success: false, message: "Your account has been suspended. Please contact the administrator for assistance." }
+    }
+
+    if (user.status === "inactive") {
+      return { success: false, message: "Your account is inactive. Please contact the administrator for assistance." }
+    }
+
     // Set a session cookie
     const sessionId = crypto.randomUUID()
     const cookieStore = await cookies()
@@ -115,6 +130,12 @@ export async function loginUser(formData: FormData) {
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
     })
+
+    // Update last login time
+    await db.collection("users").updateOne(
+      { _id: user._id },
+      { $set: { lastLoginAt: new Date() } }
+    )
 
     // Store session in database
     await db.collection("sessions").insertOne({
@@ -129,7 +150,9 @@ export async function loginUser(formData: FormData) {
     return {
       success: true,
       message: "Login successful",
-      redirectPath: user.role === "doctor" ? "/veterinary" : user.role === "farmer" ? "/farmer" : "/"
+      redirectPath: user.role === "doctor" ? "/veterinary" : 
+                   user.role === "farmer" ? "/farmer" : 
+                   user.role === "superadmin" ? "/superadmin" : "/"
     }
   } catch (error) {
     console.error("Error logging in:", error)

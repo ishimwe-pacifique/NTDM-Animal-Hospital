@@ -20,6 +20,6 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  metadataBase: new URL('https://yourdomain.com'),
+  metadataBase: new URL('https://vettrack.rw'),
   // ...other metadata
 } 

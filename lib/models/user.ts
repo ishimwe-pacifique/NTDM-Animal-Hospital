@@ -6,7 +6,8 @@ export interface User {
   email: string
   password: string // In a real app, this would be hashed
   phone: string
-  role: "farmer" | "doctor" | "admin"
+  role: "farmer" | "doctor" | "admin" | "superadmin"
+  status: "active" | "suspended" | "inactive"
   createdAt: Date
   updatedAt: Date
 }
@@ -35,6 +36,12 @@ export interface DoctorProfile extends User {
 export interface AdminProfile extends User {
   role: "admin"
   permissions: string[]
+}
+
+export interface SuperAdminProfile extends User {
+  role: "superadmin"
+  permissions: string[]
+  lastLoginAt?: Date
 }
 
 export async function getDoctors() {

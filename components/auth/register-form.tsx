@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation"
 import { registerUser, loginUser } from "@/lib/actions/auth"
 import { Home, CheckCircle, Mail } from "lucide-react"
 
-type UserRole = "farmer" | "doctor" | "admin"
+type UserRole = "farmer" | "doctor" | "admin" | "superadmin"
 
 export default function RegisterForm() {
   const [name, setName] = useState("")
@@ -225,6 +225,12 @@ export default function RegisterForm() {
                 <RadioGroupItem value="doctor" id="doctor" />
                 <Label htmlFor="doctor" className="cursor-pointer">
                   Veterinarian
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="superadmin" id="superadmin" />
+                <Label htmlFor="superadmin" className="cursor-pointer">
+                  Super Administrator
                 </Label>
               </div>
             </RadioGroup>

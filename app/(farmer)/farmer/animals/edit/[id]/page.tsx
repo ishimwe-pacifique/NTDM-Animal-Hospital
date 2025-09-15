@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 
 export default async function EditAnimalPage({ params }: { params: { id: string } }) {
   const currentUser = await getCurrentUser();
-  
+
   // Redirect if not logged in or not a farmer
   if (!currentUser || currentUser.role !== "farmer") {
     redirect("/login");
@@ -15,13 +15,13 @@ export default async function EditAnimalPage({ params }: { params: { id: string 
   // Fetch animal details from the database
   const client = await clientPromise;
   const db = client.db("ntdm_animal_hospital");
-  
+
   const animal = await db.collection("animals").findOne({
-    _id: new ObjectId(params.id),
+    _id: new ObjectId(params.id),  // ✅ no need for "?"
     $or: [
       { ownerId: currentUser._id.toString() },
-      { 'owner._id': currentUser._id.toString() },
-      { 'owner': currentUser._id.toString() }
+      { "owner._id": currentUser._id.toString() },
+      { owner: currentUser._id.toString() }
     ]
   });
 
@@ -33,7 +33,7 @@ export default async function EditAnimalPage({ params }: { params: { id: string 
   return (
     <div className="max-w-3xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-6">Edit Animal</h1>
-      <EditAnimalForm 
+      <EditAnimalForm
         animal={{
           _id: animal._id.toString(),
           name: animal.name,
@@ -46,7 +46,7 @@ export default async function EditAnimalPage({ params }: { params: { id: string 
           phoneNumber: animal.phoneNumber,
           price: animal.price,
           status: animal.status || "Healthy"
-        }} 
+        }}
         userId={currentUser._id.toString()}
       />
     </div>

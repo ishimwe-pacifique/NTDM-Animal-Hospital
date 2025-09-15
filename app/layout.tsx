@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import GoogleAnalytics from "@/components/analytics/google-analytics"
-import BodyWrapper from "@/components/layout/body-wrapper" // 👈 add this line
+import BodyWrapper from "@/components/layout/body-wrapper"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,6 +13,7 @@ const inter = Inter({
 })
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   title: "NTDM Animal Hospital",
   icons: {
     icon: "/logo/NTDM.png",
