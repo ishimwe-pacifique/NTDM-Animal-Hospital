@@ -62,7 +62,7 @@ export default function SuperAdminSidebar({ onNavigate }: SuperAdminSidebarProps
               onClick={handleNavClick}
               className={cn(
                 "group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out",
-                "hover:scale-[1.02] active:scale-[0.98]", // Subtle scale animation
+                "hover:scale-[1.02] active:scale-[0.98]",
                 isActive
                   ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent"

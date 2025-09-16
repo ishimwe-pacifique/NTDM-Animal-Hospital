@@ -227,12 +227,12 @@ export default function RegisterForm() {
                   Veterinarian
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <RadioGroupItem value="superadmin" id="superadmin" />
                 <Label htmlFor="superadmin" className="cursor-pointer">
                   Super Administrator
                 </Label>
-              </div>
+              </div> */}
             </RadioGroup>
           </div>
 
