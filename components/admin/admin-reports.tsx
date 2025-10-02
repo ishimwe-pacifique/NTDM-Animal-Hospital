@@ -235,7 +235,7 @@ export default function AdminReports() {
                       <span className="text-sm font-medium">28%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm"> 4 hours</span>
+                      <span className="text-sm">4 hours</span>
                       <span className="text-sm font-medium">5%</span>
                     </div>
                   </div>
