@@ -3,10 +3,5 @@
     "app/**/*.js": {
       "maxDuration": 30
     }
-  },
-  "build": {
-    "env": {
-      "MONGODB_URI": "@mongodb_uri"
-    }
   }
 }
