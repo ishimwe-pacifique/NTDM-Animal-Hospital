@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Bell, Menu, Settings, LogOut, User } from "lucide-react"
+import { logoutUser } from "@/lib/actions/auth"
+import { useRouter } from "next/navigation"
 
 interface AdminHeaderProps {
   onMenuClick: () => void
@@ -21,6 +23,16 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const [notifications] = useState(3)
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+      router.push("/login")
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
@@ -82,7 +94,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </DropdownMenuItem>

@@ -7,28 +7,34 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    domains: ['images.unsplash.com'],
     unoptimized: true,
   },
   serverExternalPackages: ["mongodb"],
   experimental: {
-    // Add experimental flag to help with client component resolution
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
     serverActions: {
       bodySizeLimit: '2mb',
     },
   },
-  // Ensure correct file generation for client components
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Correctly handle client references
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         dns: false,
         net: false,
         tls: false,
+        child_process: false,
       };
     }
+    // Exclude problematic MongoDB native modules
+    config.externals = config.externals || [];
+    config.externals.push({
+      'mongodb-client-encryption': 'commonjs mongodb-client-encryption',
+      '@mongodb-js/zstd': 'commonjs @mongodb-js/zstd',
+      'kerberos': 'commonjs kerberos',
+      'snappy': 'commonjs snappy',
+    });
     return config;
   },
 }

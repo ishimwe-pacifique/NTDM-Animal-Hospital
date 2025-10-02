@@ -152,7 +152,8 @@ export async function loginUser(formData: FormData) {
       message: "Login successful",
       redirectPath: user.role === "doctor" ? "/veterinary" : 
                    user.role === "farmer" ? "/farmer" : 
-                   user.role === "superadmin" ? "/superadmin" : "/"
+                   user.role === "superadmin" ? "/superadmin" : 
+                   user.role === "admin" ? "/admin" : "/"
     }
   } catch (error) {
     console.error("Error logging in:", error)
