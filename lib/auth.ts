@@ -29,8 +29,8 @@ export async function getCurrentUser(): Promise<User | null> {
     })
 
     if (!session) {
-      // Session expired or doesn't exist, clear the cookie
-      cookieStore.delete("session")
+      // Session expired or doesn't exist
+      // Don't delete cookie here - let it expire naturally or handle in logout action
       return null
     }
 
@@ -40,9 +40,9 @@ export async function getCurrentUser(): Promise<User | null> {
     })
 
     if (!user) {
-      // User doesn't exist, clear the session
+      // User doesn't exist, clean up the session from database
       await db.collection("sessions").deleteOne({ sessionId })
-      cookieStore.delete("session")
+      // Don't delete cookie here
       return null
     }
 
