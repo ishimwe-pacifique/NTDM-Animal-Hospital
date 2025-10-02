@@ -22,6 +22,11 @@ export function middleware(request: NextRequest) {
     "/superadmin/users",
     "/superadmin/consultations",
     "/superadmin/dashboard",
+
+    "/admin",
+    "/admin/users",
+    "/admin/consultations",
+    "/admin/dashboard",
   ]
 
   // If trying to access a protected route without a session, redirect to login
@@ -36,5 +41,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/farmer/:path*", "/veterinary/:path*", "/superadmin/:path*", "/login", "/register"],
+  matcher: ["/farmer/:path*", "/veterinary/:path*", "/superadmin/:path*", "/login", "/register", "/admin/:path*"],
 }

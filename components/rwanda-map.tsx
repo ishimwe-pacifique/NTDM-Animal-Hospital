@@ -24,6 +24,11 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
     if (typeof window !== "undefined" && mapRef.current && !map) {
       // Dynamically import Leaflet
       import("leaflet").then((L) => {
+        // Check if map container already has a map instance
+        if (mapRef.current && (mapRef.current as any)._leaflet_id) {
+          return
+        }
+
         // Fix for default markers in Leaflet with webpack
         delete (L.Icon.Default.prototype as any)._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -41,7 +46,7 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         }).addTo(mapInstance)
 
         // Add Rwanda boundary (simplified polygon)
-        const rwandaBounds = [
+        const rwandaBounds: [number, number][] = [
           [-1.047, 29.34],
           [-1.047, 30.899],
           [-2.84, 30.899],
@@ -114,7 +119,7 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
           const marker = L.marker([point.latitude, point.longitude], {
             icon: petIcon,
             isPetMarker: true,
-          }).addTo(map)
+          } as any).addTo(map)
 
           const popupContent = `
             <div class="pet-popup">
@@ -163,7 +168,7 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
       // Fit map to show all points
       if (locationPoints.length > 1) {
         import("leaflet").then((L) => {
-          const group = new L.featureGroup(locationPoints.map((point) => L.marker([point.latitude, point.longitude])))
+          const group = L.featureGroup(locationPoints.map((point) => L.marker([point.latitude, point.longitude])))
           map.fitBounds(group.getBounds().pad(0.1))
         })
       } else if (locationPoints.length === 1) {

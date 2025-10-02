@@ -20,8 +20,8 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  // Only force black nav items on Login and Register pages
-  const forceBlackNav = pathname === "/login" || pathname === "/register";
+  // Force black nav items on Login, Register, and any Blog page
+  const forceBlackNav = pathname === "/login" || pathname === "/register" || pathname.startsWith("/blog");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)

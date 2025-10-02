@@ -51,10 +51,42 @@ export default function PetTrackingPage() {
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<string>("")
   const [refreshing, setRefreshing] = useState(false)
-  const [deviceId, setDeviceId] = useState<string>("2688413")
-  const [apiKey, setApiKey] = useState<string>("WCY7XQTJZVB21DHQ")
+  const [deviceId, setDeviceId] = useState<string>("")
+  const [apiKey, setApiKey] = useState<string>("")
   const [results, setResults] = useState<number>(20)
+  const [configLoading, setConfigLoading] = useState(true)
+  const role = "farmer" // TODO: Replace with dynamic role detection if needed
 
+  // Fetch config from API on mount
+  useEffect(() => {
+    async function fetchConfig() {
+      setConfigLoading(true)
+      try {
+        const res = await fetch(`/api/tracking-config?role=${role}`)
+        const json = await res.json()
+        if (json.config) {
+          setDeviceId(json.config.channelId || "")
+          setApiKey(json.config.apiKey || "")
+        }
+      } catch (err) {
+        // fallback to defaults if needed
+      } finally {
+        setConfigLoading(false)
+      }
+    }
+    fetchConfig()
+  }, [])
+
+  // Save config to API
+  const saveConfig = async () => {
+    try {
+      await fetch("/api/tracking-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channelId: deviceId, apiKey, role }),
+      })
+    } catch (err) {}
+  }
   // Load Leaflet CSS dynamically
   useEffect(() => {
     const link = document.createElement("link")
@@ -70,44 +102,57 @@ export default function PetTrackingPage() {
   }, [])
 
   const fetchSensorData = async () => {
-    setRefreshing(true)
-    try {
-      const res = await fetch(
-        `https://api.thingspeak.com/channels/${deviceId}/feeds.json?api_key=${apiKey}&results=${results}`,
-      )
-      const json: ApiResponse = await res.json()
-
-      setApiResponse(json)
-
-      // Format the data using dynamic field mapping
-      const formatted = json.feeds.map((feed: Feed) => {
-        const date = new Date(feed.created_at)
-        return {
-          created_at: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          timestamp: date.toISOString(),
-          bpm: Number.parseFloat(feed.field1) || 0,
-          latitude: feed.field2 ? Number.parseFloat(feed.field2) : null,
-          longitude: feed.field3 ? Number.parseFloat(feed.field3) : null,
-          temperature: feed.field4 ? Number.parseFloat(feed.field4) : null,
-          hasLocation: !!feed.field2 && !!feed.field3,
-          hasTemperature: !!feed.field4,
-        }
-      })
-
-      // Sort by date
-      formatted.sort(
-        (a: FormattedData, b: FormattedData) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-      )
-
-      setData(formatted)
-      setLastUpdated(new Date().toLocaleString())
-    } catch (error) {
-      console.error("Error fetching data:", error)
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
+  setRefreshing(true)
+  try {
+    const res = await fetch(
+      `https://api.thingspeak.com/channels/${deviceId}/feeds.json?api_key=${apiKey}&results=${results}`,
+    )
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`)
     }
+    
+    const json: ApiResponse = await res.json()
+
+    // Validate the response structure
+    if (!json.feeds || !Array.isArray(json.feeds)) {
+      console.error("Invalid API response:", json)
+      throw new Error("No data available from sensor")
+    }
+
+    setApiResponse(json)
+
+    // Format the data using dynamic field mapping
+    const formatted = json.feeds.map((feed: Feed) => {
+      const date = new Date(feed.created_at)
+      return {
+        created_at: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        timestamp: date.toISOString(),
+        bpm: Number.parseFloat(feed.field1) || 0,
+        latitude: feed.field2 ? Number.parseFloat(feed.field2) : null,
+        longitude: feed.field3 ? Number.parseFloat(feed.field3) : null,
+        temperature: feed.field4 ? Number.parseFloat(feed.field4) : null,
+        hasLocation: !!feed.field2 && !!feed.field3,
+        hasTemperature: !!feed.field4,
+      }
+    })
+
+    // Sort by date
+    formatted.sort(
+      (a: FormattedData, b: FormattedData) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    )
+
+    setData(formatted)
+    setLastUpdated(new Date().toLocaleString())
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    // Optionally set an error state to show to the user
+    setData([]) // Clear data on error
+  } finally {
+    setLoading(false)
+    setRefreshing(false)
   }
+}
 
   useEffect(() => {
     fetchSensorData()
@@ -199,7 +244,7 @@ export default function PetTrackingPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    {apiResponse?.channel.name || "Caw Health Monitor"}
+                    {apiResponse?.channel.name || "Cow Health Monitor"}
                   </h1>
                   <p className="text-gray-600 mt-1">Real-time health and location tracking</p>
                 </div>
@@ -244,7 +289,9 @@ export default function PetTrackingPage() {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={deviceId}
                 onChange={(e) => setDeviceId(e.target.value)}
+                onBlur={saveConfig}
                 placeholder="ThingSpeak Channel ID"
+                disabled={configLoading}
               />
             </div>
             <div className="space-y-2">
@@ -254,7 +301,9 @@ export default function PetTrackingPage() {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
+                onBlur={saveConfig}
                 placeholder="ThingSpeak API Key"
+                disabled={configLoading}
               />
             </div>
             <div className="space-y-2">

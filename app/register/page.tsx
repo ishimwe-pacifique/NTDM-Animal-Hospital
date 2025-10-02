@@ -20,7 +20,10 @@ export default async function RegisterPage() {
       redirect("/farmer")
     } else if (user.role === "doctor") {
       redirect("/veterinary")
-    } else if (user.role === "superadmin") {
+    } else if(user.role === "admin") {
+      redirect("/admin")
+    }
+    else if (user.role === "superadmin") {
       redirect("/superadmin")
     } else {
       redirect("/")
