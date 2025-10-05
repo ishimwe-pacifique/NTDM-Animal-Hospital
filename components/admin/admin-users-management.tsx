@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,55 +9,141 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, MoreHorizontal, Edit, UserCheck, UserX, Key, Plus } from "lucide-react"
+import { Search, MoreHorizontal, Edit, UserCheck, UserX, Key, Plus, Loader2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-// Mock data - replace with actual API calls
-const mockUsers = [
-  {
-    _id: "1",
-    name: "John Farmer",
-    email: "john@example.com",
-    phone: "+250 78 123 4567",
-    role: "farmer",
-    status: "active",
-    district: "Kigali",
-    sector: "Nyarugenge",
-    createdAt: "2024-01-15T10:00:00Z",
-    lastLoginAt: "2024-01-20T14:30:00Z",
-    isOnline: true
-  },
-  {
-    _id: "2",
-    name: "Dr. Sarah Vet",
-    email: "sarah@example.com",
-    phone: "+250 78 987 6543",
-    role: "doctor",
-    status: "active",
-    licenseNumber: "VET-001",
-    specialization: "Large Animals",
-    createdAt: "2024-01-10T09:00:00Z",
-    lastLoginAt: "2024-01-20T16:45:00Z",
-    isOnline: false
-  }
-]
+type User = {
+  _id: string
+  name: string
+  email: string
+  phone: string
+  role: "farmer" | "doctor"
+  status: "active" | "suspended"
+  district?: string
+  sector?: string
+  licenseNumber?: string
+  specialization?: string
+  createdAt: string
+  lastLoginAt?: string
+}
 
 export default function AdminUsersManagement() {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  
+  // Create user form state
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "farmer" as "farmer" | "doctor",
+    district: "",
+    sector: "",
+    licenseNumber: "",
+    specialization: ""
+  })
+  const [creating, setCreating] = useState(false)
 
-  const filteredUsers = mockUsers.filter(user => {
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/admin-users')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setUsers(data.users)
+      } else {
+        setError(data.error || 'Failed to fetch users')
+      }
+    } catch (error) {
+      setError('Failed to fetch users')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = roleFilter === "all" || user.role === roleFilter
     const matchesStatus = statusFilter === "all" || user.status === statusFilter
     return matchesSearch && matchesRole && matchesStatus
   })
+
+  const handleStatusChange = async (userId: string, action: "suspend" | "activate") => {
+    try {
+      const response = await fetch(`/api/admin-users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setSuccess(data.message)
+        fetchUsers()
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      setError('Failed to update user status')
+    }
+  }
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCreating(true)
+    setError("")
+    
+    try {
+      const response = await fetch('/api/admin-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser)
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setSuccess(data.message)
+        setIsCreateDialogOpen(false)
+        setNewUser({
+          name: "",
+          email: "",
+          password: "",
+          phone: "",
+          role: "farmer",
+          district: "",
+          sector: "",
+          licenseNumber: "",
+          specialization: ""
+        })
+        fetchUsers()
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      setError('Failed to create user')
+    } finally {
+      setCreating(false)
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -78,17 +164,17 @@ export default function AdminUsersManagement() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
-            <div className="text-2xl font-bold">{filteredUsers.length}</div>
+            <div className="text-2xl font-bold">{users.length}</div>
             <p className="text-sm text-muted-foreground">Total Users</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6">
             <div className="text-2xl font-bold text-green-600">
-              {filteredUsers.filter(u => u.status === 'active').length}
+              {users.filter(u => u.status === 'active').length}
             </div>
             <p className="text-sm text-muted-foreground">Active Users</p>
           </CardContent>
@@ -96,9 +182,17 @@ export default function AdminUsersManagement() {
         <Card>
           <CardContent className="p-6">
             <div className="text-2xl font-bold text-blue-600">
-              {filteredUsers.filter(u => u.role === 'doctor').length}
+              {users.filter(u => u.role === 'doctor').length}
             </div>
             <p className="text-sm text-muted-foreground">Doctors</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-orange-600">
+              {users.filter(u => u.role === 'farmer').length}
+            </div>
+            <p className="text-sm text-muted-foreground">Farmers</p>
           </CardContent>
         </Card>
       </div>
@@ -152,116 +246,270 @@ export default function AdminUsersManagement() {
       {/* Users Table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user._id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{user.name}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getRoleColor(user.role)}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(user.status)}>
-                      {user.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {user.role === 'farmer' ? `${user.district}, ${user.sector}` : user.specialization}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedUser(user)
-                          setIsEditDialogOpen(true)
-                        }}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedUser(user)
-                          setIsPasswordDialogOpen(true)
-                        }}>
-                          <Key className="mr-2 h-4 w-4" />
-                          Reset Password
-                        </DropdownMenuItem>
-                        {user.status === "active" ? (
-                          <DropdownMenuItem>
-                            <UserX className="mr-2 h-4 w-4" />
-                            Suspend
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem>
-                            <UserCheck className="mr-2 h-4 w-4" />
-                            Activate
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          {error && (
+            <Alert className="mb-4">
+              <AlertDescription className="text-red-600">{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          {success && (
+            <Alert className="mb-4">
+              <AlertDescription className="text-green-600">{success}</AlertDescription>
+            </Alert>
+          )}
+          
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Location/Specialization</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user._id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{user.name}</div>
+                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-xs text-gray-400">{user.phone}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getRoleColor(user.role)}>
+                        {user.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(user.status)}>
+                        {user.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {user.role === 'farmer' ? `${user.district}, ${user.sector}` : user.specialization}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {user.status === "active" ? (
+                            <DropdownMenuItem onClick={() => handleStatusChange(user._id, "suspend")}>
+                              <UserX className="mr-2 h-4 w-4" />
+                              Suspend
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleStatusChange(user._id, "activate")}>
+                              <UserCheck className="mr-2 h-4 w-4" />
+                              Activate
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      No users found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
       {/* Create User Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-            <DialogDescription>Create a new farmer or doctor account</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">Add New User</DialogTitle>
+            <DialogDescription>
+              Create a new farmer or doctor account for the regional system
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Full name" />
+          
+          <form onSubmit={handleCreateUser} className="space-y-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Basic Information</h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+250 78 123 4567"
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="email@example.com" />
+            
+            {/* Account Type */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Account Type</h3>
+              <RadioGroup
+                value={newUser.role}
+                onValueChange={(value) => setNewUser({...newUser, role: value as "farmer" | "doctor"})}
+                className="flex flex-col space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="farmer" id="farmer-role" />
+                  <Label htmlFor="farmer-role" className="cursor-pointer">
+                    Farmer/Pet Owner
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="doctor" id="doctor-role" />
+                  <Label htmlFor="doctor-role" className="cursor-pointer">
+                    Veterinarian
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="farmer">Farmer</SelectItem>
-                  <SelectItem value="doctor">Doctor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button>Create User</Button>
-          </DialogFooter>
+            
+            {/* Role-specific fields */}
+            {newUser.role === "farmer" && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Location Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="district">District</Label>
+                    <Input
+                      id="district"
+                      placeholder="e.g., Kigali"
+                      value={newUser.district}
+                      onChange={(e) => setNewUser({...newUser, district: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sector">Sector</Label>
+                    <Input
+                      id="sector"
+                      placeholder="e.g., Nyarugenge"
+                      value={newUser.sector}
+                      onChange={(e) => setNewUser({...newUser, sector: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {newUser.role === "doctor" && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Professional Information</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="licenseNumber">License Number</Label>
+                    <Input
+                      id="licenseNumber"
+                      placeholder="VET-12345"
+                      value={newUser.licenseNumber}
+                      onChange={(e) => setNewUser({...newUser, licenseNumber: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="specialization">Specialization</Label>
+                    <Input
+                      id="specialization"
+                      placeholder="e.g., Large Animal Medicine"
+                      value={newUser.specialization}
+                      onChange={(e) => setNewUser({...newUser, specialization: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <DialogFooter className="flex gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setIsCreateDialogOpen(false)
+                  setNewUser({
+                    name: "",
+                    email: "",
+                    password: "",
+                    phone: "",
+                    role: "farmer",
+                    district: "",
+                    sector: "",
+                    licenseNumber: "",
+                    specialization: ""
+                  })
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={creating} className="bg-blue-600 hover:bg-blue-700">
+                {creating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create User"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
