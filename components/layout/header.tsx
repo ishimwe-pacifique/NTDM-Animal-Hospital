@@ -21,7 +21,7 @@ export default function Header() {
   const pathname = usePathname()
 
   // Force black nav items on Login, Register, and any Blog page
-  const forceBlackNav = pathname === "/login" || pathname === "/register" || pathname.startsWith("/blog");
+  const forceBlackNav = pathname === "/login" || pathname === "/register" || pathname.startsWith("/blog/");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
