@@ -123,7 +123,7 @@ export async function loginUser(formData: FormData) {
 
     // Set a session cookie
     const sessionId = crypto.randomUUID()
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     cookieStore.set("session", sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -171,7 +171,7 @@ export async function logoutUser() {
     const db = client.db("ntdm_animal_hospital")
     
     // Get the session ID from cookies
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const sessionId = cookieStore.get("session")?.value
 
     if (sessionId) {
@@ -186,7 +186,7 @@ export async function logoutUser() {
   } catch (error) {
     console.error("Error during logout:", error)
     // Even if there's an error, try to clear the cookie
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     cookieStore.delete("session")
     return { success: false, error: "Failed to logout" }
   }
@@ -198,7 +198,7 @@ export async function getCurrentUser() {
     const client = await clientPromise
     const db = client.db("ntdm_animal_hospital")
 
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const sessionId = cookieStore.get("session")?.value
     if (!sessionId) {
       return null

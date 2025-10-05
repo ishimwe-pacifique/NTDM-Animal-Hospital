@@ -1,9 +1,10 @@
 "use client"
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, Legend, ComposedChart } from "recharts"
 import { useEffect, useState } from "react"
-import { Activity, MapPin, Heart, RefreshCw, Thermometer, Database } from "lucide-react"
+import { Activity, MapPin, Heart, RefreshCw, Thermometer, Database, Download, FileText, FileSpreadsheet } from "lucide-react"
 import { DistributionChart } from "@/components/distribution-chart"
 import { RwandaMap } from "@/components/rwanda-map"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 // Define our data types based on API response
 type Channel = {
@@ -231,6 +232,119 @@ export default function PetTrackingPage() {
     return apiResponse?.channel[fieldKey] || fieldKey
   }
 
+  // Export functions
+  const exportToPDF = async () => {
+    try {
+      const jsPDF = (await import('jspdf')).default
+      const doc = new jsPDF()
+      
+      // Header
+      doc.setFontSize(20)
+      doc.text('Animal Health Monitoring Report', 20, 30)
+      
+      doc.setFontSize(12)
+      doc.text(`Animal: ${apiResponse?.channel.name || 'Unknown'}`, 20, 50)
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 60)
+      doc.text(`Channel ID: ${deviceId}`, 20, 70)
+      
+      // Stats
+      doc.setFontSize(14)
+      doc.text('Health Summary', 20, 90)
+      doc.setFontSize(10)
+      doc.text(`Latest ${getFieldLabel('field1')}: ${latestBpm}`, 20, 105)
+      doc.text(`Average ${getFieldLabel('field1')}: ${averageBpm}`, 20, 115)
+      doc.text(`Latest Temperature: ${latestTemperature || 'N/A'}°C`, 20, 125)
+      doc.text(`Location Coverage: ${locationPercentage}%`, 20, 135)
+      
+      // Recent data
+      doc.setFontSize(14)
+      doc.text('Recent Readings', 20, 155)
+      doc.setFontSize(8)
+      
+      let yPos = 170
+      data.slice(-15).forEach((item, index) => {
+        if (yPos > 280) {
+          doc.addPage()
+          yPos = 20
+        }
+        doc.text(`${new Date(item.timestamp).toLocaleString()} - BPM: ${item.bpm}, Temp: ${item.temperature || 'N/A'}°C`, 20, yPos)
+        yPos += 10
+      })
+      
+      doc.save(`health-report-${new Date().toISOString().split('T')[0]}.pdf`)
+    } catch (error) {
+      console.error('PDF export failed:', error)
+    }
+  }
+
+  const exportToCSV = () => {
+    const headers = ['Timestamp', 'BPM', 'Temperature', 'Latitude', 'Longitude', 'Status']
+    const csvData = data.map(item => [
+      new Date(item.timestamp).toLocaleString(),
+      item.bpm,
+      item.temperature || '',
+      item.latitude || '',
+      item.longitude || '',
+      getBpmStatus(item.bpm).label
+    ])
+    
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `health-data-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const exportToExcel = async () => {
+    try {
+      const XLSX = (await import('xlsx')).default
+      
+      // Animal info sheet
+      const animalInfo = {
+        'Animal Name': apiResponse?.channel.name || 'Unknown',
+        'Channel ID': deviceId,
+        'Report Date': new Date().toLocaleString(),
+        'Latest BPM': latestBpm,
+        'Average BPM': averageBpm,
+        'Latest Temperature': latestTemperature || 'N/A',
+        'Location Coverage': `${locationPercentage}%`,
+        'Total Records': data.length
+      }
+      
+      // Health data sheet
+      const healthData = data.map(item => ({
+        'Timestamp': new Date(item.timestamp).toLocaleString(),
+        'BPM': item.bpm,
+        'Temperature (°C)': item.temperature || '',
+        'Latitude': item.latitude || '',
+        'Longitude': item.longitude || '',
+        'BPM Status': getBpmStatus(item.bpm).label,
+        'Temp Status': getTemperatureStatus(item.temperature).label,
+        'Has Location': item.hasLocation ? 'Yes' : 'No'
+      }))
+      
+      const wb = XLSX.utils.book_new()
+      
+      // Add animal info sheet
+      const infoWs = XLSX.utils.json_to_sheet([animalInfo])
+      XLSX.utils.book_append_sheet(wb, infoWs, 'Animal Info')
+      
+      // Add health data sheet
+      const dataWs = XLSX.utils.json_to_sheet(healthData)
+      XLSX.utils.book_append_sheet(wb, dataWs, 'Health Data')
+      
+      XLSX.writeFile(wb, `health-report-${new Date().toISOString().split('T')[0]}.xlsx`)
+    } catch (error) {
+      console.error('Excel export failed:', error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -263,14 +377,38 @@ export default function PetTrackingPage() {
               <div className="text-sm text-gray-600">
                 <span className="font-medium">Last updated:</span> {lastUpdated}
               </div>
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200"
-                onClick={fetchSensorData}
-                disabled={refreshing}
-              >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-                <span className="font-medium">Refresh</span>
-              </button>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl shadow-md hover:shadow-lg hover:bg-green-700 transition-all duration-200">
+                      <Download className="w-4 h-4" />
+                      <span className="font-medium">Export Report</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => exportToPDF()}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportToCSV()}>
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportToExcel()}>
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Export as Excel
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 print:hidden"
+                  onClick={fetchSensorData}
+                  disabled={refreshing}
+                >
+                  <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+                  <span className="font-medium">Refresh</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

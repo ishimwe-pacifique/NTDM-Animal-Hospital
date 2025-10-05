@@ -3,6 +3,7 @@
 import { useState } from "react"
 import AdminSidebar from "@/components/admin/admin-sidebar"
 import AdminHeader from "@/components/admin/admin-header"
+import { useUserStatus } from "@/hooks/useUserStatus"
 
 export default function AdminLayoutClient({
   children,
@@ -10,9 +11,11 @@ export default function AdminLayoutClient({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const statusModal = useUserStatus()
 
   return (
     <div className="flex h-screen bg-gray-50">
+      {statusModal}
       <AdminSidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 

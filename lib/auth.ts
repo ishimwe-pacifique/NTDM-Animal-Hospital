@@ -9,13 +9,14 @@ interface User {
   role: string
   name: string
   email: string
+  status: string
 }
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const client = await clientPromise
     const db = client.db("ntdm_animal_hospital")
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const sessionId = cookieStore.get("session")?.value
     
     if (!sessionId) {
@@ -48,7 +49,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // Don't return the password
     const { password, ...userWithoutPassword } = user
-    return { ...userWithoutPassword, _id: user._id.toString() } as User
+    return { ...userWithoutPassword, _id: user._id.toString(), status: user.status } as User
   } catch (error) {
     console.error("Error getting current user:", error)
     return null

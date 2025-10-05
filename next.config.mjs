@@ -10,7 +10,7 @@ const nextConfig = {
     domains: ['images.unsplash.com'],
     unoptimized: true,
   },
-  serverExternalPackages: ["mongodb"],
+
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
