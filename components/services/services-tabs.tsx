@@ -363,7 +363,7 @@ export default function ServicesTabs() {
               </TabsTrigger>
               <TabsTrigger value="Ai" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
                 <Brain className="h-4 w-4" />
-                <span className="hidden sm:inline">AI Disease</span>
+                <span className="hidden sm:inline">AI Disease Prediction</span>
               </TabsTrigger>
             </TabsList>
           </div>
