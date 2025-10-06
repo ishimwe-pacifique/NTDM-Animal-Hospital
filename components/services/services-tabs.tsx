@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ServiceCard from "@/components/services/service-card"
-import { Activity, Video, ShieldAlert, ShoppingBag, Pill, Wheat, FileText } from "lucide-react"
+import { Activity, Video, ShieldAlert, ShoppingBag, Pill, Wheat, FileText, MapPin, Stethoscope, Shield, DollarSign, Brain } from "lucide-react"
 
 // Service data
 const services = {
@@ -328,43 +328,50 @@ export default function ServicesTabs() {
   return (
     <>
       <Tabs defaultValue="tracking" onValueChange={setActiveTab} className="w-full">
-        <div className="flex justify-center mb-8">
-          <TabsList className="bg-muted/50">
-            <TabsTrigger value="tracking" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              <span>Tracking</span>
-            </TabsTrigger>
-            <TabsTrigger value="consultations" className="flex items-center gap-2">
-              <Video className="h-4 w-4" />
-              <span>Consultations</span>
-            </TabsTrigger>
-            <TabsTrigger value="monitoring" className="flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4" />
-              <span>Monitoring</span>
-            </TabsTrigger>
-            <TabsTrigger value="sales" className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              <span>Animal Sales</span>
-            </TabsTrigger>
-            <TabsTrigger value="drugs" className="flex items-center gap-2">
-              <Pill className="h-4 w-4" />
-              <span>Pharmacy</span>
-            </TabsTrigger>
-            <TabsTrigger value="feeds" className="flex items-center gap-2">
-              <Wheat className="h-4 w-4" />
-              <span>Feeds</span>
-            </TabsTrigger>
-            <TabsTrigger value="government" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span>Gov Support</span>
-            </TabsTrigger>
-           
-            <TabsTrigger value="Ai" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              <span>AI-based disease prediction</span>
-            </TabsTrigger>
-
-          </TabsList>
+        <div className="flex justify-center mb-8 overflow-x-auto px-4">
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 sm:hidden"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 sm:hidden"></div>
+            <TabsList className="bg-muted/50 flex-nowrap min-w-max px-2">
+              <TabsTrigger value="tracking" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">Tracking</span>
+              </TabsTrigger>
+              <TabsTrigger value="consultations" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <Stethoscope className="h-4 w-4" />
+                <span className="hidden sm:inline">Consultations</span>
+              </TabsTrigger>
+              <TabsTrigger value="monitoring" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Monitoring</span>
+              </TabsTrigger>
+              <TabsTrigger value="sales" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <DollarSign className="h-4 w-4" />
+                <span className="hidden sm:inline">Animal Sales</span>
+              </TabsTrigger>
+              <TabsTrigger value="drugs" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <Pill className="h-4 w-4" />
+                <span className="hidden sm:inline">Pharmacy</span>
+              </TabsTrigger>
+              <TabsTrigger value="feeds" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <Wheat className="h-4 w-4" />
+                <span className="hidden sm:inline">Feeds</span>
+              </TabsTrigger>
+              <TabsTrigger value="government" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Gov Support</span>
+              </TabsTrigger>
+              <TabsTrigger value="Ai" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+                <Brain className="h-4 w-4" />
+                <span className="hidden sm:inline">AI Disease</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
+        
+        {/* Mobile hint */}
+        <div className="text-center text-sm text-gray-500 mb-4 sm:hidden">
+          👈 Swipe to see more services 👉
         </div>
 
         <TabsContent value="tracking" className="mt-0">
