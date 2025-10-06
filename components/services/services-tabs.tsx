@@ -10,7 +10,7 @@ const services = {
   tracking: [
     {
       id: "t1",
-      name: "Basic GPS Tracking",
+      name: "Animal Health Tracking Device",
       description: "Real-time location tracking for your livestock with mobile app access.",
       price: 43300,
       duration: "Device + 3 months service",

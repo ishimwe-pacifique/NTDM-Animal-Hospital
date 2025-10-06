@@ -7,7 +7,9 @@ const path = require('path');
 // Directories where we need to create client reference manifest files
 const routeGroups = [
   '.next/server/app/(veterinary)',
-  '.next/server/app/(farmer)'
+  '.next/server/app/(farmer)',
+  '.next/server/app/(admin)',
+  '.next/server/app/(superadmin)'
 ];
 
 // Create the manifest file
