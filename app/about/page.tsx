@@ -91,20 +91,12 @@ export default function AboutPage() {
                 role: "Technology Director",
                 specialty: "Animal Tracking Systems",
               },
-                 {
+              {
                 image:
                   "/WhatsApp Image 2025-05-15 at 15.48.58_74fbf054.jpg",
                 name: "Dr. Benitte Ikuzwe",
                 role: "Managing Director",
                 specialty: "Veterinanry Technician",
-              },
-
-                  {
-                image:
-                  "/Supervisor.jpg",
-                name: "Dr. Richard GASHURURU",
-                role: "Supervisor",
-                specialty: "Veterinary Mentorship",
               },
 
             ].map((member, index) => (
@@ -122,6 +114,34 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+
+        <div>
+          <h2 className="heading-lg text-center mb-12">Mentors</h2>
+
+          {[
+            {
+              image:
+                "/Supervisor.jpg",
+              name: "Dr. Richard GASHURURU",
+              role: "Mentor",
+              specialty: "PHD holder",
+            },
+
+          ].map((member, index) => (
+            <div key={index} className="salon-card text-center p-6">
+              <div className="relative w-40 h-40 rounded-full overflow-hidden mx-auto mb-4">
+                <Image src={member.image || "/placeholder.svg"} alt={member.name} fill className="object-cover" />
+              </div>
+              <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
+              <p className="text-primary font-medium mb-2">{member.role}</p>
+              <p className="text-gray-600 mb-4"> {member.specialty}</p>
+              <Link href="/booking" className="text-primary hover:text-primary/80 transition-colors">
+                Book a consultation
+              </Link>
+            </div>
+          ))}
+
+        </div> <br />
 
         <div className="text-center">
           <h2 className="heading-lg mb-6">Experience the NTDM Difference</h2>

@@ -27,7 +27,7 @@ const services = {
     },
     {
       id: "t3",
-      name: "Herd Management System",
+      name: "Pig Management System",
       description: "Comprehensive tracking solution for large herds with analytics dashboard.",
       price: 500,
       duration: "10 devices + 6 months service",
