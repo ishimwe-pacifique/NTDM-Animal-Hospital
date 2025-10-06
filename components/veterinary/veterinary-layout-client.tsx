@@ -1,15 +1,14 @@
 "use client"
 
-import { useUserStatus } from "@/hooks/useUserStatus"
 import { useSessionTimeout } from "@/hooks/useSessionTimeout"
 
-export default function UserStatusChecker() {
-  const statusModal = useUserStatus()
+export default function VeterinaryLayoutClient({ children }: { children: React.ReactNode }) {
   const sessionModal = useSessionTimeout()
+  
   return (
     <>
-      {statusModal}
       {sessionModal}
+      {children}
     </>
   )
 }

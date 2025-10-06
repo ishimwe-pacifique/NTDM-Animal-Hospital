@@ -2,11 +2,11 @@ export const dynamic = "force-dynamic";
 
 import { getCurrentUser } from "@/lib/actions/auth"
 import { redirect } from "next/navigation"
-import { VeterinaryHeader } from "./veterinary/components/veterinary-header"
-import { VeterinarySidebar } from "./veterinary/components/veterinary-sidebar"
 import ClientManifestHelper from "./page-client-manifest"
+import VeterinaryLayoutClient from "@/components/veterinary/veterinary-layout-client"
+import { VeterinaryLayout } from "@/components/veterinary/veterinary-layout"
 
-export default async function VeterinaryLayout({
+export default async function VeterinaryRootLayout({
   children,
 }: {
   children: React.ReactNode
@@ -18,15 +18,11 @@ export default async function VeterinaryLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <VeterinaryHeader />
-      <div className="flex flex-1 overflow-hidden">
-        <VeterinarySidebar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <ClientManifestHelper />
-          {children}
-        </main>
-      </div>
-    </div>
+    <VeterinaryLayoutClient>
+      <VeterinaryLayout>
+        <ClientManifestHelper />
+        {children}
+      </VeterinaryLayout>
+    </VeterinaryLayoutClient>
   )
 } 

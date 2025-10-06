@@ -342,7 +342,13 @@ export async function getConsultations(doctorId?: string, farmerId?: string) {
     let query = {}
 
     if (doctorId) {
-      query = { doctor: doctorId }
+      // Handle both string and ObjectId references for doctor
+      query = { 
+        $or: [
+          { doctor: doctorId },
+          { doctor: new ObjectId(doctorId) }
+        ]
+      }
     } else if (farmerId) {
       query = { farmerId }
     }

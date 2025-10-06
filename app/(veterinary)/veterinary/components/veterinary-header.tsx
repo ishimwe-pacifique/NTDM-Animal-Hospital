@@ -1,97 +1,89 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "./user-nav"
-import { Bell, User } from "lucide-react"
-import { useState } from "react"
+import { Bell, Search, Menu } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react"
 
-export function VeterinaryHeader() {
-  const pathname = usePathname()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+interface VeterinaryHeaderProps {
+  onMenuClick?: () => void
+}
 
-  const navItems = [
-    { name: "Dashboard", href: "/veterinary" },
-    { name: "Appointments", href: "/veterinary/appointments" },
-    { name: "Patients", href: "/veterinary/patients" },
-    { name: "Consultations", href: "/veterinary/consultations" },
-  ]
+export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
+  const [showSearch, setShowSearch] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center px-4">
+        {/* Mobile menu button */}
         <Button
           variant="ghost"
-          onClick={toggleMobileMenu}
-          className="mr-2 px-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
+          size="icon"
+          className="lg:hidden mr-2"
+          onClick={onMenuClick}
         >
-          <User className="h-5 w-5" />
+          <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
 
-        <div className="mr-4 hidden lg:flex flex-1">
-          <Link href="/veterinary" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold text-primary">
-              Veterinary Portal
-            </span>
-          </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`transition-colors hover:text-foreground/80 ${
-                  pathname === item.href ? "text-foreground font-semibold" : "text-foreground/60"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        
-        {/* Mobile title - show only on small devices */}
-        <div className="lg:hidden flex-1 flex justify-center">
-          <Link href="/veterinary" className="font-bold text-primary text-sm sm:text-base truncate max-w-[200px]">
-            Veterinary Portal
-          </Link>
+        {/* Page title */}
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold text-foreground truncate">
+            Veterinary Dashboard
+          </h1>
         </div>
 
-        <div className="flex items-center justify-end space-x-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
+        {/* Search and actions */}
+        <div className="flex items-center space-x-2">
+          {/* Search */}
+          <div className="hidden md:flex items-center space-x-2">
+            {showSearch ? (
+              <Input
+                placeholder="Search patients, appointments..."
+                className="w-64"
+                onBlur={() => setShowSearch(false)}
+                autoFocus
+              />
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSearch(true)}
+              >
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Search</span>
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile search */}
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Search className="h-5 w-5" />
+            <span className="sr-only">Search</span>
+          </Button>
+
+          {/* Notifications */}
+          <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
             <span className="sr-only">Notifications</span>
           </Button>
+
+          {/* User menu */}
           <UserNav />
         </div>
       </div>
-
-      {/* Mobile navigation menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border">
-          <nav className="grid divide-y divide-border">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`py-3 px-4 ${
-                  pathname === item.href 
-                    ? "bg-muted font-medium" 
-                    : "hover:bg-muted/50"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
     </header>
   )
 } 

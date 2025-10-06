@@ -104,7 +104,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-600 mb-2">Quick Stats</p>
             <div className="flex justify-between text-xs">
-              <span>Active Users: <strong>245</strong></span>
+              <span>Active Users:  <strong>245</strong></span>
               <span>Tickets: <strong>7</strong></span>
             </div>
           </div>

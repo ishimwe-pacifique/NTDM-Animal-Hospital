@@ -1,11 +1,80 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, FileText, Calendar, MessageSquare, TrendingUp, AlertCircle, Plus, ArrowRight } from "lucide-react"
+import { Users, FileText, Calendar, MessageSquare, TrendingUp, AlertCircle, Plus, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 
+type DashboardData = {
+  stats: {
+    totalUsers: number
+    activeUsers: number
+    growthPercentage: number
+    consultations: number
+    supportTickets: number
+    contentItems: number
+  }
+  recentAlerts: Array<{
+    id: string
+    type: string
+    title: string
+    description: string
+    priority: string
+    createdAt: string
+  }>
+  performance: {
+    userSatisfaction: number
+    responseTime: string
+    resolutionRate: number
+  }
+}
+
 export default function AdminDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/admin-dashboard')
+      const result = await response.json()
+      
+      if (response.ok) {
+        setData(result)
+      } else {
+        setError(result.error || 'Failed to fetch data')
+      }
+    } catch (error) {
+      setError('Failed to fetch dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600">{error || 'No data available'}</p>
+        <Button onClick={fetchDashboardData} className="mt-4">
+          Retry
+        </Button>
+      </div>
+    )
+  }
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -34,19 +103,19 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">245</div>
-            <p className="text-xs text-muted-foreground">+12% from last month</p>
+            <div className="text-2xl font-bold">{data.stats.totalUsers}</div>
+            <p className="text-xs text-muted-foreground">+{data.stats.growthPercentage}% from last month</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Consultations</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">+3 from yesterday</p>
+            <div className="text-2xl font-bold">{data.stats.activeUsers}</div>
+            <p className="text-xs text-muted-foreground">{data.stats.totalUsers - data.stats.activeUsers} inactive</p>
           </CardContent>
         </Card>
         
@@ -56,19 +125,19 @@ export default function AdminDashboard() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
-            <p className="text-xs text-muted-foreground">2 urgent</p>
+            <div className="text-2xl font-bold">{data.stats.supportTickets}</div>
+            <p className="text-xs text-muted-foreground">All resolved</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Content Items</CardTitle>
+            <CardTitle className="text-sm font-medium">New Registrations</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">32</div>
-            <p className="text-xs text-muted-foreground">5 pending review</p>
+            <div className="text-2xl font-bold">{data.recentAlerts.length}</div>
+            <p className="text-xs text-muted-foreground">Last 24 hours</p>
           </CardContent>
         </Card>
       </div>
@@ -92,33 +161,25 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-start justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-orange-800">High consultation volume</p>
-                  <p className="text-xs text-orange-600 mt-1">Kigali district - 2 hours ago</p>
+              {data.recentAlerts.length > 0 ? (
+                data.recentAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-start justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-blue-800">{alert.title}</p>
+                      <p className="text-xs text-blue-600 mt-1">{alert.description}</p>
+                    </div>
+                    <Button size="sm" variant="outline" className="text-blue-600 border-blue-200" asChild>
+                      <Link href="/admin/users">
+                        View
+                      </Link>
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No recent alerts</p>
                 </div>
-                <Button size="sm" variant="outline" className="text-orange-600 border-orange-200">
-                  Review
-                </Button>
-              </div>
-              <div className="flex items-start justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-blue-800">New doctor registration</p>
-                  <p className="text-xs text-blue-600 mt-1">Dr. Smith - 4 hours ago</p>
-                </div>
-                <Button size="sm" variant="outline" className="text-blue-600 border-blue-200">
-                  Approve
-                </Button>
-              </div>
-              <div className="flex items-start justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-green-800">System maintenance completed</p>
-                  <p className="text-xs text-green-600 mt-1">All systems operational - 1 hour ago</p>
-                </div>
-                <Button size="sm" variant="outline" className="text-green-600 border-green-200">
-                  Dismiss
-                </Button>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -135,16 +196,16 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm">User Satisfaction</span>
-                  <span className="text-sm font-medium text-green-600">94%</span>
+                  <span className="text-sm font-medium text-green-600">{data.performance.userSatisfaction}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{width: '94%'}}></div>
+                  <div className="bg-green-500 h-2 rounded-full" style={{width: `${data.performance.userSatisfaction}%`}}></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm">Response Time</span>
-                  <span className="text-sm font-medium text-blue-600">2.3 min</span>
+                  <span className="text-sm font-medium text-blue-600">{data.performance.responseTime}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div className="bg-blue-500 h-2 rounded-full" style={{width: '85%'}}></div>
@@ -153,10 +214,10 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm">Resolution Rate</span>
-                  <span className="text-sm font-medium text-green-600">87%</span>
+                  <span className="text-sm font-medium text-green-600">{data.performance.resolutionRate}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{width: '87%'}}></div>
+                  <div className="bg-green-500 h-2 rounded-full" style={{width: `${data.performance.resolutionRate}%`}}></div>
                 </div>
               </div>
             </div>

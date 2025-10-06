@@ -32,4 +32,5 @@ SUPERADMIN_SETUP.md
 
 # scripts
 /scripts/*
-!/scripts/fix-manifest.js
+!/scripts/fix-manifest.cjs
+!/scripts/mark-dynamic.mjs

@@ -80,14 +80,31 @@ export function VeterinarySidebar() {
     setCollapsed(!collapsed)
   }
 
-  // Hide completely on mobile as we'll use the header dropdown instead
-  if (isMobile) return null
+  // Auto-collapse on mobile by default
+  useEffect(() => {
+    if (isMobile) {
+      setCollapsed(true)
+    }
+  }, [isMobile])
 
   return (
-    <div className={cn(
-      "flex h-full flex-col border-r bg-background transition-all duration-300",
-      collapsed ? "w-16" : "w-64"
-    )}>
+    <>
+      {/* Mobile overlay */}
+      {isMobile && !collapsed && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden" 
+          onClick={() => setCollapsed(true)}
+        />
+      )}
+      
+      <div className={cn(
+        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-background transition-all duration-300",
+        isMobile ? (
+          collapsed ? "-translate-x-full" : "translate-x-0 w-64"
+        ) : (
+          collapsed ? "w-16" : "w-64"
+        )
+      )}>
       <div className="flex h-14 items-center border-b px-4 justify-between">
         {!collapsed && (
           <Link href="/veterinary" className="flex items-center gap-2 font-semibold truncate">
@@ -136,5 +153,6 @@ export function VeterinarySidebar() {
         </nav>
       </div>
     </div>
+    </>
   )
 } 

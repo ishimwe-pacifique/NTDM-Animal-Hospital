@@ -1,10 +1,11 @@
 {
   "name": "my-v0-project",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/fix-manifest.js",
+    "build": "next build && node scripts/fix-manifest.cjs && node scripts/mark-dynamic.mjs",
     "start": "next start",
     "lint": "next lint",
     "fix-manifest": "node scripts/fix-manifest.js"

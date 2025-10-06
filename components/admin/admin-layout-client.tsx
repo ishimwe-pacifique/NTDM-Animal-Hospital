@@ -4,6 +4,7 @@ import { useState } from "react"
 import AdminSidebar from "@/components/admin/admin-sidebar"
 import AdminHeader from "@/components/admin/admin-header"
 import { useUserStatus } from "@/hooks/useUserStatus"
+import { useSessionTimeout } from "@/hooks/useSessionTimeout"
 
 export default function AdminLayoutClient({
   children,
@@ -12,10 +13,12 @@ export default function AdminLayoutClient({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const statusModal = useUserStatus()
+  const sessionModal = useSessionTimeout()
 
   return (
     <div className="flex h-screen bg-gray-50">
       {statusModal}
+      {sessionModal}
       <AdminSidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
