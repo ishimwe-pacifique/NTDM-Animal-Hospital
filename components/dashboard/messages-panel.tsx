@@ -60,6 +60,24 @@ export function MessagesPanel() {
     }
   }, [selectedConversation])
 
+  // Auto-refresh messages every 3 seconds
+  useEffect(() => {
+    if (selectedConversation) {
+      const interval = setInterval(() => {
+        fetchMessages(selectedConversation.id)
+      }, 3000)
+      return () => clearInterval(interval)
+    }
+  }, [selectedConversation])
+
+  // Auto-refresh conversations every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchConversations()
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   const fetchConversations = async () => {
     try {
       const response = await fetch('/api/chat/conversations')
