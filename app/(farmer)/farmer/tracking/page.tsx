@@ -1,7 +1,7 @@
 "use client"
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, Legend, ComposedChart } from "recharts"
 import { useEffect, useState } from "react"
-import { Activity, MapPin, Heart, RefreshCw, Thermometer, Database, Download, FileText, FileSpreadsheet } from "lucide-react"
+import { Activity, MapPin, Heart, RefreshCw, Thermometer, Database, Download, FileText, FileSpreadsheet, Eye, EyeOff } from "lucide-react"
 import { DistributionChart } from "@/components/distribution-chart"
 import { RwandaMap } from "@/components/rwanda-map"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -56,6 +56,7 @@ export default function PetTrackingPage() {
   const [apiKey, setApiKey] = useState<string>("")
   const [results, setResults] = useState<number>(20)
   const [configLoading, setConfigLoading] = useState(true)
+  const [showApiKey, setShowApiKey] = useState(false)
   const role = "farmer" // TODO: Replace with dynamic role detection if needed
 
   // Fetch config from API on mount
@@ -103,57 +104,55 @@ export default function PetTrackingPage() {
   }, [])
 
   const fetchSensorData = async () => {
-  setRefreshing(true)
-  try {
-    const res = await fetch(
-      `https://api.thingspeak.com/channels/${deviceId}/feeds.json?api_key=${apiKey}&results=${results}`,
-    )
-    
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`)
-    }
-    
-    const json: ApiResponse = await res.json()
-
-    // Validate the response structure
-    if (!json.feeds || !Array.isArray(json.feeds)) {
-      console.error("Invalid API response:", json)
-      throw new Error("No data available from sensor")
-    }
-
-    setApiResponse(json)
-
-    // Format the data using dynamic field mapping
-    const formatted = json.feeds.map((feed: Feed) => {
-      const date = new Date(feed.created_at)
-      return {
-        created_at: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        timestamp: date.toISOString(),
-        bpm: Number.parseFloat(feed.field1) || 0,
-        latitude: feed.field2 ? Number.parseFloat(feed.field2) : null,
-        longitude: feed.field3 ? Number.parseFloat(feed.field3) : null,
-        temperature: feed.field4 ? Number.parseFloat(feed.field4) : null,
-        hasLocation: !!feed.field2 && !!feed.field3,
-        hasTemperature: !!feed.field4,
+    setRefreshing(true)
+    try {
+      const res = await fetch(`/api/thingspeak?channelId=${deviceId}&results=${results}`)
+      
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `HTTP error! status: ${res.status}`)
       }
-    })
+      
+      const json: ApiResponse = await res.json()
 
-    // Sort by date
-    formatted.sort(
-      (a: FormattedData, b: FormattedData) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    )
+      // Validate the response structure
+      if (!json.feeds || !Array.isArray(json.feeds)) {
+        console.error("Invalid API response:", json)
+        throw new Error("No data available from sensor")
+      }
 
-    setData(formatted)
-    setLastUpdated(new Date().toLocaleString())
-  } catch (error) {
-    console.error("Error fetching data:", error)
-    // Optionally set an error state to show to the user
-    setData([]) // Clear data on error
-  } finally {
-    setLoading(false)
-    setRefreshing(false)
+      setApiResponse(json)
+
+      // Format the data using dynamic field mapping
+      const formatted = json.feeds.map((feed: Feed) => {
+        const date = new Date(feed.created_at)
+        return {
+          created_at: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          timestamp: date.toISOString(),
+          bpm: Number.parseFloat(feed.field1) || 0,
+          latitude: feed.field2 ? Number.parseFloat(feed.field2) : null,
+          longitude: feed.field3 ? Number.parseFloat(feed.field3) : null,
+          temperature: feed.field4 ? Number.parseFloat(feed.field4) : null,
+          hasLocation: !!feed.field2 && !!feed.field3,
+          hasTemperature: !!feed.field4,
+        }
+      })
+
+      // Sort by date
+      formatted.sort(
+        (a: FormattedData, b: FormattedData) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+      )
+
+      setData(formatted)
+      setLastUpdated(new Date().toLocaleString())
+    } catch (error) {
+      console.error("Error fetching data:", error)
+      setData([]) // Clear data on error
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
   }
-}
 
   useEffect(() => {
     fetchSensorData()
@@ -434,15 +433,24 @@ export default function PetTrackingPage() {
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">API Key</label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                onBlur={saveConfig}
-                placeholder="ThingSpeak API Key"
-                disabled={configLoading}
-              />
+              <div className="relative">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  onBlur={saveConfig}
+                  placeholder="ThingSpeak API Key (secured)"
+                  disabled={configLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                >
+                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Results Count</label>

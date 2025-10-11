@@ -84,8 +84,16 @@ export function MessagesPanel() {
       const data = await response.json()
       if (response.ok) {
         setConversations(data.conversations)
-        if (data.conversations.length > 0 && !selectedConversation) {
+        // Only auto-select first conversation on initial load
+        if (data.conversations.length > 0 && !selectedConversation && loading) {
           setSelectedConversation(data.conversations[0])
+        }
+        // If we have a selected conversation, update it with fresh data
+        if (selectedConversation && data.conversations.length > 0) {
+          const updatedConversation = data.conversations.find((c: Conversation) => c.id === selectedConversation.id)
+          if (updatedConversation) {
+            setSelectedConversation(updatedConversation)
+          }
         }
       }
     } catch (error) {
@@ -233,7 +241,7 @@ export function MessagesPanel() {
                 <div className="flex items-start space-x-3">
                   <Avatar>
                     <AvatarFallback>
-                      {conversation.otherUser.name.split(' ').map(n => n[0]).join('')}
+                      {conversation.otherUser.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
@@ -266,7 +274,7 @@ export function MessagesPanel() {
             <div className="p-4 border-b flex items-center space-x-3">
               <Avatar>
                 <AvatarFallback>
-                  {selectedConversation.otherUser.name.split(' ').map(n => n[0]).join('')}
+                  {selectedConversation.otherUser.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div>

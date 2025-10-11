@@ -6,24 +6,24 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Calendar,
-  ClipboardList,
+  ClipboardCheck,
   Activity,
-  Home,
+  Stethoscope,
   MessageSquare,
   Settings,
-  Users,
-  X
+  Heart,
+  X,
+  PawPrint
 } from "lucide-react"
 
 const sidebarNavItems = [
-  { title: "Dashboard", href: "/veterinary", icon: Home },
-  { title: "Appointments", href: "/veterinary/appointments", icon: Calendar },
-  { title: "Patients", href: "/veterinary/patients", icon: Users },
-  // { title: "Tracking", href: "/veterinary/tracking", icon: Activity },
-  { title: "Tracking", href: "#", icon: Activity },
-  { title: "Consultations", href: "/veterinary/consultations", icon: ClipboardList },
-  { title: "Messages", href: "/veterinary/messages", icon: MessageSquare },
-  { title: "Settings", href: "/veterinary/settings", icon: Settings },
+  { title: "Dashboard", href: "/veterinary", icon: Stethoscope, color: "text-blue-600" },
+  { title: "Appointments", href: "/veterinary/appointments", icon: Calendar, color: "text-green-600" },
+  { title: "Patients", href: "/veterinary/patients", icon: Heart, color: "text-red-500" },
+  { title: "Tracking", href: "/veterinary/tracking", icon: Activity, color: "text-purple-600" },
+  { title: "Consultations", href: "/veterinary/consultations", icon: ClipboardCheck, color: "text-orange-600" },
+  { title: "Messages", href: "/veterinary/messages", icon: MessageSquare, color: "text-indigo-600" },
+  { title: "Settings", href: "/veterinary/settings", icon: Settings, color: "text-gray-600" },
 ]
 
 interface VeterinarySidebarProps {
@@ -37,7 +37,7 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 z-50 h-full w-64 bg-white border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out",
+      "fixed left-0 top-0 z-50 h-full w-64 bg-white border-r border-blue-100 shadow-xl transition-transform duration-300 ease-in-out",
       isMobile ? (
         isOpen ? "translate-x-0" : "-translate-x-full"
       ) : (
@@ -45,9 +45,15 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
       )
     )}>
       {/* Header */}
-      <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
-        <Link href="/veterinary" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-blue-600">VetPortal</span>
+      <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <Link href="/veterinary" className="flex items-center space-x-3">
+          <div className="p-2 bg-blue-600 rounded-lg">
+            <PawPrint className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <span className="text-lg font-bold text-blue-700">Vet Portal</span>
+            <p className="text-xs text-blue-500">Animal Hospital</p>
+          </div>
         </Link>
         
         {isMobile && (
@@ -58,7 +64,7 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 px-4 py-6 space-y-1">
         {sidebarNavItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -67,18 +73,42 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
               href={item.href}
               onClick={isMobile ? onClose : undefined}
               className={cn(
-                "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group",
                 isActive
-                  ? "bg-blue-50 text-blue-700 border border-blue-200"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                  : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-md"
               )}
             >
-              <item.icon className="h-5 w-5" />
-              <span>{item.title}</span>
+              <div className={cn(
+                "p-1.5 rounded-lg transition-colors",
+                isActive 
+                  ? "bg-white/20" 
+                  : "bg-gray-100 group-hover:bg-white"
+              )}>
+                <item.icon className={cn(
+                  "h-4 w-4 transition-colors",
+                  isActive ? "text-white" : item.color
+                )} />
+              </div>
+              <span className={cn(
+                "font-medium",
+                isActive ? "text-white" : "text-gray-700"
+              )}>{item.title}</span>
+              {isActive && (
+                <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
+              )}
             </Link>
           )
         })}
       </nav>
+      
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="flex items-center space-x-2 text-xs text-gray-500">
+          <Heart className="h-3 w-3 text-red-400" />
+          <span>Caring for animals with love</span>
+        </div>
+      </div>
     </aside>
   )
 }

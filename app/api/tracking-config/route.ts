@@ -1,3 +1,7 @@
+import { NextResponse } from "next/server"
+import clientPromise from "@/lib/db"
+import { getCurrentUser } from "@/lib/actions/auth"
+
 export const dynamic = "force-dynamic";
 
 // POST: Save config
@@ -30,6 +34,3 @@ export async function GET(req: Request) {
   const config = await db.collection("trackingConfigs").findOne({ userId: user._id, role })
   return NextResponse.json({ config })
 }
-import { NextResponse } from "next/server"
-import clientPromise from "@/lib/db"
-import { getCurrentUser } from "@/lib/auth"
