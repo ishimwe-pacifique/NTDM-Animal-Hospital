@@ -11,7 +11,18 @@ interface ServiceProps {
     price: number | string
     duration: string
     image: string
+    category?: string
   }
+}
+
+function getServiceLink(service: ServiceProps['service']) {
+  // Check if service has category (dynamic services)
+  if (service.category === 'sales') return `/animal-sales?category=${service.id}`
+  if (service.category === 'drugs') return `/pharmacy?category=${service.id}`
+  if (service.category === 'feeds') return `/feeds?category=${service.id}`
+  
+  // For static services, use booking page
+  return `/booking?service=${encodeURIComponent(service.name)}`
 }
 
 export default function ServiceCard({ service }: ServiceProps) {
@@ -47,7 +58,7 @@ export default function ServiceCard({ service }: ServiceProps) {
           asChild
           className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shadow-md"
         >
-          <Link href={`/booking?service=${encodeURIComponent(service.name)}`}>Book Now</Link>
+          <Link href={getServiceLink(service)}>Order Now</Link>
         </Button>
       </div>
     </div>

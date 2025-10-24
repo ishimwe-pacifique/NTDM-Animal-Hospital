@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ServiceCard from "@/components/services/service-card"
 import { Activity, Video, ShieldAlert, ShoppingBag, Pill, Wheat, FileText, MapPin, Stethoscope, Shield, DollarSign, Brain } from "lucide-react"
@@ -319,9 +319,31 @@ Ai: [
 
 export default function ServicesTabs() {
   const [activeTab, setActiveTab] = useState("tracking")
+  const [categories, setCategories] = useState<{sales: any[], drugs: any[], feeds: any[]}>({
+    sales: [],
+    drugs: [],
+    feeds: []
+  })
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    }
+  }
 
   // Filter services based on active tab
   const getFilteredServices = () => {
+    if (activeTab === 'sales' || activeTab === 'drugs' || activeTab === 'feeds') {
+      return categories[activeTab as keyof typeof categories] || []
+    }
     return services[activeTab as keyof typeof services] || []
   }
 
@@ -400,24 +422,48 @@ export default function ServicesTabs() {
 
         <TabsContent value="sales" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.sales.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {categories.sales.map((category) => (
+              <ServiceCard key={category.id} service={{
+                id: category.id,
+                name: category.name,
+                description: category.description,
+                price: 'View Items',
+                duration: '',
+                image: category.image,
+                category: 'sales'
+              }} />
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="drugs" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.drugs.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {categories.drugs.map((category) => (
+              <ServiceCard key={category.id} service={{
+                id: category.id,
+                name: category.name,
+                description: category.description,
+                price: 'View Items',
+                duration: '',
+                image: category.image,
+                category: 'drugs'
+              }} />
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="feeds" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.feeds.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {categories.feeds.map((category) => (
+              <ServiceCard key={category.id} service={{
+                id: category.id,
+                name: category.name,
+                description: category.description,
+                price: 'View Items',
+                duration: '',
+                image: category.image,
+                category: 'feeds'
+              }} />
             ))}
           </div>
         </TabsContent>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +11,44 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Plus, Edit, Trash2, Eye, Calendar } from "lucide-react"
+import { FileText, Plus, Edit, Trash2, Eye, Calendar, DollarSign, Pill, Wheat } from "lucide-react"
+
+interface Service {
+  id: string
+  name: string
+  description: string
+  price: number
+  duration: string
+  image: string
+  images?: string[]
+  category: string
+  categoryId: string
+  // Animal Sales fields
+  animalType?: string
+  breed?: string
+  age?: string
+  sex?: string
+  district?: string
+  sector?: string
+  village?: string
+  sellerPhone?: string
+  sellerEmail?: string
+  // Drug fields
+  drugType?: string
+  usageDescription?: string
+  // Feed fields
+  feedType?: string
+  quality?: string
+  targetAnimal?: string
+}
+
+interface Category {
+  id: string
+  name: string
+  description: string
+  image: string
+  type: string
+}
 
 const mockBlogPosts = [
   {
@@ -32,33 +69,278 @@ const mockBlogPosts = [
   }
 ]
 
-const mockServices = [
-  {
-    id: "1",
-    name: "Emergency Consultation",
-    price: "$50",
-    status: "active",
-    description: "24/7 emergency veterinary consultation"
-  },
-  {
-    id: "2",
-    name: "Regular Checkup",
-    price: "$25",
-    status: "active",
-    description: "Routine health examination for animals"
-  }
-]
-
 export default function AdminContentManagement() {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false)
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false)
+  const [isEditServiceOpen, setIsEditServiceOpen] = useState(false)
+  const [services, setServices] = useState<{sales: Service[], drugs: Service[], feeds: Service[]}>({
+    sales: [],
+    drugs: [],
+    feeds: []
+  })
+  const [categories, setCategories] = useState<{sales: Category[], drugs: Category[], feeds: Category[]}>({
+    sales: [],
+    drugs: [],
+    feeds: []
+  })
+  const [currentService, setCurrentService] = useState<Service | null>(null)
+  const [currentCategoryEdit, setCurrentCategoryEdit] = useState<Category | null>(null)
+  const [currentCategory, setCurrentCategory] = useState<string>('sales')
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false)
+  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    duration: '',
+    image: '',
+    categoryId: '',
+    // Animal Sales fields
+    animalType: '',
+    breed: '',
+    age: '',
+    sex: '',
+    district: '',
+    sector: '',
+    village: '',
+    sellerPhone: '',
+    sellerEmail: '',
+    // Drug fields
+    drugType: '',
+    usageDescription: '',
+    // Feed fields
+    feedType: '',
+    quality: '',
+    targetAnimal: ''
+  })
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    description: '',
+    image: ''
+  })
+
+  useEffect(() => {
+    fetchServices()
+    fetchCategories()
+  }, [])
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch('/api/services')
+      const data = await response.json()
+      setServices(data)
+    } catch (error) {
+      console.error('Failed to fetch services:', error)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    }
+  }
+
+  const handleCreateCategory = async () => {
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...categoryFormData,
+          type: currentCategory
+        })
+      })
+      
+      if (response.ok) {
+        await fetchCategories()
+        setIsCreateCategoryOpen(false)
+        setCategoryFormData({ name: '', description: '', image: '' })
+      }
+    } catch (error) {
+      console.error('Failed to create category:', error)
+    }
+  }
+
+  const handleEditCategory = async () => {
+    if (!currentCategoryEdit) return
+    
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: currentCategoryEdit.id,
+          type: currentCategoryEdit.type,
+          ...categoryFormData
+        })
+      })
+      
+      if (response.ok) {
+        await fetchCategories()
+        setIsEditCategoryOpen(false)
+        setCurrentCategoryEdit(null)
+        setCategoryFormData({ name: '', description: '', image: '' })
+      }
+    } catch (error) {
+      console.error('Failed to update category:', error)
+    }
+  }
+
+  const handleDeleteCategory = async (category: Category) => {
+    try {
+      const response = await fetch(`/api/categories?id=${category.id}&type=${category.type}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        await fetchCategories()
+      }
+    } catch (error) {
+      console.error('Failed to delete category:', error)
+    }
+  }
+
+  const openEditCategoryDialog = (category: Category) => {
+    setCurrentCategoryEdit(category)
+    setCategoryFormData({
+      name: category.name,
+      description: category.description,
+      image: category.image || ''
+    })
+    setIsEditCategoryOpen(true)
+  }
+
+  const handleCreateService = async () => {
+    try {
+      const response = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          price: Number(formData.price),
+          category: currentCategory
+        })
+      })
+      
+      if (response.ok) {
+        await fetchServices()
+        setIsCreateServiceOpen(false)
+        resetForm()
+      }
+    } catch (error) {
+      console.error('Failed to create service:', error)
+    }
+  }
+
+  const handleEditService = async () => {
+    if (!currentService) return
+    
+    try {
+      const response = await fetch('/api/services', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: currentService.id,
+          category: currentService.category,
+          ...formData,
+          price: Number(formData.price)
+        })
+      })
+      
+      if (response.ok) {
+        await fetchServices()
+        setIsEditServiceOpen(false)
+        setCurrentService(null)
+        resetForm()
+      }
+    } catch (error) {
+      console.error('Failed to update service:', error)
+    }
+  }
+
+  const handleDeleteService = async (service: Service) => {
+    try {
+      const response = await fetch(`/api/services?id=${service.id}&category=${service.category}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        await fetchServices()
+      }
+    } catch (error) {
+      console.error('Failed to delete service:', error)
+    }
+  }
+
+  const openEditDialog = (service: Service) => {
+    setCurrentService(service)
+    setFormData({
+      name: service.name,
+      description: service.description,
+      price: service.price.toString(),
+      duration: service.duration,
+      image: service.image,
+      categoryId: service.categoryId,
+      animalType: service.animalType || '',
+      breed: service.breed || '',
+      age: service.age || '',
+      sex: service.sex || '',
+      district: service.district || '',
+      sector: service.sector || '',
+      village: service.village || '',
+      sellerPhone: service.sellerPhone || '',
+      sellerEmail: service.sellerEmail || '',
+      drugType: service.drugType || '',
+      usageDescription: service.usageDescription || '',
+      feedType: service.feedType || '',
+      quality: service.quality || '',
+      targetAnimal: service.targetAnimal || ''
+    })
+    setIsEditServiceOpen(true)
+  }
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      duration: '',
+      image: '',
+      categoryId: '',
+      animalType: '',
+      breed: '',
+      age: '',
+      sex: '',
+      district: '',
+      sector: '',
+      village: '',
+      sellerPhone: '',
+      sellerEmail: '',
+      drugType: '',
+      usageDescription: '',
+      feedType: '',
+      quality: '',
+      targetAnimal: ''
+    })
+  }
+
+  const getCategoryName = (categoryId: string, type: string) => {
+    const category = categories[type as keyof typeof categories]?.find(c => c.id === categoryId)
+    return category?.name || 'Unknown'
+  }
 
   return (
     <div className="space-y-6">
       <Tabs defaultValue="blog" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="blog">Blog Posts</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
+          <TabsTrigger value="sales">Animal Sales</TabsTrigger>
+          <TabsTrigger value="drugs">Pharmacy</TabsTrigger>
+          <TabsTrigger value="feeds">Feeds</TabsTrigger>
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
         </TabsList>
 
@@ -116,14 +398,17 @@ export default function AdminContentManagement() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="services" className="space-y-4">
+        <TabsContent value="sales" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Services</CardTitle>
-                <Button onClick={() => setIsCreateServiceOpen(true)}>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Animal Sales Categories
+                </CardTitle>
+                <Button onClick={() => { setCurrentCategory('sales'); setIsCreateCategoryOpen(true) }}>
                   <Plus className="h-4 w-4 mr-2" />
-                  New Service
+                  Add Category
                 </Button>
               </div>
             </CardHeader>
@@ -131,28 +416,252 @@ export default function AdminContentManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Service Name</TableHead>
+                    <TableHead>Category Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Items Count</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.sales?.map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="max-w-xs truncate">{category.description}</TableCell>
+                      <TableCell>{services.sales?.filter(s => s.categoryId === category.id).length || 0}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => { setCurrentCategory('sales'); setFormData({...formData, categoryId: category.id}); setIsCreateServiceOpen(true) }}>
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => openEditCategoryDialog(category)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(category)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Animals</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Animal Name</TableHead>
+                    <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Duration</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockServices.map((service) => (
+                  {services.sales?.map((service) => (
                     <TableRow key={service.id}>
                       <TableCell className="font-medium">{service.name}</TableCell>
-                      <TableCell>{service.price}</TableCell>
-                      <TableCell>
-                        <Badge variant="default">{service.status}</Badge>
-                      </TableCell>
+                      <TableCell>{getCategoryName(service.categoryId, 'sales')}</TableCell>
+                      <TableCell>RWF {service.price.toLocaleString()}</TableCell>
+                      <TableCell>{service.duration}</TableCell>
                       <TableCell className="max-w-xs truncate">{service.description}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => openEditDialog(service)}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteService(service)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="drugs" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center gap-2">
+                  <Pill className="h-5 w-5" />
+                  Pharmacy Categories
+                </CardTitle>
+                <Button onClick={() => { setCurrentCategory('drugs'); setIsCreateCategoryOpen(true) }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Category
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Items Count</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.drugs?.map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="max-w-xs truncate">{category.description}</TableCell>
+                      <TableCell>{services.drugs?.filter(s => s.categoryId === category.id).length || 0}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => { setCurrentCategory('drugs'); setFormData({...formData, categoryId: category.id}); setIsCreateServiceOpen(true) }}>
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => openEditCategoryDialog(category)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(category)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Drugs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Drug Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Package</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services.drugs?.map((service) => (
+                    <TableRow key={service.id}>
+                      <TableCell className="font-medium">{service.name}</TableCell>
+                      <TableCell>{getCategoryName(service.categoryId, 'drugs')}</TableCell>
+                      <TableCell>RWF {service.price.toLocaleString()}</TableCell>
+                      <TableCell>{service.duration}</TableCell>
+                      <TableCell className="max-w-xs truncate">{service.description}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEditDialog(service)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteService(service)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="feeds" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center gap-2">
+                  <Wheat className="h-5 w-5" />
+                  Feed Categories
+                </CardTitle>
+                <Button onClick={() => { setCurrentCategory('feeds'); setIsCreateCategoryOpen(true) }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Category
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Items Count</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.feeds?.map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="max-w-xs truncate">{category.description}</TableCell>
+                      <TableCell>{services.feeds?.filter(s => s.categoryId === category.id).length || 0}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => { setCurrentCategory('feeds'); setFormData({...formData, categoryId: category.id}); setIsCreateServiceOpen(true) }}>
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => openEditCategoryDialog(category)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(category)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Feeds</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Feed Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Package</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services.feeds?.map((service) => (
+                    <TableRow key={service.id}>
+                      <TableCell className="font-medium">{service.name}</TableCell>
+                      <TableCell>{getCategoryName(service.categoryId, 'feeds')}</TableCell>
+                      <TableCell>RWF {service.price.toLocaleString()}</TableCell>
+                      <TableCell>{service.duration}</TableCell>
+                      <TableCell className="max-w-xs truncate">{service.description}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEditDialog(service)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteService(service)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -222,32 +731,502 @@ export default function AdminContentManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Create Service Dialog */}
-      <Dialog open={isCreateServiceOpen} onOpenChange={setIsCreateServiceOpen}>
-        <DialogContent>
+      {/* Create Category Dialog */}
+      <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
+        <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Service</DialogTitle>
-            <DialogDescription>Add a new service offering</DialogDescription>
+            <DialogTitle>Create New Category</DialogTitle>
+            <DialogDescription>Add a new category for {currentCategory}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div>
-              <Label htmlFor="serviceName">Service Name</Label>
-              <Input id="serviceName" placeholder="Service name" />
+              <Label htmlFor="categoryName">Category Name</Label>
+              <Input 
+                id="categoryName" 
+                placeholder="Category name"
+                value={categoryFormData.name}
+                onChange={(e) => setCategoryFormData({...categoryFormData, name: e.target.value})}
+              />
             </div>
             <div>
-              <Label htmlFor="price">Price</Label>
-              <Input id="price" placeholder="$0.00" />
+              <Label htmlFor="categoryDescription">Description</Label>
+              <Textarea 
+                id="categoryDescription" 
+                placeholder="Category description"
+                value={categoryFormData.description}
+                onChange={(e) => setCategoryFormData({...categoryFormData, description: e.target.value})}
+              />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea id="description" placeholder="Service description" />
+              <Label htmlFor="categoryImage">Image URL</Label>
+              <Input 
+                id="categoryImage" 
+                placeholder="https://..."
+                value={categoryFormData.image}
+                onChange={(e) => setCategoryFormData({...categoryFormData, image: e.target.value})}
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateServiceOpen(false)}>
+            <Button variant="outline" onClick={() => { setIsCreateCategoryOpen(false); setCategoryFormData({ name: '', description: '', image: '' }) }}>
               Cancel
             </Button>
-            <Button>Create Service</Button>
+            <Button onClick={handleCreateCategory}>Create Category</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
+        <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+            <DialogDescription>Update category details</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div>
+              <Label htmlFor="editCategoryName">Category Name</Label>
+              <Input 
+                id="editCategoryName" 
+                value={categoryFormData.name}
+                onChange={(e) => setCategoryFormData({...categoryFormData, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editCategoryDescription">Description</Label>
+              <Textarea 
+                id="editCategoryDescription" 
+                value={categoryFormData.description}
+                onChange={(e) => setCategoryFormData({...categoryFormData, description: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editCategoryImage">Image URL</Label>
+              <Input 
+                id="editCategoryImage" 
+                value={categoryFormData.image}
+                onChange={(e) => setCategoryFormData({...categoryFormData, image: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setIsEditCategoryOpen(false); setCurrentCategoryEdit(null); setCategoryFormData({ name: '', description: '', image: '' }) }}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditCategory}>Update Category</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Service Dialog */}
+      <Dialog open={isCreateServiceOpen} onOpenChange={setIsCreateServiceOpen}>
+        <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add {currentCategory === 'sales' ? 'Animal' : currentCategory === 'drugs' ? 'Drug' : 'Feed'}</DialogTitle>
+            <DialogDescription>Add item to category</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select value={formData.categoryId || undefined} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories[currentCategory as keyof typeof categories]?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input 
+                id="name" 
+                placeholder="Item name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Price (RWF)</Label>
+              <Input 
+                id="price" 
+                type="number" 
+                placeholder="0"
+                value={formData.price}
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="duration">Unit/Package</Label>
+              <Input 
+                id="duration" 
+                placeholder="Per head, Per bag, etc."
+                value={formData.duration}
+                onChange={(e) => setFormData({...formData, duration: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="image">Image URL</Label>
+              <Input 
+                id="image" 
+                placeholder="https://..."
+                value={formData.image}
+                onChange={(e) => setFormData({...formData, image: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea 
+                id="description" 
+                placeholder="Description"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+            
+            {/* Animal Sales specific fields */}
+            {currentCategory === 'sales' && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="animalType">Animal Type</Label>
+                    <Select value={formData.animalType || undefined} onValueChange={(value) => setFormData({...formData, animalType: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select animal type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Cow">Cow</SelectItem>
+                        <SelectItem value="Goat">Goat</SelectItem>
+                        <SelectItem value="Sheep">Sheep</SelectItem>
+                        <SelectItem value="Dog">Dog</SelectItem>
+                        <SelectItem value="Cat">Cat</SelectItem>
+                        <SelectItem value="Chicken">Chicken</SelectItem>
+                        <SelectItem value="Pig">Pig</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="breed">Breed</Label>
+                    <Input 
+                      id="breed" 
+                      placeholder="Animal breed"
+                      value={formData.breed}
+                      onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="age">Age</Label>
+                    <Input 
+                      id="age" 
+                      placeholder="e.g., 2 years, 6 months"
+                      value={formData.age}
+                      onChange={(e) => setFormData({...formData, age: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="sex">Sex</Label>
+                    <Select value={formData.sex || undefined} onValueChange={(value) => setFormData({...formData, sex: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sex" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="district">District</Label>
+                    <Select value={formData.district || undefined} onValueChange={(value) => setFormData({...formData, district: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kigali">Kigali</SelectItem>
+                        <SelectItem value="Northern">Northern</SelectItem>
+                        <SelectItem value="Southern">Southern</SelectItem>
+                        <SelectItem value="Eastern">Eastern</SelectItem>
+                        <SelectItem value="Western">Western</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="sector">Sector</Label>
+                    <Input 
+                      id="sector" 
+                      placeholder="Sector"
+                      value={formData.sector}
+                      onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="village">Village</Label>
+                    <Input 
+                      id="village" 
+                      placeholder="Village"
+                      value={formData.village}
+                      onChange={(e) => setFormData({...formData, village: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="sellerPhone">Seller Phone</Label>
+                    <Input 
+                      id="sellerPhone" 
+                      placeholder="+250..."
+                      value={formData.sellerPhone}
+                      onChange={(e) => setFormData({...formData, sellerPhone: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="sellerEmail">Seller Email</Label>
+                    <Input 
+                      id="sellerEmail" 
+                      type="email"
+                      placeholder="seller@example.com"
+                      value={formData.sellerEmail}
+                      onChange={(e) => setFormData({...formData, sellerEmail: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            
+            {/* Drug specific fields */}
+            {currentCategory === 'drugs' && (
+              <>
+                <div>
+                  <Label htmlFor="drugType">Drug Type</Label>
+                  <Select value={formData.drugType || undefined} onValueChange={(value) => setFormData({...formData, drugType: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select drug type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Antibiotic">Antibiotic</SelectItem>
+                      <SelectItem value="Dewormer">Dewormer</SelectItem>
+                      <SelectItem value="Vaccine">Vaccine</SelectItem>
+                      <SelectItem value="Vitamins">Vitamins</SelectItem>
+                      <SelectItem value="Pain Relief">Pain Relief</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="district">District</Label>
+                    <Select value={formData.district || undefined} onValueChange={(value) => setFormData({...formData, district: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kigali">Kigali</SelectItem>
+                        <SelectItem value="Northern">Northern</SelectItem>
+                        <SelectItem value="Southern">Southern</SelectItem>
+                        <SelectItem value="Eastern">Eastern</SelectItem>
+                        <SelectItem value="Western">Western</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="sector">Sector</Label>
+                    <Input 
+                      id="sector" 
+                      placeholder="Sector"
+                      value={formData.sector}
+                      onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="village">Village</Label>
+                    <Input 
+                      id="village" 
+                      placeholder="Village"
+                      value={formData.village}
+                      onChange={(e) => setFormData({...formData, village: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="usageDescription">Usage Description</Label>
+                  <Textarea 
+                    id="usageDescription" 
+                    placeholder="How to use this drug (optional)"
+                    rows={3}
+                    value={formData.usageDescription}
+                    onChange={(e) => setFormData({...formData, usageDescription: e.target.value})}
+                  />
+                </div>
+              </>
+            )}
+            
+            {/* Feed specific fields */}
+            {currentCategory === 'feeds' && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="feedType">Feed Type</Label>
+                    <Select value={formData.feedType || undefined} onValueChange={(value) => setFormData({...formData, feedType: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select feed type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Hay">Hay</SelectItem>
+                        <SelectItem value="Concentrates">Concentrates</SelectItem>
+                        <SelectItem value="Minerals">Minerals</SelectItem>
+                        <SelectItem value="Supplements">Supplements</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="quality">Quality</Label>
+                    <Select value={formData.quality || undefined} onValueChange={(value) => setFormData({...formData, quality: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select quality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="targetAnimal">Target Animal</Label>
+                    <Select value={formData.targetAnimal || undefined} onValueChange={(value) => setFormData({...formData, targetAnimal: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select target animal" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Cattle">Cattle</SelectItem>
+                        <SelectItem value="Goats">Goats</SelectItem>
+                        <SelectItem value="Poultry">Poultry</SelectItem>
+                        <SelectItem value="Sheep">Sheep</SelectItem>
+                        <SelectItem value="Pigs">Pigs</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="district">District</Label>
+                    <Select value={formData.district || undefined} onValueChange={(value) => setFormData({...formData, district: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kigali">Kigali</SelectItem>
+                        <SelectItem value="Northern">Northern</SelectItem>
+                        <SelectItem value="Southern">Southern</SelectItem>
+                        <SelectItem value="Eastern">Eastern</SelectItem>
+                        <SelectItem value="Western">Western</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="sector">Sector</Label>
+                    <Input 
+                      id="sector" 
+                      placeholder="Sector"
+                      value={formData.sector}
+                      onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="village">Village</Label>
+                    <Input 
+                      id="village" 
+                      placeholder="Village"
+                      value={formData.village}
+                      onChange={(e) => setFormData({...formData, village: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setIsCreateServiceOpen(false); resetForm() }}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateService}>Add Item</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Service Dialog */}
+      <Dialog open={isEditServiceOpen} onOpenChange={setIsEditServiceOpen}>
+        <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit {currentService?.category === 'sales' ? 'Animal' : currentService?.category === 'drugs' ? 'Drug' : 'Feed'}</DialogTitle>
+            <DialogDescription>Update the details</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
+            <div>
+              <Label htmlFor="editName">Name</Label>
+              <Input 
+                id="editName" 
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editCategory">Category</Label>
+              <Select value={formData.categoryId || undefined} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories[currentService?.category as keyof typeof categories]?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="editPrice">Price (RWF)</Label>
+              <Input 
+                id="editPrice" 
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editDuration">Unit/Package</Label>
+              <Input 
+                id="editDuration" 
+                value={formData.duration}
+                onChange={(e) => setFormData({...formData, duration: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editImage">Image URL</Label>
+              <Input 
+                id="editImage" 
+                value={formData.image}
+                onChange={(e) => setFormData({...formData, image: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editDescription">Description</Label>
+              <Textarea 
+                id="editDescription" 
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setIsEditServiceOpen(false); setCurrentService(null); resetForm() }}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditService}>Update</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

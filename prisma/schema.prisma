@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Category {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  image       String?
+  type        String // 'sales', 'drugs', 'feeds'
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  services    Service[]
+}
+
+model Service {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  duration    String
+  image       String?
+  category    String // 'sales', 'drugs', 'feeds'
+  categoryId  String
+  
+  // Animal Sales fields
+  animalType    String?
+  breed         String?
+  age           String?
+  sex           String?
+  district      String?
+  sector        String?
+  village       String?
+  sellerPhone   String?
+  sellerEmail   String?
+  
+  // Drug fields
+  drugType         String?
+  usageDescription String?
+  
+  // Feed fields
+  feedType     String?
+  quality      String?
+  targetAnimal String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  categoryRef Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}

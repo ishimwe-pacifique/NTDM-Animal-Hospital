@@ -87,7 +87,7 @@ export default function PetTrackingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channelId: deviceId, apiKey, role }),
       })
-    } catch (err) {}
+    } catch (err) { }
   }
   // Load Leaflet CSS dynamically
   useEffect(() => {
@@ -107,12 +107,12 @@ export default function PetTrackingPage() {
     setRefreshing(true)
     try {
       const res = await fetch(`/api/thingspeak?channelId=${deviceId}&results=${results}`)
-      
+
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.error || `HTTP error! status: ${res.status}`)
       }
-      
+
       const json: ApiResponse = await res.json()
 
       // Validate the response structure
@@ -175,10 +175,10 @@ export default function PetTrackingPage() {
   const averageTemperature =
     temperatureData.length > 0
       ? Math.round(
-          (temperatureData.reduce((sum: number, item: FormattedData) => sum + (item.temperature || 0), 0) /
-            temperatureData.length) *
-            10,
-        ) / 10
+        (temperatureData.reduce((sum: number, item: FormattedData) => sum + (item.temperature || 0), 0) /
+          temperatureData.length) *
+        10,
+      ) / 10
       : 0
 
   const latestTemperature = data.length > 0 ? data[data.length - 1].temperature : null
@@ -236,16 +236,16 @@ export default function PetTrackingPage() {
     try {
       const jsPDF = (await import('jspdf')).default
       const doc = new jsPDF()
-      
+
       // Header
       doc.setFontSize(20)
       doc.text('Animal Health Monitoring Report', 20, 30)
-      
+
       doc.setFontSize(12)
       doc.text(`Animal: ${apiResponse?.channel.name || 'Unknown'}`, 20, 50)
       doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 60)
       doc.text(`Channel ID: ${deviceId}`, 20, 70)
-      
+
       // Stats
       doc.setFontSize(14)
       doc.text('Health Summary', 20, 90)
@@ -254,12 +254,12 @@ export default function PetTrackingPage() {
       doc.text(`Average ${getFieldLabel('field1')}: ${averageBpm}`, 20, 115)
       doc.text(`Latest Temperature: ${latestTemperature || 'N/A'}°C`, 20, 125)
       doc.text(`Location Coverage: ${locationPercentage}%`, 20, 135)
-      
+
       // Recent data
       doc.setFontSize(14)
       doc.text('Recent Readings', 20, 155)
       doc.setFontSize(8)
-      
+
       let yPos = 170
       data.slice(-15).forEach((item, index) => {
         if (yPos > 280) {
@@ -269,7 +269,7 @@ export default function PetTrackingPage() {
         doc.text(`${new Date(item.timestamp).toLocaleString()} - BPM: ${item.bpm}, Temp: ${item.temperature || 'N/A'}°C`, 20, yPos)
         yPos += 10
       })
-      
+
       doc.save(`health-report-${new Date().toISOString().split('T')[0]}.pdf`)
     } catch (error) {
       console.error('PDF export failed:', error)
@@ -286,11 +286,11 @@ export default function PetTrackingPage() {
       item.longitude || '',
       getBpmStatus(item.bpm).label
     ])
-    
+
     const csvContent = [headers, ...csvData]
       .map(row => row.map(field => `"${field}"`).join(','))
       .join('\n')
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -303,7 +303,7 @@ export default function PetTrackingPage() {
   const exportToExcel = async () => {
     try {
       const XLSX = (await import('xlsx')).default
-      
+
       // Animal info sheet
       const animalInfo = {
         'Animal Name': apiResponse?.channel.name || 'Unknown',
@@ -315,7 +315,7 @@ export default function PetTrackingPage() {
         'Location Coverage': `${locationPercentage}%`,
         'Total Records': data.length
       }
-      
+
       // Health data sheet
       const healthData = data.map(item => ({
         'Timestamp': new Date(item.timestamp).toLocaleString(),
@@ -327,17 +327,17 @@ export default function PetTrackingPage() {
         'Temp Status': getTemperatureStatus(item.temperature).label,
         'Has Location': item.hasLocation ? 'Yes' : 'No'
       }))
-      
+
       const wb = XLSX.utils.book_new()
-      
+
       // Add animal info sheet
       const infoWs = XLSX.utils.json_to_sheet([animalInfo])
       XLSX.utils.book_append_sheet(wb, infoWs, 'Animal Info')
-      
+
       // Add health data sheet
       const dataWs = XLSX.utils.json_to_sheet(healthData)
       XLSX.utils.book_append_sheet(wb, dataWs, 'Health Data')
-      
+
       XLSX.writeFile(wb, `health-report-${new Date().toISOString().split('T')[0]}.xlsx`)
     } catch (error) {
       console.error('Excel export failed:', error)
@@ -545,8 +545,7 @@ export default function PetTrackingPage() {
                     <Heart className="w-6 h-6 text-white" />
                   </div>
                   <span
-                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      bpmStatus.color === "#10B981"
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${bpmStatus.color === "#10B981"
                         ? "bg-green-100 text-green-800"
                         : bpmStatus.color === "#EF4444"
                           ? "bg-red-100 text-red-800"
@@ -555,7 +554,7 @@ export default function PetTrackingPage() {
                             : bpmStatus.color === "#3B82F6"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-gray-100 text-gray-800"
-                    }`}
+                      }`}
                   >
                     {bpmStatus.label}
                   </span>
@@ -570,8 +569,7 @@ export default function PetTrackingPage() {
                     <Thermometer className="w-6 h-6 text-white" />
                   </div>
                   <span
-                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      temperatureStatus.color === "#10B981"
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${temperatureStatus.color === "#10B981"
                         ? "bg-green-100 text-green-800"
                         : temperatureStatus.color === "#EF4444"
                           ? "bg-red-100 text-red-800"
@@ -580,7 +578,7 @@ export default function PetTrackingPage() {
                             : temperatureStatus.color === "#3B82F6"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-gray-100 text-gray-800"
-                    }`}
+                      }`}
                   >
                     {temperatureStatus.label}
                   </span>
@@ -753,8 +751,7 @@ export default function PetTrackingPage() {
                             <td className="px-6 py-4">
                               <div className="flex flex-col gap-1">
                                 <span
-                                  className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    bpmStatus.color === "#10B981"
+                                  className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${bpmStatus.color === "#10B981"
                                       ? "bg-green-100 text-green-800"
                                       : bpmStatus.color === "#EF4444"
                                         ? "bg-red-100 text-red-800"
@@ -763,14 +760,13 @@ export default function PetTrackingPage() {
                                           : bpmStatus.color === "#3B82F6"
                                             ? "bg-blue-100 text-blue-800"
                                             : "bg-gray-100 text-gray-800"
-                                  }`}
+                                    }`}
                                 >
                                   {getFieldLabel("field1")}: {bpmStatus.label}
                                 </span>
                                 {item.hasTemperature && (
                                   <span
-                                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                      tempStatus.color === "#10B981"
+                                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${tempStatus.color === "#10B981"
                                         ? "bg-green-100 text-green-800"
                                         : tempStatus.color === "#EF4444"
                                           ? "bg-red-100 text-red-800"
@@ -779,7 +775,7 @@ export default function PetTrackingPage() {
                                             : tempStatus.color === "#3B82F6"
                                               ? "bg-blue-100 text-blue-800"
                                               : "bg-gray-100 text-gray-800"
-                                    }`}
+                                      }`}
                                   >
                                     {getFieldLabel("field4")}: {tempStatus.label}
                                   </span>
