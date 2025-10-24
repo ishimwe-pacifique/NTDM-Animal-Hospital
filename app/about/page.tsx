@@ -51,16 +51,16 @@ export default function AboutPage() {
             <div className="bg-primary/5 p-8 rounded-lg">
               <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
               <p className="text-gray-700">
-                NTDM Animal Hospital aims to revolutionize animal health and management by providing innovative tracking
-                devices, veterinary consultations, and disease prevention solutions, connecting farmers with the market,
-                empowering livestock farmers and pet owners to ensure the well-being of their animals.
+                To revolutionize animal health and management through technology-driven innovation.
+                At NTDM ANIMAL HOSPITAL, we provide smart tracking devices, AI-powered disease prediction, and an integrated digital platform. where farmers can buy feeds, medicines, and sell animals while connecting directly with veterinarians.
+                Our mission is to empower farmers, improve livestock productivity, and support the government’s efforts to monitor the national animal population efficiently and accurately.
               </p>
             </div>
             <div className="bg-secondary/5 p-8 rounded-lg">
               <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
               <p className="text-gray-700">
-                At NTDM Animal Hospital, we want to become a leading animal health service provider in Rwanda and
-                beyond, leveraging technology to enhance productivity, public health, and sustainable agriculture.
+                To become Africa’s leading smart animal health and management service, combining IoT and Artificial Intelligence to build a healthier, more sustainable livestock sector.
+                We envision a future where every farmer in Rwanda and beyond benefits from digital veterinary access, real-time disease report and prediction, and a connected agricultural marketplace that drives productivity and strengthens public health.
               </p>
             </div>
           </div>
