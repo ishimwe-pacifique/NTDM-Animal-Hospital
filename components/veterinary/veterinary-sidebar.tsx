@@ -51,7 +51,7 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
             <PawPrint className="h-5 w-5 text-white" />
           </div>
           <div>
-            <span className="text-lg font-bold text-blue-700">Vet Portal</span>
+            <span className="text-lg font-bold text-blue-700">VetPortal</span>
             <p className="text-xs text-blue-500">Animal Hospital</p>
           </div>
         </Link>
