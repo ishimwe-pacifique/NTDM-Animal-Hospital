@@ -8,6 +8,7 @@ import { ArrowLeft, ShoppingCart, Truck, MapPin, Star, Heart, Share2 } from "luc
 import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Feed {
   id: string
@@ -31,6 +32,7 @@ export default function FeedDetailPage() {
   const [wishlist, setWishlist] = useState<string[]>([])
   const params = useParams()
   const feedId = params.id as string
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchFeed()
@@ -97,11 +99,11 @@ export default function FeedDetailPage() {
         <div className="container mx-auto px-4">
           <Link href="/feeds" className="inline-flex items-center text-primary hover:underline mb-8">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Feeds
+            {t('common.backTo')} {t('nav.feeds')}
           </Link>
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-600 mb-4">Feed Not Found</h2>
-            <p className="text-gray-500">The feed product you're looking for doesn't exist.</p>
+            <h2 className="text-2xl font-bold text-gray-600 mb-4">{t('feeds.notFound')}</h2>
+            <p className="text-gray-500">{t('feeds.notFoundDesc')}</p>
           </div>
         </div>
       </div>
@@ -126,13 +128,13 @@ export default function FeedDetailPage() {
           <div className="max-w-2xl text-white">
             <Link href="/feeds" className="inline-flex items-center text-white/80 hover:text-white mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Feeds
+              {t('common.backTo')} {t('nav.feeds')}
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-400">
               {feed.name}
             </h1>
             <p className="text-lg md:text-xl text-white/90">
-              Premium nutrition for healthy, productive animals
+              {t('feeds.subtitle')}
             </p>
           </div>
         </div>
@@ -151,7 +153,7 @@ export default function FeedDetailPage() {
                 className="object-cover"
               />
               <Badge className="absolute top-4 right-4 bg-green-500">
-                Available
+                {t('common.available')}
               </Badge>
               {feed.quality && (
                 <Badge className={`absolute top-4 left-4 ${getQualityColor(feed.quality)} text-white`}>
@@ -181,20 +183,20 @@ export default function FeedDetailPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('common.description')}</h3>
               <p className="text-gray-600">{feed.description}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               {feed.feedType && (
                 <div>
-                  <h4 className="font-medium text-gray-900">Feed Type</h4>
+                  <h4 className="font-medium text-gray-900">{t('feeds.type')}</h4>
                   <p className="text-gray-600">{feed.feedType}</p>
                 </div>
               )}
               {feed.quality && (
                 <div>
-                  <h4 className="font-medium text-gray-900">Quality</h4>
+                  <h4 className="font-medium text-gray-900">{t('feeds.quality')}</h4>
                   <p className="text-gray-600">{feed.quality}</p>
                 </div>
               )}
@@ -202,7 +204,7 @@ export default function FeedDetailPage() {
 
             {feed.district && (
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('common.location')}</h3>
                 <div className="flex items-center text-gray-600">
                   <MapPin className="h-4 w-4 mr-2" />
                   <span>{feed.district}, {feed.sector}</span>
@@ -219,22 +221,22 @@ export default function FeedDetailPage() {
                 <Heart 
                   className={`h-4 w-4 mr-2 ${wishlist.includes(feed.id) ? 'fill-red-500 text-red-500' : ''}`}
                 />
-                {wishlist.includes(feed.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                {wishlist.includes(feed.id) ? t('common.removeFromWishlist') : t('common.addToWishlist')}
               </Button>
               <Button variant="outline" className="flex-shrink-0">
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                {t('common.share')}
               </Button>
             </div>
 
             <div className="space-y-3">
               <Button className="w-full" size="lg">
                 <ShoppingCart className="h-5 w-5 mr-2" />
-                Order Now
+                {t('common.orderNow')}
               </Button>
               <Button variant="outline" className="w-full" size="lg">
                 <Truck className="h-5 w-5 mr-2" />
-                Request Delivery Quote
+                {t('common.requestDelivery')}
               </Button>
             </div>
           </div>
@@ -242,26 +244,26 @@ export default function FeedDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Product Information</CardTitle>
+            <CardTitle>{t('common.productInfo')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-semibold mb-2">Feed Details</h4>
+                <h4 className="font-semibold mb-2">{t('feeds.feedDetails')}</h4>
                 <ul className="space-y-1 text-sm text-gray-600">
-                  <li><strong>Type:</strong> {feed.feedType || 'Not specified'}</li>
-                  <li><strong>Quality:</strong> {feed.quality || 'Not specified'}</li>
-                  <li><strong>Target Animal:</strong> {feed.targetAnimal || 'Not specified'}</li>
-                  <li><strong>Package:</strong> {feed.duration}</li>
+                  <li><strong>{t('feeds.type')}:</strong> {feed.feedType || 'Not specified'}</li>
+                  <li><strong>{t('feeds.quality')}:</strong> {feed.quality || 'Not specified'}</li>
+                  <li><strong>{t('feeds.targetAnimal')}:</strong> {feed.targetAnimal || 'Not specified'}</li>
+                  <li><strong>{t('feeds.package')}:</strong> {feed.duration}</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Availability</h4>
+                <h4 className="font-semibold mb-2">{t('feeds.availability')}</h4>
                 <ul className="space-y-1 text-sm text-gray-600">
-                  <li><strong>Status:</strong> In Stock</li>
-                  <li><strong>Location:</strong> {feed.district || 'Multiple locations'}</li>
-                  <li><strong>Delivery:</strong> Available</li>
-                  <li><strong>Quality Rating:</strong> <Star className="h-4 w-4 inline text-yellow-400" /> Premium</li>
+                  <li><strong>{t('feeds.status')}:</strong> {t('common.inStock')}</li>
+                  <li><strong>{t('common.location')}:</strong> {feed.district || 'Multiple locations'}</li>
+                  <li><strong>{t('common.delivery')}:</strong> {t('common.available')}</li>
+                  <li><strong>{t('feeds.qualityRating')}:</strong> <Star className="h-4 w-4 inline text-yellow-400" /> {t('common.premium')}</li>
                 </ul>
               </div>
             </div>

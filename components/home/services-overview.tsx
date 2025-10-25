@@ -1,43 +1,48 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Activity, Video, ShieldAlert, ShoppingBag } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const services = [
-  {
-    icon: <Activity className="h-6 w-6 text-primary" />,
-    title: "Animal Tracking Devices",
-    description: "Monitor your livestock and pets with our advanced GPS tracking technology.",
-    link: "/services#tracking",
-  },
-  {
-    icon: <Video className="h-6 w-6 text-primary" />,
-    title: "Veterinary Consultations",
-    description: "Connect with expert veterinarians through in-person or virtual consultations.",
-    link: "/services#consultations",
-  },
-  {
-    icon: <ShieldAlert className="h-6 w-6 text-primary" />,
-    title: "Disease Monitoring",
-    description: "Early detection and prevention of diseases through regular health monitoring.",
-    link: "/services#monitoring",
-  },
-  {
-    icon: <ShoppingBag className="h-6 w-6 text-primary" />,
-    title: "Animal Sales",
-    description: "Purchase healthy livestock and pets through our verified marketplace.",
-    link: "/services#sales",
-  },
-]
+// Services will be translated dynamically
 
 export default function ServicesOverview() {
+  const { t } = useLanguage()
+  
+  const services = [
+    {
+      icon: <Activity className="h-6 w-6 text-primary" />,
+      title: t('services.tracking.title'),
+      description: t('services.tracking.desc'),
+      link: "/services#tracking",
+    },
+    {
+      icon: <Video className="h-6 w-6 text-primary" />,
+      title: t('services.consultation.title'),
+      description: t('services.consultation.desc'),
+      link: "/services#consultations",
+    },
+    {
+      icon: <ShieldAlert className="h-6 w-6 text-primary" />,
+      title: t('services.monitoring.title'),
+      description: t('services.monitoring.desc'),
+      link: "/services#monitoring",
+    },
+    {
+      icon: <ShoppingBag className="h-6 w-6 text-primary" />,
+      title: t('nav.animalSales'),
+      description: t('animals.subtitle'),
+      link: "/services#sales",
+    },
+  ]
   return (
     <section className="section-padding bg-gray-50">
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h2 className="heading-lg mb-4">Our Featured Services</h2>
+          <h2 className="heading-lg mb-4">{t('home.services.title')}</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive solutions for animal health, tracking, and management to ensure the well-being of your
-            livestock and pets.
+            {t('home.services.subtitle')}
           </p>
         </div>
 
@@ -56,7 +61,7 @@ export default function ServicesOverview() {
                 href={service.link}
                 className="text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center"
               >
-                Learn More
+                {t('common.learnMore')}
                 <svg
                   className="ml-2 w-4 h-4"
                   fill="none"
@@ -78,7 +83,7 @@ export default function ServicesOverview() {
 
         <div className="text-center mt-16">
           <Button asChild size="lg" className="btn-primary">
-            <Link href="/services">View All Services</Link>
+            <Link href="/services">{t('common.viewAll')} {t('nav.services')}</Link>
           </Button>
         </div>
       </div>

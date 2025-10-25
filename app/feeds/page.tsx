@@ -10,6 +10,7 @@ import { ArrowLeft, Search, ShoppingCart, Truck, MapPin, Star, Heart, Info } fro
 import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Feed {
   id: string
@@ -50,6 +51,7 @@ export default function FeedsPage() {
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('category')
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchData()
@@ -184,13 +186,13 @@ export default function FeedsPage() {
           <div className="max-w-2xl text-white">
             <Link href="/services" className="inline-flex items-center text-white/80 hover:text-white mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Services
+              {t('common.backTo')} {t('nav.services')}
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-400">
-              {categoryId && currentCategory ? currentCategory.name : 'Animal Feeds'}
+              {categoryId && currentCategory ? currentCategory.name : t('feeds.title')}
             </h1>
             <p className="text-lg md:text-xl text-white/90">
-              {categoryId && currentCategory ? currentCategory.description : 'Premium nutrition for healthy, productive animals'}
+              {categoryId && currentCategory ? currentCategory.description : t('feeds.subtitle')}
             </p>
           </div>
         </div>
@@ -205,7 +207,7 @@ export default function FeedsPage() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search feeds..."
+                placeholder={t('common.search') + '...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -213,12 +215,12 @@ export default function FeedsPage() {
             </div>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t('common.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name A-Z</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="name">{t('sort.nameAZ')}</SelectItem>
+                <SelectItem value="price-low">{t('sort.priceLow')}</SelectItem>
+                <SelectItem value="price-high">{t('sort.priceHigh')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -229,7 +231,7 @@ export default function FeedsPage() {
                 <SelectValue placeholder="Feed Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Hay">Hay</SelectItem>
                 <SelectItem value="Concentrates">Concentrates</SelectItem>
                 <SelectItem value="Minerals">Minerals</SelectItem>
@@ -242,7 +244,7 @@ export default function FeedsPage() {
                 <SelectValue placeholder="Quality" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Quality</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="High">High</SelectItem>
                 <SelectItem value="Medium">Medium</SelectItem>
                 <SelectItem value="Low">Low</SelectItem>
@@ -254,7 +256,7 @@ export default function FeedsPage() {
                 <SelectValue placeholder="Target Animal" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Animals</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Cattle">Cattle</SelectItem>
                 <SelectItem value="Goats">Goats</SelectItem>
                 <SelectItem value="Poultry">Poultry</SelectItem>
@@ -268,7 +270,7 @@ export default function FeedsPage() {
                 <SelectValue placeholder="District" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Districts</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Kigali">Kigali</SelectItem>
                 <SelectItem value="Northern">Northern</SelectItem>
                 <SelectItem value="Southern">Southern</SelectItem>
@@ -295,7 +297,7 @@ export default function FeedsPage() {
         </div>
 
         <div className="mb-4 flex justify-between items-center">
-          <p className="text-gray-600">{filteredFeeds.length} feed products found</p>
+          <p className="text-gray-600">{filteredFeeds.length} {t('feeds.title').toLowerCase()} found</p>
           {wishlist.length > 0 && (
             <p className="text-sm text-gray-500">
               <Heart className="h-4 w-4 inline mr-1" />
@@ -317,11 +319,11 @@ export default function FeedsPage() {
                   />
                 </Link>
                 <Badge className="absolute top-2 right-2 bg-green-500">
-                  Available
+                  {t('common.available')}
                 </Badge>
                 {feed.quality && (
                   <Badge className={`absolute top-2 left-2 ${getQualityColor(feed.quality)} text-white`}>
-                    {feed.quality} Quality
+                    {feed.quality} {t('feeds.quality')}
                   </Badge>
                 )}
                 <Button
@@ -352,7 +354,7 @@ export default function FeedsPage() {
                       <Badge variant="secondary">{feed.feedType}</Badge>
                     )}
                     {feed.targetAnimal && (
-                      <Badge variant="outline">For {feed.targetAnimal}</Badge>
+                      <Badge variant="outline">{t('feeds.targetAnimal')}: {feed.targetAnimal}</Badge>
                     )}
                   </div>
                   {feed.district && (
@@ -367,7 +369,7 @@ export default function FeedsPage() {
                   <span className="text-sm text-gray-500">{feed.duration}</span>
                   <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                    <span className="text-sm text-gray-600">Premium Quality</span>
+                    <span className="text-sm text-gray-600">{t('common.premium')}</span>
                   </div>
                 </div>
                 
@@ -375,17 +377,17 @@ export default function FeedsPage() {
                   <Link href={`/feeds/${feed.id}`}>
                     <Button variant="outline" className="w-full">
                       <Info className="h-4 w-4 mr-2" />
-                      View Details
+                      {t('common.learnMore')}
                     </Button>
                   </Link>
                   <div className="flex gap-2">
                     <Button className="flex-1">
                       <ShoppingCart className="h-4 w-4 mr-2" />
-                      Order Now
+                      {t('common.orderNow')}
                     </Button>
                     <Button variant="outline">
                       <Truck className="h-4 w-4 mr-2" />
-                      Delivery
+                      {t('common.delivery')}
                     </Button>
                   </div>
                 </div>
@@ -397,10 +399,10 @@ export default function FeedsPage() {
         {filteredFeeds.length === 0 && !loading && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              {searchTerm || selectedFeedType || selectedTargetAnimal || selectedDistrict ? 'No feeds found' : 'No feeds available'}
+              {searchTerm || selectedFeedType || selectedTargetAnimal || selectedDistrict ? t('feeds.notFound') : t('feeds.notFound')}
             </h3>
             <p className="text-gray-500">
-              {searchTerm || selectedFeedType || selectedTargetAnimal || selectedDistrict ? 'Try a different search term or filter' : 'Check back later for new products'}
+              {searchTerm || selectedFeedType || selectedTargetAnimal || selectedDistrict ? t('feeds.notFoundDesc') : t('feeds.notFoundDesc')}
             </p>
           </div>
         )}

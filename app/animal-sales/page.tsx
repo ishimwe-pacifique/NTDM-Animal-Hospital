@@ -10,6 +10,7 @@ import { ArrowLeft, Phone, Mail, Search, Filter, MapPin, Calendar, User, Heart, 
 import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Animal {
   id: string
@@ -51,6 +52,7 @@ export default function AnimalSalesPage() {
   const [wishlist, setWishlist] = useState<string[]>([])
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('category')
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchData()
@@ -167,13 +169,13 @@ export default function AnimalSalesPage() {
           <div className="max-w-2xl text-white">
             <Link href="/services" className="inline-flex items-center text-white/80 hover:text-white mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Services
+              {t('common.backTo')} {t('nav.services')}
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-400">
-              {categoryId && currentCategory ? currentCategory.name : 'Animals for Sale'}
+              {categoryId && currentCategory ? currentCategory.name : t('animals.title')}
             </h1>
             <p className="text-lg md:text-xl text-white/90">
-              {categoryId && currentCategory ? currentCategory.description : 'Browse our healthy, certified animals ready for your farm'}
+              {categoryId && currentCategory ? currentCategory.description : t('animals.subtitle')}
             </p>
           </div>
         </div>
@@ -188,7 +190,7 @@ export default function AnimalSalesPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search animals by name, breed, or type..."
+                placeholder={t('common.search') + '...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -196,12 +198,12 @@ export default function AnimalSalesPage() {
             </div>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t('common.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name A-Z</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="name">{t('sort.nameAZ')}</SelectItem>
+                <SelectItem value="price-low">{t('sort.priceLow')}</SelectItem>
+                <SelectItem value="price-high">{t('sort.priceHigh')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -212,7 +214,7 @@ export default function AnimalSalesPage() {
                 <SelectValue placeholder="Animal Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Cow">Cow</SelectItem>
                 <SelectItem value="Goat">Goat</SelectItem>
                 <SelectItem value="Sheep">Sheep</SelectItem>
@@ -228,7 +230,7 @@ export default function AnimalSalesPage() {
                 <SelectValue placeholder="District" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Districts</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Kigali">Kigali</SelectItem>
                 <SelectItem value="Northern">Northern</SelectItem>
                 <SelectItem value="Southern">Southern</SelectItem>
@@ -254,7 +256,7 @@ export default function AnimalSalesPage() {
         </div>
 
         <div className="mb-4 flex justify-between items-center">
-          <p className="text-gray-600">{filteredAnimals.length} animals found</p>
+          <p className="text-gray-600">{filteredAnimals.length} {t('animals.title').toLowerCase()} found</p>
           {wishlist.length > 0 && (
             <p className="text-sm text-gray-500">
               <Heart className="h-4 w-4 inline mr-1" />
@@ -276,7 +278,7 @@ export default function AnimalSalesPage() {
                   />
                 </Link>
                 <Badge className="absolute top-2 right-2 bg-green-500">
-                  Available
+                  {t('common.available')}
                 </Badge>
                 <Button
                   variant="ghost"
@@ -304,13 +306,13 @@ export default function AnimalSalesPage() {
                   {animal.breed && (
                     <div className="flex items-center text-sm text-gray-600">
                       <User className="h-4 w-4 mr-2" />
-                      <span>Breed: {animal.breed}</span>
+                      <span>{t('animals.breed')}: {animal.breed}</span>
                     </div>
                   )}
                   {animal.age && (
                     <div className="flex items-center text-sm text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
-                      <span>Age: {animal.age}</span>
+                      <span>{t('animals.age')}: {animal.age}</span>
                     </div>
                   )}
                   {animal.sex && (
@@ -333,7 +335,7 @@ export default function AnimalSalesPage() {
                   <Link href={`/animal-sales/${animal.id}`}>
                     <Button variant="outline" className="w-full">
                       <Info className="h-4 w-4 mr-2" />
-                      View Details
+                      {t('common.learnMore')}
                     </Button>
                   </Link>
                   <div className="flex gap-2">
@@ -363,10 +365,10 @@ export default function AnimalSalesPage() {
         {filteredAnimals.length === 0 && !loading && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              {searchTerm || selectedAnimalType || selectedDistrict ? 'No animals match your search' : 'No animals available'}
+              {searchTerm || selectedAnimalType || selectedDistrict ? t('animals.notFound') : t('animals.notFound')}
             </h3>
             <p className="text-gray-500">
-              {searchTerm || selectedAnimalType || selectedDistrict ? 'Try adjusting your filters' : 'Check back later for new listings'}
+              {searchTerm || selectedAnimalType || selectedDistrict ? t('animals.notFoundDesc') : t('animals.notFoundDesc')}
             </p>
           </div>
         )}

@@ -10,6 +10,7 @@ import { ArrowLeft, Search, ShoppingCart, Phone, MapPin, Info, Heart, ArrowUpDow
 import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Drug {
   id: string
@@ -47,6 +48,7 @@ export default function PharmacyPage() {
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('category')
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchData()
@@ -196,13 +198,13 @@ export default function PharmacyPage() {
           <div className="max-w-2xl text-white">
             <Link href="/services" className="inline-flex items-center text-white/80 hover:text-white mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Services
+              {t('common.backTo')} {t('nav.services')}
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-400">
-              {categoryId && currentCategory ? currentCategory.name : 'Veterinary Pharmacy'}
+              {categoryId && currentCategory ? currentCategory.name : t('pharmacy.title')}
             </h1>
             <p className="text-lg md:text-xl text-white/90">
-              {categoryId && currentCategory ? currentCategory.description : 'Quality medications and treatments for your animals'}
+              {categoryId && currentCategory ? currentCategory.description : t('pharmacy.subtitle')}
             </p>
           </div>
         </div>
@@ -217,7 +219,7 @@ export default function PharmacyPage() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search medications..."
+                placeholder={t('common.search') + '...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -225,12 +227,12 @@ export default function PharmacyPage() {
             </div>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t('common.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name A-Z</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="name">{t('sort.nameAZ')}</SelectItem>
+                <SelectItem value="price-low">{t('sort.priceLow')}</SelectItem>
+                <SelectItem value="price-high">{t('sort.priceHigh')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -241,7 +243,7 @@ export default function PharmacyPage() {
                 <SelectValue placeholder="Drug Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Antibiotic">Antibiotic</SelectItem>
                 <SelectItem value="Dewormer">Dewormer</SelectItem>
                 <SelectItem value="Vaccine">Vaccine</SelectItem>
@@ -255,7 +257,7 @@ export default function PharmacyPage() {
                 <SelectValue placeholder="District" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Districts</SelectItem>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
                 <SelectItem value="Kigali">Kigali</SelectItem>
                 <SelectItem value="Northern">Northern</SelectItem>
                 <SelectItem value="Southern">Southern</SelectItem>
@@ -281,7 +283,7 @@ export default function PharmacyPage() {
         </div>
 
         <div className="mb-4 flex justify-between items-center">
-          <p className="text-gray-600">{filteredDrugs.length} medications found</p>
+          <p className="text-gray-600">{filteredDrugs.length} {t('pharmacy.title').toLowerCase()} found</p>
           {wishlist.length > 0 && (
             <p className="text-sm text-gray-500">
               <Heart className="h-4 w-4 inline mr-1" />
@@ -303,7 +305,7 @@ export default function PharmacyPage() {
                   />
                 </Link>
                 <Badge className="absolute top-2 right-2 bg-blue-500">
-                  In Stock
+                  {t('common.inStock')}
                 </Badge>
                 <Button
                   variant="ghost"
@@ -347,20 +349,20 @@ export default function PharmacyPage() {
                 
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm text-gray-500">{drug.duration}</span>
-                  <Badge variant="outline">Prescription</Badge>
+                  <Badge variant="outline">{t('pharmacy.prescription')}</Badge>
                 </div>
                 
                 <div className="space-y-2">
                   <Link href={`/pharmacy/${drug.id}`}>
                     <Button variant="outline" className="w-full">
                       <Info className="h-4 w-4 mr-2" />
-                      View Details
+                      {t('common.learnMore')}
                     </Button>
                   </Link>
                   <div className="flex gap-2">
                     <Button className="flex-1">
                       <ShoppingCart className="h-4 w-4 mr-2" />
-                      Order Now
+                      {t('common.orderNow')}
                     </Button>
                     <Button variant="outline">
                       <Phone className="h-4 w-4 mr-2" />
@@ -376,10 +378,10 @@ export default function PharmacyPage() {
         {filteredDrugs.length === 0 && !loading && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              {searchTerm || selectedDrugType || selectedDistrict ? 'No medications found' : 'No medications available'}
+              {searchTerm || selectedDrugType || selectedDistrict ? t('pharmacy.notFound') : t('pharmacy.notFound')}
             </h3>
             <p className="text-gray-500">
-              {searchTerm || selectedDrugType || selectedDistrict ? 'Try a different search term or filter' : 'Check back later for new products'}
+              {searchTerm || selectedDrugType || selectedDistrict ? t('pharmacy.notFoundDesc') : t('pharmacy.notFoundDesc')}
             </p>
           </div>
         )}

@@ -6,19 +6,24 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const navItems = [
-  { name: "Home", href: "/" },
-  { name: "Services", href: "/services" },
-  { name: "About Us", href: "/about" },
-  { name: "Blog", href: "/blog" },
-  { name: "Contact Us", href: "/contact" },
-]
+// Navigation items will be translated dynamically
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { t } = useLanguage()
+  
+  const navItems = [
+    { name: t('nav.home'), href: "/" },
+    { name: t('nav.services'), href: "/services" },
+    { name: t('nav.about'), href: "/about" },
+    { name: t('nav.blog'), href: "/blog" },
+    { name: t('nav.contact'), href: "/contact" },
+  ]
 
   // Force black nav items on Login, Register, and any Blog page
   const forceBlackNav = pathname === "/login" || pathname === "/register" || pathname.startsWith("/blog/");
@@ -72,11 +77,12 @@ export default function Header() {
               </Link>
             ))}
             <div className="flex space-x-2 ml-4">
+              <LanguageSwitcher />
               <Button asChild variant="outline" className="rounded-full">
-                <Link href="/login">Login</Link>
+                <Link href="/login">{t('nav.login')}</Link>
               </Button>
               <Button asChild className="rounded-full">
-                <Link href="/register">Register</Link>
+                <Link href="/register">{t('nav.register')}</Link>
               </Button>
             </div>
           </nav>
@@ -108,12 +114,15 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
+            <div className="flex justify-center mb-4">
+              <LanguageSwitcher />
+            </div>
             <div className="grid grid-cols-2 gap-2 mt-4">
               <Button asChild variant="outline" className="w-full">
-                <Link href="/login">Login</Link>
+                <Link href="/login">{t('nav.login')}</Link>
               </Button>
               <Button asChild className="w-full">
-                <Link href="/register">Register</Link>
+                <Link href="/register">{t('nav.register')}</Link>
               </Button>
             </div>
           </div>

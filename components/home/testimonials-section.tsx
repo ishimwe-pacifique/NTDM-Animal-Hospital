@@ -3,53 +3,45 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Jean Mutesi",
-    role: "Livestock Farmer",
-    // image:
-    //   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
-    quote:
-      "The tracking devices from NTDM have revolutionized how I manage my cattle. I can monitor their location and health status in real-time, which has significantly improved my farm's productivity.",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Emmanuel Hakizimana",
-    role: "Pet Owner",
-    // image:
-    //   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
-    quote:
-      "The virtual consultations are incredibly convenient. When my dog was sick, I got expert advice within minutes without having to travel to the clinic. Highly recommend!",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Alice Uwimana",
-    role: "Poultry Farmer",
-    // image:
-    //   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
-    quote:
-      "The disease monitoring system helped me detect an outbreak early in my poultry farm. The quick response from NTDM's veterinarians saved most of my flock. Their service is invaluable.",
-    rating: 4,
-  },
-  {
-    id: 4,
-    name: "Patrick Niyonzima",
-    role: "Dairy Farmer",
-    // image:
-    //   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format&q=60",
-    quote:
-      "I purchased my dairy cows through NTDM's marketplace and received healthy, high-yielding animals. Their follow-up care and support has been exceptional. My dairy production has increased by 30%!",
-    rating: 5,
-  },
-]
+// Testimonials will be translated dynamically
 
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [autoplay, setAutoplay] = useState(true)
+  const { t } = useLanguage()
+  
+  const testimonials = [
+    {
+      id: 1,
+      name: "Jean Mutesi",
+      role: t('home.testimonials.farmer'),
+      quote: t('home.testimonials.quote1'),
+      rating: 5,
+    },
+    {
+      id: 2,
+      name: "Emmanuel Hakizimana",
+      role: t('home.testimonials.petOwner'),
+      quote: t('home.testimonials.quote2'),
+      rating: 5,
+    },
+    {
+      id: 3,
+      name: "Alice Uwimana",
+      role: t('home.testimonials.poultryFarmer'),
+      quote: t('home.testimonials.quote3'),
+      rating: 4,
+    },
+    {
+      id: 4,
+      name: "Patrick Niyonzima",
+      role: t('home.testimonials.dairyFarmer'),
+      quote: t('home.testimonials.quote4'),
+      rating: 5,
+    },
+  ]
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -82,10 +74,9 @@ export default function TestimonialsSection() {
 
       <div className="container-custom relative z-10">
         <div className="text-center mb-12">
-          <h2 className="heading-lg mb-4">What Our Customers Say</h2>
+          <h2 className="heading-lg mb-4">{t('home.testimonials.title')}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what animal owners across Rwanda have to say about NTDM Animal
-            Hospital.
+            {t('home.testimonials.subtitle')}
           </p>
         </div>
 

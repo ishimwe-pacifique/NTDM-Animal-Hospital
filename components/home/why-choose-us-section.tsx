@@ -1,40 +1,44 @@
+"use client"
+
 import Image from "next/image"
 import { Award, Zap, Globe } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const features = [
-  {
-    icon: <Award className="h-8 w-8 text-primary" />,
-    title: "Expert Veterinarians",
-    description:
-      "Our team of certified veterinarians brings years of experience and specialized knowledge to every case.",
-    image:
-      "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
-  },
-  {
-    icon: <Zap className="h-8 w-8 text-primary" />,
-    title: "Innovative Technology",
-    description: "We use cutting-edge tracking devices and diagnostic tools to provide the best care for your animals.",
-    image:
-      "https://images.unsplash.com/photo-1581092921461-7d65ca45393a?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
-  },
-  {
-    icon: <Globe className="h-8 w-8 text-primary" />,
-    title: "Comprehensive Care",
-    description:
-      "From preventive care to emergency services, we offer a complete range of solutions for all your animal needs.",
-    image:
-      "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
-  },
-]
+// Features will be translated dynamically
 
 export default function WhyChooseUsSection() {
+  const { t } = useLanguage()
+  
+  const features = [
+    {
+      icon: <Award className="h-8 w-8 text-primary" />,
+      title: t('home.features.expert.title'),
+      description: t('home.features.expert.desc'),
+      image:
+        "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      icon: <Zap className="h-8 w-8 text-primary" />,
+      title: t('home.features.technology.title'),
+      description: t('home.features.technology.desc'),
+      image:
+        "https://images.unsplash.com/photo-1581092921461-7d65ca45393a?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+    {
+      icon: <Globe className="h-8 w-8 text-primary" />,
+      title: t('home.features.comprehensive.title'),
+      description: t('home.features.comprehensive.desc'),
+      image:
+        "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+    },
+  ]
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h2 className="heading-lg mb-4">Why Choose NTDM Animal Hospital?</h2>
+          <h2 className="heading-lg mb-4">{t('home.features.title')}</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Experience the difference with our commitment to excellence, innovation, and comprehensive animal care.
+            {t('home.features.subtitle')}
           </p>
         </div>
 
@@ -68,7 +72,7 @@ export default function WhyChooseUsSection() {
             href="/about"
             className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors"
           >
-            Learn More About Us
+            {t('common.learnMore')} {t('nav.about')}
             <svg
               className="ml-2 w-4 h-4"
               fill="none"

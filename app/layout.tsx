@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import GoogleAnalytics from "@/components/analytics/google-analytics"
 import BodyWrapper from "@/components/layout/body-wrapper"
+import { LanguageProvider } from "@/contexts/LanguageContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,7 +42,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} font-sans`}>
         <GoogleAnalytics />
-        <BodyWrapper>{children}</BodyWrapper>
+        <LanguageProvider>
+          <BodyWrapper>{children}</BodyWrapper>
+        </LanguageProvider>
       </body>
     </html>
   )

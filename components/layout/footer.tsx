@@ -1,7 +1,9 @@
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, Clock, Youtube, Linkedin } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function Footer() {
+  const { t } = useLanguage()
   return (
     <footer className="bg-gray-900 text-white pt-20 pb-10">
       <div className="container-custom">
@@ -15,8 +17,7 @@ export default function Footer() {
               <span className="text-2xl font-bold gradient-text">NTDM Animal Hospital</span>
             </div>
             <p className="text-gray-400 mb-6">
-              Revolutionizing animal health with innovative tracking, consultation, and care solutions for livestock and
-              pets.
+              {t('footer.description')}
             </p>
             <div className="flex space-x-4">
               <a
@@ -71,32 +72,32 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6 flex items-center">
               <span className="w-8 h-0.5 bg-primary mr-3"></span>
-              Quick Links
+              {t('footer.quickLinks')}
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/services" className="text-gray-400 hover:text-primary transition-colors">
-                  Our Services
+                  {t('nav.services')}
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="text-gray-400 hover:text-primary transition-colors">
-                  Customer Portal
+                  {t('Customer Portal')}
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="text-gray-400 hover:text-primary transition-colors">
-                  About Us
+                  {t('nav.about')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-400 hover:text-primary transition-colors">
-                  Contact
+                  {t('nav.contact')}
                 </Link>
               </li>
               <li>
                 <Link href="/booking" className="text-gray-400 hover:text-primary transition-colors">
-                  Book Consultation
+                  {t('Book Consultation')}
                 </Link>
               </li>
             </ul>
@@ -106,7 +107,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6 flex items-center">
               <span className="w-8 h-0.5 bg-primary mr-3"></span>
-              Contact Us
+              {t('footer.contact')}
             </h3>
             <ul className="space-y-4">
               <li className="flex items-start">
@@ -128,27 +129,27 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6 flex items-center">
               <span className="w-8 h-0.5 bg-primary mr-3"></span>
-              Business Hours
+              {t('contact.hours')}
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start">
                 <Clock className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
                 <div>
-                  <p className="text-gray-400">Monday - Friday:</p>
+                  <p className="text-gray-400">{t('footer.weekdays')}:</p>
                   <p className="font-semibold text-white">8:00 AM - 6:00 PM</p>
                 </div>
               </li>
               <li className="flex items-start">
                 <Clock className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
                 <div>
-                  <p className="text-gray-400">Saturday:</p>
+                  <p className="text-gray-400">{t('footer.saturday')}:</p>
                   <p className="font-semibold text-white">9:00 AM - 4:00 PM</p>
                 </div>
               </li>
               <li className="flex items-start">
                 <Clock className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
                 <div>
-                  <p className="text-gray-400">Emergency Services:</p>
+                  <p className="text-gray-400">{t('contact.emergency')}:</p>
                   <p className="font-semibold text-white">24/7</p>
                 </div>
               </li>
@@ -159,18 +160,18 @@ export default function Footer() {
         {/* Newsletter Subscription */}
         <div className="border-t border-gray-800 pt-10 pb-8 mb-8">
           <div className="max-w-2xl mx-auto text-center">
-            <h3 className="text-xl font-semibold mb-4">Subscribe to Our Newsletter</h3>
+            <h3 className="text-xl font-semibold mb-4">{t('footer.newsletter')}</h3>
             <p className="text-gray-400 mb-6">
-              Stay updated with our latest services, animal care tips, and special offers.
+              {t('footer.newsletterDesc')}
             </p>
             <form className="flex flex-col sm:flex-row gap-4">
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('footer.emailPlaceholder')}
                 className="flex-grow px-4 py-3 rounded-full bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <button type="submit" className="btn-primary">
-                Subscribe
+                {t('footer.subscribe')}
               </button>
             </form>
           </div>
@@ -178,11 +179,11 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="text-center text-gray-500 text-sm">
-          <p>&copy; {new Date().getFullYear()} NTDM Animal Hospital. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {t('footer.company')}. {t('footer.rights')}.</p>
           <p className="mt-2">
-            <span className="inline-block">Serving Rwanda and East Africa</span>
+            <span className="inline-block">{t('footer.serving')}</span>
             <span className="mx-2">|</span>
-            <span className="inline-block">Track, Consult, and Care for Your Animals</span>
+            <span className="inline-block">{t('footer.tagline')}</span>
           </p>
         </div>
       </div>
