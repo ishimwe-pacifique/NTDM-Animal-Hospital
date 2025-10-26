@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 import { MapPin, Navigation, Zap } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface LocationPoint {
   latitude: number
@@ -16,6 +17,7 @@ interface RwandaMapProps {
 }
 
 export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
+  const { t } = useLanguage()
   const mapRef = useRef<HTMLDivElement>(null)
   const [map, setMap] = useState<any>(null)
   const [selectedPoint, setSelectedPoint] = useState<LocationPoint | null>(null)
@@ -126,25 +128,25 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
               <h3 class="font-bold text-lg text-gray-800 mb-2">${animalName}</h3>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600">Time:</span>
+                  <span class="text-gray-600">${t('farmer.time')}:</span>
                   <span class="font-medium">${new Date(point.timestamp).toLocaleString()}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600">Heart Rate:</span>
+                  <span class="text-gray-600">${t('farmer.heartRate')}:</span>
                   <span class="font-medium text-red-600">${point.bpm} BPM</span>
                 </div>
                 ${
                   point.temperature
                     ? `
                   <div class="flex justify-between">
-                    <span class="text-gray-600">Temperature:</span>
+                    <span class="text-gray-600">${t('farmer.temperature')}:</span>
                     <span class="font-medium text-orange-600">${point.temperature}°C</span>
                   </div>
                 `
                     : ""
                 }
                 <div class="flex justify-between">
-                  <span class="text-gray-600">Location:</span>
+                  <span class="text-gray-600">${t('farmer.location')}:</span>
                   <span class="font-medium">${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}</span>
                 </div>
                 <div class="text-xs text-gray-500 mt-2">
@@ -186,12 +188,12 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <MapPin className="w-4 h-4" />
-            <span>{locationPoints.length} location points tracked</span>
+            <span>{locationPoints.length} {t('farmer.locationPointsTracked')}</span>
           </div>
           {latestPoint && (
             <div className="flex items-center gap-2 text-sm text-green-600">
               <Navigation className="w-4 h-4" />
-              <span>Last seen: {new Date(latestPoint.timestamp).toLocaleTimeString()}</span>
+              <span>{t('farmer.lastSeen')}: {new Date(latestPoint.timestamp).toLocaleTimeString()}</span>
             </div>
           )}
         </div>
@@ -201,14 +203,14 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
             onClick={() => map && map.setView([-1.9403, 29.8739], 9)}
             className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
           >
-            Reset View
+            {t('farmer.resetView')}
           </button>
           {latestPoint && (
             <button
               onClick={() => map && map.setView([latestPoint.latitude, latestPoint.longitude], 12)}
               className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors"
             >
-              Latest Location
+              {t('farmer.latestLocation')}
             </button>
           )}
         </div>
@@ -227,7 +229,7 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
           <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-              <p className="text-gray-600">Loading Rwanda map...</p>
+              <p className="text-gray-600">{t('farmer.loadingRwandaMap')}</p>
             </div>
           </div>
         )}
@@ -238,12 +240,12 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         <div className="bg-white rounded-lg p-4 border shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <MapPin className="w-5 h-5 text-blue-500" />
-            <h4 className="font-semibold text-gray-800">Coverage Area</h4>
+            <h4 className="font-semibold text-gray-800">{t('farmer.coverageArea')}</h4>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {locationPoints.length > 1 ? "Multiple" : locationPoints.length === 1 ? "Single" : "No"} Points
+            {locationPoints.length > 1 ? t('farmer.multiplePoints') : locationPoints.length === 1 ? t('farmer.singlePoint') : t('farmer.noPoints')} Points
           </p>
-          <p className="text-sm text-gray-600">Tracking locations</p>
+          <p className="text-sm text-gray-600">{t('farmer.trackingLocations')}</p>
         </div>
 
         {latestPoint && (
@@ -251,10 +253,10 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
             <div className="bg-white rounded-lg p-4 border shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-5 h-5 text-red-500" />
-                <h4 className="font-semibold text-gray-800">Current Health</h4>
+                <h4 className="font-semibold text-gray-800">{t('farmer.currentHealth')}</h4>
               </div>
               <p className="text-2xl font-bold text-red-600">{latestPoint.bpm} BPM</p>
-              <p className="text-sm text-gray-600">Heart rate</p>
+              <p className="text-sm text-gray-600">{t('farmer.heartRate')}</p>
             </div>
 
             {latestPoint.temperature && (
@@ -267,10 +269,10 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <h4 className="font-semibold text-gray-800">Temperature</h4>
+                  <h4 className="font-semibold text-gray-800">{t('farmer.temperature')}</h4>
                 </div>
                 <p className="text-2xl font-bold text-orange-600">{latestPoint.temperature}°C</p>
-                <p className="text-sm text-gray-600">Body temperature</p>
+                <p className="text-sm text-gray-600">{t('farmer.bodyTemperature')}</p>
               </div>
             )}
           </>
@@ -280,25 +282,25 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
       {/* Selected Point Details */}
       {selectedPoint && (
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
-          <h4 className="font-semibold text-gray-800 mb-3">Selected Location Details</h4>
+          <h4 className="font-semibold text-gray-800 mb-3">{t('farmer.selectedLocationDetails')}</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-gray-600 block">Coordinates</span>
+              <span className="text-gray-600 block">{t('farmer.coordinates')}</span>
               <span className="font-medium">
                 {selectedPoint.latitude.toFixed(6)}, {selectedPoint.longitude.toFixed(6)}
               </span>
             </div>
             <div>
-              <span className="text-gray-600 block">Time</span>
+              <span className="text-gray-600 block">{t('farmer.time')}</span>
               <span className="font-medium">{new Date(selectedPoint.timestamp).toLocaleString()}</span>
             </div>
             <div>
-              <span className="text-gray-600 block">Heart Rate</span>
+              <span className="text-gray-600 block">{t('farmer.heartRate')}</span>
               <span className="font-medium text-red-600">{selectedPoint.bpm} BPM</span>
             </div>
             {selectedPoint.temperature && (
               <div>
-                <span className="text-gray-600 block">Temperature</span>
+                <span className="text-gray-600 block">{t('farmer.temperature')}</span>
                 <span className="font-medium text-orange-600">{selectedPoint.temperature}°C</span>
               </div>
             )}
