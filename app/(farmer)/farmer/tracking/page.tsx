@@ -210,19 +210,45 @@ export default function PetTrackingPage() {
   const bpmStatus = getBpmStatus(latestBpm)
   const temperatureStatus = getTemperatureStatus(latestTemperature)
 
-  // Data for pie chart
+  // Data for pie chart - use English keys for consistent colors
   const statusCounts = data.reduce((acc: Record<string, number>, item: FormattedData) => {
-    const status = getBpmStatus(item.bpm).label
-    acc[status] = (acc[status] || 0) + 1
+    const bpm = item.bpm
+    let statusKey = "High"
+    if (bpm === 0) statusKey = "No Data"
+    else if (bpm < 60) statusKey = "Low"
+    else if (bpm <= 100) statusKey = "Normal"
+    else if (bpm <= 130) statusKey = "Elevated"
+    
+    acc[statusKey] = (acc[statusKey] || 0) + 1
     return acc
   }, {})
 
-  const pieData = Object.entries(statusCounts).map(([name, value]: [string, number]) => ({
-    name,
+  const getStatusColor = (statusKey: string) => {
+    switch (statusKey) {
+      case "No Data": return "#9CA3AF"
+      case "Low": return "#3B82F6"
+      case "Normal": return "#10B981"
+      case "Elevated": return "#F59E0B"
+      case "High": return "#EF4444"
+      default: return "#9CA3AF"
+    }
+  }
+
+  const getTranslatedStatus = (statusKey: string) => {
+    switch (statusKey) {
+      case "No Data": return t('farmer.noData')
+      case "Low": return t('farmer.low')
+      case "Normal": return t('farmer.normal')
+      case "Elevated": return t('farmer.elevated')
+      case "High": return t('farmer.high')
+      default: return statusKey
+    }
+  }
+
+  const pieData = Object.entries(statusCounts).map(([statusKey, value]: [string, number]) => ({
+    name: getTranslatedStatus(statusKey),
     value,
-    color: getBpmStatus(
-      name === "No Data" ? 0 : name === "Low" ? 50 : name === "Normal" ? 80 : name === "Elevated" ? 120 : 150,
-    ).color,
+    color: getStatusColor(statusKey),
   }))
 
   // Get locations for map

@@ -40,7 +40,11 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         })
 
         // Initialize map centered on Rwanda
-        const mapInstance = L.map(mapRef.current!).setView([-1.9403, 29.8739], 9)
+        const mapInstance = L.map(mapRef.current!, {
+          center: [-1.9403, 29.8739],
+          zoom: 9,
+          zoomControl: true
+        })
 
         // Add OpenStreetMap tiles
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -167,7 +171,7 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         })
       })
 
-      // Fit map to show all points
+      // Fit map to show all points or ensure default view
       if (locationPoints.length > 1) {
         import("leaflet").then((L) => {
           const group = L.featureGroup(locationPoints.map((point) => L.marker([point.latitude, point.longitude])))
@@ -175,6 +179,9 @@ export function RwandaMap({ locationPoints, animalName }: RwandaMapProps) {
         })
       } else if (locationPoints.length === 1) {
         map.setView([locationPoints[0].latitude, locationPoints[0].longitude], 12)
+      } else {
+        // Ensure map shows Rwanda when no location points
+        map.setView([-1.9403, 29.8739], 9)
       }
     }
   }, [map, locationPoints, animalName])
