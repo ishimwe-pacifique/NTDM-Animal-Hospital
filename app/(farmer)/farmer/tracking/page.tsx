@@ -5,6 +5,7 @@ import { Activity, MapPin, Heart, RefreshCw, Thermometer, Database, Download, Fi
 import { DistributionChart } from "@/components/distribution-chart"
 import { RwandaMap } from "@/components/rwanda-map"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 // Define our data types based on API response
 type Channel = {
@@ -47,6 +48,7 @@ type FormattedData = {
 }
 
 export default function PetTrackingPage() {
+  const { t } = useLanguage()
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null)
   const [data, setData] = useState<FormattedData[]>([])
   const [loading, setLoading] = useState(true)
@@ -190,19 +192,19 @@ export default function PetTrackingPage() {
 
   // Dynamic status determination
   const getBpmStatus = (bpm: number) => {
-    if (bpm === 0) return { label: "No Data", color: "#9CA3AF" }
-    if (bpm < 60) return { label: "Low", color: "#3B82F6" }
-    if (bpm <= 100) return { label: "Normal", color: "#10B981" }
-    if (bpm <= 130) return { label: "Elevated", color: "#F59E0B" }
-    return { label: "High", color: "#EF4444" }
+    if (bpm === 0) return { label: t('farmer.noData'), color: "#9CA3AF" }
+    if (bpm < 60) return { label: t('farmer.low'), color: "#3B82F6" }
+    if (bpm <= 100) return { label: t('farmer.normal'), color: "#10B981" }
+    if (bpm <= 130) return { label: t('farmer.elevated'), color: "#F59E0B" }
+    return { label: t('farmer.high'), color: "#EF4444" }
   }
 
   const getTemperatureStatus = (temp: number | null) => {
-    if (temp === null) return { label: "No Data", color: "#9CA3AF" }
-    if (temp < 36) return { label: "Low", color: "#3B82F6" }
-    if (temp <= 39) return { label: "Normal", color: "#10B981" }
-    if (temp <= 41) return { label: "Elevated", color: "#F59E0B" }
-    return { label: "High", color: "#EF4444" }
+    if (temp === null) return { label: t('farmer.noData'), color: "#9CA3AF" }
+    if (temp < 36) return { label: t('farmer.low'), color: "#3B82F6" }
+    if (temp <= 39) return { label: t('farmer.normal'), color: "#10B981" }
+    if (temp <= 41) return { label: t('farmer.elevated'), color: "#F59E0B" }
+    return { label: t('farmer.high'), color: "#EF4444" }
   }
 
   const bpmStatus = getBpmStatus(latestBpm)
@@ -239,25 +241,25 @@ export default function PetTrackingPage() {
 
       // Header
       doc.setFontSize(20)
-      doc.text('Animal Health Monitoring Report', 20, 30)
+      doc.text(t('farmer.animalHealthMonitoringReport'), 20, 30)
 
       doc.setFontSize(12)
-      doc.text(`Animal: ${apiResponse?.channel.name || 'Unknown'}`, 20, 50)
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 60)
-      doc.text(`Channel ID: ${deviceId}`, 20, 70)
+      doc.text(`${t('farmer.animal')}: ${apiResponse?.channel.name || t('farmer.unknown')}`, 20, 50)
+      doc.text(`${t('farmer.generated')}: ${new Date().toLocaleString()}`, 20, 60)
+      doc.text(`${t('farmer.channelId')}: ${deviceId}`, 20, 70)
 
       // Stats
       doc.setFontSize(14)
-      doc.text('Health Summary', 20, 90)
+      doc.text(t('farmer.healthSummary'), 20, 90)
       doc.setFontSize(10)
-      doc.text(`Latest ${getFieldLabel('field1')}: ${latestBpm}`, 20, 105)
-      doc.text(`Average ${getFieldLabel('field1')}: ${averageBpm}`, 20, 115)
-      doc.text(`Latest Temperature: ${latestTemperature || 'N/A'}°C`, 20, 125)
-      doc.text(`Location Coverage: ${locationPercentage}%`, 20, 135)
+      doc.text(`${t('farmer.latest')} ${getFieldLabel('field1')}: ${latestBpm}`, 20, 105)
+      doc.text(`${t('farmer.average')} ${getFieldLabel('field1')}: ${averageBpm}`, 20, 115)
+      doc.text(`${t('farmer.latest')} ${t('farmer.temperature')}: ${latestTemperature || 'N/A'}°C`, 20, 125)
+      doc.text(`${t('farmer.locationCoverage')}: ${locationPercentage}%`, 20, 135)
 
       // Recent data
       doc.setFontSize(14)
-      doc.text('Recent Readings', 20, 155)
+      doc.text(t('farmer.recentReadings'), 20, 155)
       doc.setFontSize(8)
 
       let yPos = 170
@@ -277,7 +279,7 @@ export default function PetTrackingPage() {
   }
 
   const exportToCSV = () => {
-    const headers = ['Timestamp', 'BPM', 'Temperature', 'Latitude', 'Longitude', 'Status']
+    const headers = [t('farmer.timestamp'), 'BPM', t('farmer.temperature'), t('farmer.latitude'), t('farmer.longitude'), t('farmer.status')]
     const csvData = data.map(item => [
       new Date(item.timestamp).toLocaleString(),
       item.bpm,
@@ -306,37 +308,37 @@ export default function PetTrackingPage() {
 
       // Animal info sheet
       const animalInfo = {
-        'Animal Name': apiResponse?.channel.name || 'Unknown',
-        'Channel ID': deviceId,
-        'Report Date': new Date().toLocaleString(),
-        'Latest BPM': latestBpm,
-        'Average BPM': averageBpm,
-        'Latest Temperature': latestTemperature || 'N/A',
-        'Location Coverage': `${locationPercentage}%`,
-        'Total Records': data.length
+        [t('farmer.animal')]: apiResponse?.channel.name || t('farmer.unknown'),
+        [t('farmer.channelId')]: deviceId,
+        [t('farmer.reportDate')]: new Date().toLocaleString(),
+        [`${t('farmer.latest')} BPM`]: latestBpm,
+        [`${t('farmer.average')} BPM`]: averageBpm,
+        [`${t('farmer.latest')} ${t('farmer.temperature')}`]: latestTemperature || 'N/A',
+        [t('farmer.locationCoverage')]: `${locationPercentage}%`,
+        [t('farmer.totalRecords')]: data.length
       }
 
       // Health data sheet
       const healthData = data.map(item => ({
-        'Timestamp': new Date(item.timestamp).toLocaleString(),
+        [t('farmer.timestamp')]: new Date(item.timestamp).toLocaleString(),
         'BPM': item.bpm,
-        'Temperature (°C)': item.temperature || '',
-        'Latitude': item.latitude || '',
-        'Longitude': item.longitude || '',
-        'BPM Status': getBpmStatus(item.bpm).label,
-        'Temp Status': getTemperatureStatus(item.temperature).label,
-        'Has Location': item.hasLocation ? 'Yes' : 'No'
+        [`${t('farmer.temperature')} (°C)`]: item.temperature || '',
+        [t('farmer.latitude')]: item.latitude || '',
+        [t('farmer.longitude')]: item.longitude || '',
+        [t('farmer.bpmStatus')]: getBpmStatus(item.bpm).label,
+        [t('farmer.tempStatus')]: getTemperatureStatus(item.temperature).label,
+        [t('farmer.hasLocation')]: item.hasLocation ? t('farmer.yes') : t('farmer.no')
       }))
 
       const wb = XLSX.utils.book_new()
 
       // Add animal info sheet
       const infoWs = XLSX.utils.json_to_sheet([animalInfo])
-      XLSX.utils.book_append_sheet(wb, infoWs, 'Animal Info')
+      XLSX.utils.book_append_sheet(wb, infoWs, t('farmer.animalInfo'))
 
       // Add health data sheet
       const dataWs = XLSX.utils.json_to_sheet(healthData)
-      XLSX.utils.book_append_sheet(wb, dataWs, 'Health Data')
+      XLSX.utils.book_append_sheet(wb, dataWs, t('farmer.healthData'))
 
       XLSX.writeFile(wb, `health-report-${new Date().toISOString().split('T')[0]}.xlsx`)
     } catch (error) {
@@ -357,9 +359,9 @@ export default function PetTrackingPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    {apiResponse?.channel.name || "Cow Health Monitor"}
+                    {apiResponse?.channel.name || t('farmer.cowHealthMonitor')}
                   </h1>
-                  <p className="text-gray-600 mt-1">Real-time health and location tracking</p>
+                  <p className="text-gray-600 mt-1">{t('farmer.realTimeTracking')}</p>
                 </div>
               </div>
               {apiResponse && (
@@ -374,14 +376,14 @@ export default function PetTrackingPage() {
 
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-600">
-                <span className="font-medium">Last updated:</span> {lastUpdated}
+                <span className="font-medium">{t('farmer.lastUpdated')}:</span> {lastUpdated}
               </div>
               <div className="flex gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl shadow-md hover:shadow-lg hover:bg-green-700 transition-all duration-200">
                       <Download className="w-4 h-4" />
-                      <span className="font-medium">Export Report</span>
+                      <span className="font-medium">{t('farmer.exportReport')}</span>
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -405,7 +407,7 @@ export default function PetTrackingPage() {
                   disabled={refreshing}
                 >
                   <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-                  <span className="font-medium">Refresh</span>
+                  <span className="font-medium">{t('farmer.refresh')}</span>
                 </button>
               </div>
             </div>
@@ -416,11 +418,11 @@ export default function PetTrackingPage() {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            Data Source Configuration
+            {t('farmer.dataSourceConfig')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Channel ID</label>
+              <label className="block text-sm font-medium text-gray-700">{t('farmer.channelId')}</label>
               <input
                 type="text"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -432,7 +434,7 @@ export default function PetTrackingPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">API Key</label>
+              <label className="block text-sm font-medium text-gray-700">{t('farmer.apiKey')}</label>
               <div className="relative">
                 <input
                   type={showApiKey ? "text" : "password"}
@@ -453,7 +455,7 @@ export default function PetTrackingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Results Count</label>
+              <label className="block text-sm font-medium text-gray-700">{t('farmer.resultsCount')}</label>
               <div className="flex gap-2">
                 <input
                   type="number"
@@ -467,7 +469,7 @@ export default function PetTrackingPage() {
                   className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
                   onClick={fetchSensorData}
                 >
-                  Fetch
+                  {t('farmer.fetch')}
                 </button>
               </div>
             </div>
@@ -478,21 +480,21 @@ export default function PetTrackingPage() {
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600 font-medium">Loading sensor data...</p>
+              <p className="text-gray-600 font-medium">{t('farmer.loadingSensorData')}</p>
             </div>
           </div>
         ) : data.length === 0 ? (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-12 text-center">
             <div className="text-6xl mb-4">📡</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No Data Available</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('farmer.noDataAvailable')}</h3>
             <p className="text-gray-600 mb-6">
-              No sensor data found for the selected channel. Please verify the Channel ID and API Key.
+              {t('farmer.noSensorData')}
             </p>
             <button
               onClick={fetchSensorData}
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
             >
-              Try Again
+              {t('farmer.tryAgain')}
             </button>
           </div>
         ) : (
@@ -502,34 +504,34 @@ export default function PetTrackingPage() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  Data Fields Mapping
+                  {t('farmer.dataFieldsMapping')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-100">
                     <Heart className="w-6 h-6 text-red-500" />
                     <div>
-                      <p className="font-semibold text-red-800">Field 1</p>
+                      <p className="font-semibold text-red-800">{t('farmer.field')} 1</p>
                       <p className="text-sm text-red-600">{getFieldLabel("field1")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
                     <MapPin className="w-6 h-6 text-blue-500" />
                     <div>
-                      <p className="font-semibold text-blue-800">Field 2</p>
+                      <p className="font-semibold text-blue-800">{t('farmer.field')} 2</p>
                       <p className="text-sm text-blue-600">{getFieldLabel("field2")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
                     <MapPin className="w-6 h-6 text-green-500" />
                     <div>
-                      <p className="font-semibold text-green-800">Field 3</p>
+                      <p className="font-semibold text-green-800">{t('farmer.field')} 3</p>
                       <p className="text-sm text-green-600">{getFieldLabel("field3")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-100">
                     <Thermometer className="w-6 h-6 text-orange-500" />
                     <div>
-                      <p className="font-semibold text-orange-800">Field 4</p>
+                      <p className="font-semibold text-orange-800">{t('farmer.field')} 4</p>
                       <p className="text-sm text-orange-600">{getFieldLabel("field4")}</p>
                     </div>
                   </div>
@@ -559,7 +561,7 @@ export default function PetTrackingPage() {
                     {bpmStatus.label}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Latest {getFieldLabel("field1")}</h3>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">{t('farmer.latest')} {getFieldLabel("field1")}</h3>
                 <p className="text-3xl font-bold text-gray-900">{latestBpm}</p>
               </div>
 
@@ -595,7 +597,7 @@ export default function PetTrackingPage() {
                     <Activity className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Average {getFieldLabel("field1")}</h3>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">{t('farmer.average')} {getFieldLabel("field1")}</h3>
                 <p className="text-3xl font-bold text-gray-900">{averageBpm}</p>
               </div>
 
@@ -605,7 +607,7 @@ export default function PetTrackingPage() {
                     <MapPin className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Location Coverage</h3>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">{t('farmer.locationCoverage')}</h3>
                 <div className="flex items-baseline gap-2">
                   <p className="text-3xl font-bold text-gray-900">{locationPercentage}%</p>
                   <span className="text-sm text-gray-500">
@@ -620,7 +622,7 @@ export default function PetTrackingPage() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  Health Metrics Trend
+                  {t('farmer.healthMetricsTrend')}
                 </h2>
                 <ResponsiveContainer width="100%" height={320}>
                   <ComposedChart data={data}>
@@ -682,7 +684,7 @@ export default function PetTrackingPage() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  {getFieldLabel("field1")} Distribution
+                  {getFieldLabel("field1")} {t('farmer.distribution')}
                 </h2>
                 <DistributionChart pieData={pieData} data={data} />
               </div>
@@ -693,7 +695,7 @@ export default function PetTrackingPage() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  🇷🇼 {apiResponse?.channel.name} Location Tracking in Rwanda
+                  🇷🇼 {apiResponse?.channel.name} {t('farmer.locationTrackingInRwanda')}
                 </h2>
                 <RwandaMap
                   locationPoints={locationPoints.map((point) => ({
@@ -712,22 +714,22 @@ export default function PetTrackingPage() {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                 <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
-                Recent Readings
+                {t('farmer.recentReadings')}
               </h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Time</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('farmer.time')}</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         {getFieldLabel("field1")}
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         {getFieldLabel("field4")}
                       </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('farmer.status')}</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        Location ({getFieldLabel("field2")}, {getFieldLabel("field3")})
+                        {t('farmer.location')} ({getFieldLabel("field2")}, {getFieldLabel("field3")})
                       </th>
                     </tr>
                   </thead>
@@ -788,7 +790,7 @@ export default function PetTrackingPage() {
                                   {item.latitude?.toFixed(6)}, {item.longitude?.toFixed(6)}
                                 </span>
                               ) : (
-                                <span className="text-gray-400">No location data</span>
+                                <span className="text-gray-400">{t('farmer.noLocationData')}</span>
                               )}
                             </td>
                           </tr>

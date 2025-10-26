@@ -1,18 +1,17 @@
-import type { Metadata } from "next"
-import { MessagesPanel } from "@/components/dashboard/messages-panel"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Messages - NTDM Animal Hospital",
-  description: "Communicate with NTDM Animal Hospital veterinarians and staff.",
-}
+import { MessagesPanel } from "@/components/dashboard/messages-panel"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function MessagesPage() {
+  const { t } = useLanguage()
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Messages</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('farmer.messages')}</h1>
         <p className="text-muted-foreground">
-          Communicate with veterinarians about your animals
+          {t('farmer.communicateVeterinarians')}
         </p>
       </div>
       

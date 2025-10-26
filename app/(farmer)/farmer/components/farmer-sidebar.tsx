@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Activity } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function FarmerSidebar() {
+  const { t } = useLanguage();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -37,12 +39,11 @@ export default function FarmerSidebar() {
   }, []);
 
   const navItems = [
-    { href: "/farmer", label: "Dashboard", icon: <Home className="h-5 w-5" /> },
-    { href: "/farmer/animals", label: "Animals", icon: <User className="h-5 w-5" /> },
-    { href: "/farmer/consultations", label: "Consultations", icon: <Stethoscope className="h-5 w-5" /> },
-    // { href: "/farmer/tracking", label: "Tracking", icon: <Activity className="h-5 w-5" /> },
-    { href: "/farmer/tracking", label: "Tracking", icon: <Activity className="h-5 w-5" /> },
-    { href: "/farmer/messages", label: "Messages", icon: <MessageSquare className="h-5 w-5" /> }
+    { href: "/farmer", label: t('farmer.dashboard'), icon: <Home className="h-5 w-5" /> },
+    { href: "/farmer/animals", label: t('farmer.animals'), icon: <User className="h-5 w-5" /> },
+    { href: "/farmer/consultations", label: t('farmer.consultations'), icon: <Stethoscope className="h-5 w-5" /> },
+    { href: "/farmer/tracking", label: t('farmer.tracking'), icon: <Activity className="h-5 w-5" /> },
+    { href: "/farmer/messages", label: t('farmer.messages'), icon: <MessageSquare className="h-5 w-5" /> }
   ];
 
   // Toggle sidebar visibility on mobile
@@ -96,7 +97,7 @@ export default function FarmerSidebar() {
             {/* Sidebar header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               {!collapsed && (
-                <div className="font-bold text-green-700">Farmer Portal</div>
+                <div className="font-bold text-green-700">{t('farmer.portal')}</div>
               )}
               {!isMobile && (
                 <button
@@ -141,7 +142,7 @@ export default function FarmerSidebar() {
             {/* Footer section */}
             <div className="p-4 border-t border-gray-100 text-xs text-gray-500">
               {!collapsed && (
-                <p>© {new Date().getFullYear()} Farmer Portal</p>
+                <p>© {new Date().getFullYear()} {t('farmer.portal')}</p>
               )}
             </div>
           </nav>

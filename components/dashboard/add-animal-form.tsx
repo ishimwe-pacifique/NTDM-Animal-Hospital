@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { registerAnimal } from "@/lib/actions"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface AddAnimalFormProps {
   userId: string;
 }
 
 export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
+  const { t } = useLanguage()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -66,78 +68,78 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Animal Information</CardTitle>
+        <CardTitle>{t('farmer.animalInformation')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Animal Name</Label>
+              <Label htmlFor="name">{t('farmer.name')}</Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter animal name"
+                placeholder={t('farmer.enterAnimalName')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="type">Animal Type</Label>
+              <Label htmlFor="type">{t('farmer.animalType')}</Label>
               <Select value={formData.type} onValueChange={(value) => handleSelectChange("type", value)} required>
                 <SelectTrigger id="type">
-                  <SelectValue placeholder="Select animal type" />
+                  <SelectValue placeholder={t('farmer.selectAnimalType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cow">Cow</SelectItem>
-                  <SelectItem value="goat">Goat</SelectItem>
-                  <SelectItem value="sheep">Sheep</SelectItem>
-                  <SelectItem value="chicken">Chicken</SelectItem>
-                  <SelectItem value="dog">Dog</SelectItem>
-                  <SelectItem value="cat">Cat</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="cow">{t('farmer.cow')}</SelectItem>
+                  <SelectItem value="goat">{t('farmer.goat')}</SelectItem>
+                  <SelectItem value="sheep">{t('farmer.sheep')}</SelectItem>
+                  <SelectItem value="chicken">{t('farmer.chicken')}</SelectItem>
+                  <SelectItem value="dog">{t('farmer.dog')}</SelectItem>
+                  <SelectItem value="cat">{t('farmer.cat')}</SelectItem>
+                  <SelectItem value="other">{t('farmer.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="breed">Breed</Label>
+              <Label htmlFor="breed">{t('farmer.breed')}</Label>
               <Input
                 id="breed"
                 name="breed"
                 value={formData.breed}
                 onChange={handleChange}
-                placeholder="Enter breed"
+                placeholder={t('farmer.enterBreed')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="class">Class</Label>
+              <Label htmlFor="class">{t('farmer.class')}</Label>
               <Select value={formData.class} onValueChange={(value) => handleSelectChange("class", value)} required>
                 <SelectTrigger id="class">
-                  <SelectValue placeholder="Select class" />
+                  <SelectValue placeholder={t('farmer.selectClass')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dairy">Dairy</SelectItem>
-                  <SelectItem value="meat">Meat</SelectItem>
-                  <SelectItem value="poultry">Poultry</SelectItem>
-                  <SelectItem value="pet">Pet</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="dairy">{t('farmer.dairy')}</SelectItem>
+                  <SelectItem value="meat">{t('farmer.meat')}</SelectItem>
+                  <SelectItem value="poultry">{t('farmer.poultry')}</SelectItem>
+                  <SelectItem value="pet">{t('farmer.pet')}</SelectItem>
+                  <SelectItem value="other">{t('farmer.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="district">District</Label>
+              <Label htmlFor="district">{t('farmer.district')}</Label>
               <Select
                 value={formData.district}
                 onValueChange={(value) => handleSelectChange("district", value)}
                 required
               >
                 <SelectTrigger id="district">
-                  <SelectValue placeholder="Select district" />
+                  <SelectValue placeholder={t('farmer.selectDistrict')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="kigali">Kigali</SelectItem>
@@ -150,10 +152,10 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sector">Sector</Label>
+              <Label htmlFor="sector">{t('farmer.sector')}</Label>
               <Select value={formData.sector} onValueChange={(value) => handleSelectChange("sector", value)} required>
                 <SelectTrigger id="sector">
-                  <SelectValue placeholder="Select sector" />
+                  <SelectValue placeholder={t('farmer.selectSector')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="nyarugenge">Nyarugenge</SelectItem>
@@ -166,38 +168,38 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ownerName">Owner Name</Label>
+              <Label htmlFor="ownerName">{t('farmer.ownerName')}</Label>
               <Input
                 id="ownerName"
                 name="ownerName"
                 value={formData.ownerName}
                 onChange={handleChange}
-                placeholder="Enter owner name"
+                placeholder={t('farmer.enterOwnerName')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Label htmlFor="phoneNumber">{t('farmer.phoneNumber')}</Label>
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                placeholder="Enter phone number"
+                placeholder={t('farmer.enterPhoneNumber')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price (RWF)</Label>
+              <Label htmlFor="price">{t('farmer.priceRWF')}</Label>
               <Input
                 id="price"
                 name="price"
                 type="number"
                 value={formData.price}
                 onChange={handleChange}
-                placeholder="Enter price"
+                placeholder={t('farmer.enterPrice')}
                 required
               />
             </div>
@@ -205,10 +207,10 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
 
           <div className="flex justify-end space-x-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              Cancel
+              {t('farmer.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Registering..." : "Register Animal"}
+              {isSubmitting ? t('farmer.registering') : t('farmer.registerAnimal')}
             </Button>
           </div>
         </form>

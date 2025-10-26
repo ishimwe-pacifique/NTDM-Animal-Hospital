@@ -1,6 +1,10 @@
+"use client"
+
 import Image from "next/image"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function BlogBanner() {
+  const { t } = useLanguage()
   return (
     <section className="relative pt-32 pb-20">
       {/* Background Image with Overlay */}
@@ -17,9 +21,9 @@ export default function BlogBanner() {
 
       <div className="container-custom relative z-10">
         <div className="max-w-2xl text-white">
-          <h1 className="heading-xl mb-4 text-blue-600">Our Blog</h1>
+          <h1 className="heading-xl mb-4 text-blue-600">{t('nav.blog')}</h1>
           <p className="text-lg md:text-xl text-white/90">
-            Expert insights, tips, and news on animal health, tracking, and care from our veterinarians.
+            {t('blog.subtitle')}
           </p>
         </div>
       </div>

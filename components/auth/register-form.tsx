@@ -14,6 +14,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { registerUser, loginUser } from "@/lib/actions/auth"
 import { Home, CheckCircle, Mail } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 type UserRole = "farmer" | "doctor" | "admin" | "superadmin"
 
@@ -33,6 +34,7 @@ export default function RegisterForm() {
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
   const router = useRouter()
+  const { t } = useLanguage()
 
   const validatePasswords = () => {
     if (password !== confirmPassword) {
@@ -100,8 +102,8 @@ export default function RegisterForm() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <CheckCircle className="h-6 w-6 text-green-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-green-600">Account Created Successfully!</CardTitle>
-          <CardDescription>Welcome to NTDM Animal Hospital</CardDescription>
+          <CardTitle className="text-2xl font-bold text-green-600">{t('auth.accountCreated')}</CardTitle>
+          <CardDescription>{t('auth.welcome')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert className="border-green-200 bg-green-50">
@@ -114,12 +116,12 @@ export default function RegisterForm() {
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
               <Mail className="h-4 w-4" />
-              <span>Please check your email inbox for a welcome message</span>
+              <span>{t('auth.checkEmail')}</span>
             </div>
             
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800 font-medium mb-2">
-                📧 Check Your Email
+                📧 {t('auth.checkEmailTitle')}
               </p>
               <p className="text-xs text-blue-700">
                 We've sent a welcome email to <strong>{email}</strong> with important information about your account and next steps.
@@ -136,7 +138,7 @@ export default function RegisterForm() {
               onClick={() => router.push("/login")}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              Continue to Login
+              {t('auth.continueLogin')}
             </Button>
           </div>
         </CardContent>
@@ -147,18 +149,18 @@ export default function RegisterForm() {
   return (
     <Card className="w-full">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-        <CardDescription>Enter your information to create an account</CardDescription>
+        <CardTitle className="text-2xl font-bold">{t('auth.createAccount')}</CardTitle>
+        <CardDescription>{t('auth.createAccountDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t('common.name')}</Label>
             <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('common.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -171,7 +173,7 @@ export default function RegisterForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -183,7 +185,7 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -198,7 +200,7 @@ export default function RegisterForm() {
           {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone">{t('common.phone')}</Label>
             <Input
               id="phone"
               placeholder="+250 78 123 4567"
@@ -209,7 +211,7 @@ export default function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label>Account Type</Label>
+            <Label>{t('auth.accountType')}</Label>
             <RadioGroup
               value={role}
               onValueChange={(value) => setRole(value as UserRole)}
@@ -218,7 +220,7 @@ export default function RegisterForm() {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="farmer" id="farmer" />
                 <Label htmlFor="farmer" className="cursor-pointer">
-                  Farmer/Pet Owner
+                  {t('auth.farmerPetOwner')}
                 </Label>
               </div>
               {/* <div className="flex items-center space-x-2">
@@ -266,7 +268,7 @@ export default function RegisterForm() {
           {role === "farmer" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="district">District</Label>
+                <Label htmlFor="district">{t('auth.district')}</Label>
                 <Input
                   id="district"
                   placeholder="e.g., Kigali"
@@ -277,7 +279,7 @@ export default function RegisterForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sector">Sector</Label>
+                <Label htmlFor="sector">{t('auth.sector')}</Label>
                 <Input
                   id="sector"
                   placeholder="e.g., Nyarugenge"
@@ -307,15 +309,15 @@ export default function RegisterForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <p>
-            Already have an account?{" "}
+            {t('auth.haveAccount')}{" "}
             <Link href="/login" className="text-primary hover:underline">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </div>
@@ -326,7 +328,7 @@ export default function RegisterForm() {
             <span className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+            <span className="bg-white px-2 text-gray-500">{t('auth.orContinueWith')}</span>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4">
@@ -334,7 +336,7 @@ export default function RegisterForm() {
             Google
           </Button>
           <Button variant="outline" type="button">
-            Phone Number
+            {t('auth.phoneNumber')}
           </Button>
         </div>
       </CardFooter>

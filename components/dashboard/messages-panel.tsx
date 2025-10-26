@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Send, Plus, Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 type Conversation = {
   id: string
@@ -40,6 +41,7 @@ type User = {
 }
 
 export function MessagesPanel() {
+  const { t } = useLanguage()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [availableUsers, setAvailableUsers] = useState<User[]>([])
@@ -196,7 +198,7 @@ export function MessagesPanel() {
       {/* Conversations List */}
       <Card className="md:col-span-1 overflow-hidden">
         <div className="p-4 border-b flex justify-between items-center">
-          <Input placeholder="Search messages..." className="flex-1 mr-2" />
+          <Input placeholder={t('farmer.searchMessages')} className="flex-1 mr-2" />
           <Dialog open={showNewChat} onOpenChange={setShowNewChat}>
             <DialogTrigger asChild>
               <Button size="sm">
@@ -205,7 +207,7 @@ export function MessagesPanel() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Start New Conversation</DialogTitle>
+                <DialogTitle>{t('farmer.startNewConversation')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {availableUsers.map(user => (
@@ -227,7 +229,7 @@ export function MessagesPanel() {
         <div className="overflow-y-auto h-[calc(100%-60px)]">
           {conversations.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
-              No conversations yet. Start a new chat!
+              {t('farmer.noConversationsYet')}
             </div>
           ) : (
             conversations.map((conversation) => (
@@ -257,7 +259,7 @@ export function MessagesPanel() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 truncate">
-                      {conversation.lastMessage?.content || 'No messages yet'}
+                      {conversation.lastMessage?.content || t('farmer.noMessagesYet')}
                     </p>
                   </div>
                 </div>
@@ -280,7 +282,7 @@ export function MessagesPanel() {
               <div>
                 <h3 className="font-semibold">{selectedConversation.otherUser.name}</h3>
                 <p className="text-xs text-gray-500">
-                  {selectedConversation.otherUser.role === 'doctor' ? 'Veterinarian' : 'Farmer'}
+                  {selectedConversation.otherUser.role === 'doctor' ? t('farmer.veterinarian') : t('farmer.farmer')}
                 </p>
               </div>
             </div>
@@ -288,7 +290,7 @@ export function MessagesPanel() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
-                  No messages yet. Start the conversation!
+                  {t('farmer.noMessagesStart')}
                 </div>
               ) : (
                 messages.map((message) => (
@@ -311,7 +313,7 @@ export function MessagesPanel() {
             <div className="p-4 border-t">
               <div className="flex space-x-2">
                 <Input
-                  placeholder="Type a message..."
+                  placeholder={t('farmer.typeMessage')}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
@@ -331,7 +333,7 @@ export function MessagesPanel() {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-500">
-            Select a conversation to start chatting
+            {t('farmer.selectConversation')}
           </div>
         )}
       </Card>

@@ -1,6 +1,10 @@
+"use client"
+
 import Image from "next/image"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function BookingBanner() {
+  const { t } = useLanguage()
   return (
     <section className="relative pt-32 pb-20">
       {/* Background Image with Overlay */}
@@ -17,9 +21,9 @@ export default function BookingBanner() {
 
       <div className="container-custom relative z-10">
         <div className="max-w-2xl text-white">
-          <h1 className="heading-xl mb-4">Book Your Consultation</h1>
+          <h1 className="heading-xl mb-4">{t('booking.title')}</h1>
           <p className="text-lg md:text-xl text-white/90">
-            Schedule your visit to NTDM Animal Hospital and experience our expert veterinary services.
+            {t('booking.subtitle')}
           </p>
         </div>
       </div>

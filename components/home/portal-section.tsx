@@ -1,42 +1,46 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Laptop, MessageSquare, Bell, FileText } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const portalFeatures = [
-  {
-    icon: <Laptop className="h-6 w-6 text-primary" />,
-    title: "Animal Management",
-    description: "Register and track all your animals in one place with detailed health records and location data.",
-  },
-  {
-    icon: <MessageSquare className="h-6 w-6 text-primary" />,
-    title: "Veterinary Consultations",
-    description: "Book and manage virtual consultations with our expert veterinarians from anywhere.",
-  },
-  {
-    icon: <Bell className="h-6 w-6 text-primary" />,
-    title: "Real-time Alerts",
-    description:
-      "Receive instant notifications about your animals' health, location changes, or appointment reminders.",
-  },
-  {
-    icon: <FileText className="h-6 w-6 text-primary" />,
-    title: "Health Records",
-    description: "Access complete medical history, prescriptions, and treatment plans for all your registered animals.",
-  },
-]
+// Portal features will be translated dynamically
 
 export default function PortalSection() {
+  const { t } = useLanguage()
+  
+  const portalFeatures = [
+    {
+      icon: <Laptop className="h-6 w-6 text-primary" />,
+      title: t('home.portal.management.title'),
+      description: t('home.portal.management.desc'),
+    },
+    {
+      icon: <MessageSquare className="h-6 w-6 text-primary" />,
+      title: t('home.portal.consultations.title'),
+      description: t('home.portal.consultations.desc'),
+    },
+    {
+      icon: <Bell className="h-6 w-6 text-primary" />,
+      title: t('home.portal.alerts.title'),
+      description: t('home.portal.alerts.desc'),
+    },
+    {
+      icon: <FileText className="h-6 w-6 text-primary" />,
+      title: t('home.portal.records.title'),
+      description: t('home.portal.records.desc'),
+    },
+  ]
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="heading-lg mb-6">Customer Portal</h2>
+            <h2 className="heading-lg mb-6">{t('home.portal.title')}</h2>
             <p className="text-xl text-gray-600 mb-8">
-              Our comprehensive customer portal gives you complete control over your animals' health and management.
-              Track, consult, and care for your animals effortlessly.
+              {t('home.portal.subtitle')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -55,10 +59,10 @@ export default function PortalSection() {
 
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
-                <Link href="/login">Login to Portal</Link>
+                <Link href="/login">{t('home.portal.login')}</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/register">Create Account</Link>
+                <Link href="/register">{t('home.portal.createAccount')}</Link>
               </Button>
             </div>
           </div>
@@ -73,9 +77,9 @@ export default function PortalSection() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Track Your Animals Anywhere</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.portal.trackTitle')}</h3>
                 <p className="text-gray-700">
-                  Access real-time data and health information from your phone or computer.
+                  {t('home.portal.trackDesc')}
                 </p>
               </div>
             </div>

@@ -17,6 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 
 interface HeaderUser {
   _id: string
@@ -26,6 +28,7 @@ interface HeaderUser {
 }
 
 export default function FarmerHeader() {
+  const { t } = useLanguage()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<HeaderUser | null>(null)
@@ -87,9 +90,9 @@ export default function FarmerHeader() {
               <Cow className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold leading-tight">Farmer</h1>
+              <h1 className="text-lg font-bold leading-tight">{t('farmer.farmer')}</h1>
               <span className="text-xs text-emerald-100 font-medium hidden sm:block">
-                {user?.name ? `Welcome, ${user.name.split(" ")[0]}` : "Welcome, Farmer"}
+                {user?.name ? `${t('farmer.welcomeBack')}, ${user.name.split(" ")[0]}` : `${t('farmer.welcomeBack')}, ${t('farmer.farmer')}`}
               </span>
             </div>
           </Link>
@@ -97,12 +100,15 @@ export default function FarmerHeader() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+            
             {/* Notifications */}
             <Button
               variant="ghost"
               size="sm"
               className="relative text-white hover:bg-white/10 hover:text-white p-2 h-auto"
-              aria-label="Notifications"
+              aria-label={t('farmer.notifications')}
             >
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
@@ -126,13 +132,13 @@ export default function FarmerHeader() {
                         {user?.name ? user.name.charAt(0).toUpperCase() : "F"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden lg:block font-medium text-sm">{user?.name?.split(" ")[0] || "Farmer"}</span>
+                    <span className="hidden lg:block font-medium text-sm">{user?.name?.split(" ")[0] || t('farmer.farmer')}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name || "Farmer"}</p>
+                      <p className="text-sm font-medium leading-none">{user?.name || t('farmer.farmer')}</p>
                       <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
@@ -140,19 +146,19 @@ export default function FarmerHeader() {
                   <DropdownMenuItem asChild>
                     <Link href="/farmer/profile" className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('farmer.profile')}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/farmer/settings" className="flex items-center">
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>{t('farmer.settings')}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
+                    <span>{t('farmer.logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -184,7 +190,7 @@ export default function FarmerHeader() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-white">{user?.name || "Farmer"}</p>
+                  <p className="font-medium text-white">{user?.name || t('farmer.farmer')}</p>
                   <p className="text-xs text-emerald-100">{user?.email}</p>
                 </div>
               </div>
@@ -200,7 +206,7 @@ export default function FarmerHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="h-5 w-5" />
-                  <span className="font-medium">Profile</span>
+                  <span className="font-medium">{t('farmer.profile')}</span>
                 </Link>
                 <Link
                   href="/farmer/settings"
@@ -208,14 +214,14 @@ export default function FarmerHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Settings className="h-5 w-5" />
-                  <span className="font-medium">Settings</span>
+                  <span className="font-medium">{t('farmer.settings')}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-3 px-3 py-3 rounded-lg text-red-200 hover:text-red-100 hover:bg-red-500/20 transition-all duration-200 w-full text-left"
                 >
                   <LogOut className="h-5 w-5" />
-                  <span className="font-medium">Logout</span>
+                  <span className="font-medium">{t('farmer.logout')}</span>
                 </button>
               </div>
             </div>

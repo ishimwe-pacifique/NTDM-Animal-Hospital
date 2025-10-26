@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface DistributionChartProps {
   pieData: Array<{ name: string; value: number; color: string }>
@@ -6,6 +7,7 @@ interface DistributionChartProps {
 }
 
 export function DistributionChart({ pieData, data }: DistributionChartProps) {
+  const { t } = useLanguage()
   // Create BPM range data for bar chart
   const bpmRanges = [
     { range: "0-60", min: 0, max: 60, color: "#3B82F6" },
@@ -26,8 +28,8 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{`${label} BPM`}</p>
-          <p className="text-blue-600">{`Count: ${payload[0].value} readings`}</p>
-          <p className="text-gray-500 text-sm">{`${((payload[0].value / data.length) * 100).toFixed(1)}% of total`}</p>
+          <p className="text-blue-600">{`${t('farmer.count')}: ${payload[0].value} ${t('farmer.readings')}`}</p>
+          <p className="text-gray-500 text-sm">{`${((payload[0].value / data.length) * 100).toFixed(1)}% ${t('farmer.ofTotal')}`}</p>
         </div>
       )
     }
@@ -40,7 +42,7 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{data.name}</p>
-          <p className="text-blue-600">{`${data.value} readings`}</p>
+          <p className="text-blue-600">{`${data.value} ${t('farmer.readings')}`}</p>
           <p className="text-gray-500 text-sm">
             {`${((data.value / pieData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%`}
           </p>
@@ -54,7 +56,7 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
     <div className="space-y-6">
       {/* Pie Chart */}
       <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Health Status Distribution</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">{t('farmer.healthStatusDistribution')}</h3>
         {pieData.length > 0 ? (
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
@@ -78,13 +80,13 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex justify-center items-center h-64 text-gray-400">No data available</div>
+          <div className="flex justify-center items-center h-64 text-gray-400">{t('farmer.noDataAvailableChart')}</div>
         )}
       </div>
 
       {/* Bar Chart */}
       <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">BPM Range Distribution</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">{t('farmer.bpmRangeDistribution')}</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -92,7 +94,7 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
             <YAxis
               tick={{ fontSize: 12 }}
               axisLine={{ stroke: "#d1d5db" }}
-              label={{ value: "Count", angle: -90, position: "insideLeft" }}
+              label={{ value: t('farmer.count'), angle: -90, position: "insideLeft" }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="count" radius={[4, 4, 0, 0]} stroke="#ffffff" strokeWidth={1}>
@@ -113,7 +115,7 @@ export function DistributionChart({ pieData, data }: DistributionChartProps) {
             style={{ borderLeftColor: item.color }}
           >
             <div className="text-2xl font-bold text-gray-800">{item.value}</div>
-            <div className="text-sm text-gray-600">{item.name} Readings</div>
+            <div className="text-sm text-gray-600">{item.name} {t('farmer.readings')}</div>
             <div className="text-xs text-gray-500 mt-1">
               {((item.value / pieData.reduce((sum, i) => sum + i.value, 0)) * 100).toFixed(1)}%
             </div>

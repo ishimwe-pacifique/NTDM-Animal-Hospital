@@ -1,16 +1,19 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MapPin } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function CTASection() {
+  const { t } = useLanguage()
   return (
     <section className="py-20 bg-gradient-to-br from-primary/10 to-secondary/10 relative overflow-hidden">
       <div className="container-custom">
         <div className="text-center mb-12">
-          <h2 className="heading-lg mb-6">Our Locations</h2>
+          <h2 className="heading-lg mb-6">{t('home.locations.title')}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8 text-lg">
-            Visit us at one of our convenient locations across Rwanda. Each hospital offers our full range of animal
-            care services.
+            {t('home.locations.subtitle')}
           </p>
         </div>
 
@@ -28,23 +31,23 @@ export default function CTASection() {
               <p className="text-gray-600 mb-1">{location.address}</p>
               <p className="text-gray-600 mb-4">{location.phone}</p>
               <Link href="/contact" className="text-primary hover:text-primary/80 font-medium">
-                Get Directions
+                {t('home.locations.directions')}
               </Link>
             </div>
           ))}
         </div>
 
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">Ready to Experience Better Animal Care?</h3>
+          <h3 className="text-2xl font-bold mb-4">{t('home.cta.title')}</h3>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-            Book your consultation today and let our expert veterinarians help keep your animals healthy and productive.
+            {t('home.cta.subtitle')}
           </p>
           <Button
             asChild
             size="lg"
             className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shadow-md"
           >
-            <Link href="/booking">Book Your Consultation Now</Link>
+            <Link href="/booking">{t('home.cta.button')}</Link>
           </Button>
         </div>
       </div>

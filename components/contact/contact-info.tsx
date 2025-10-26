@@ -1,18 +1,22 @@
+"use client"
+
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function ContactInfo() {
+  const { t } = useLanguage()
   return (
     <div className="salon-card p-8 shadow-salon">
       <h2 className="heading-md mb-6 flex items-center">
         <span className="w-8 h-0.5 bg-primary mr-2"></span>
-        Get In Touch
+        {t('contact.getInTouch')}
       </h2>
 
       <div className="space-y-6">
         <div className="flex items-start">
           <MapPin className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
-            <h3 className="font-semibold mb-1">Address</h3>
+            <h3 className="font-semibold mb-1">{t('contact.address')}</h3>
             <p className="text-gray-600">Nyagatare, Rwanda</p>
           </div>
         </div>
@@ -20,7 +24,7 @@ export default function ContactInfo() {
         <div className="flex items-start">
           <Phone className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
-            <h3 className="font-semibold mb-1">Phone</h3>
+            <h3 className="font-semibold mb-1">{t('common.phone')}</h3>
             <p className="text-gray-600">+250 78 051 9960</p>
           </div>
         </div>
@@ -28,7 +32,7 @@ export default function ContactInfo() {
         <div className="flex items-start">
           <Mail className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
-            <h3 className="font-semibold mb-1">Email</h3>
+            <h3 className="font-semibold mb-1">{t('common.email')}</h3>
             <p className="text-gray-600">ntdm2050@gmail.com</p>
           </div>
         </div>
@@ -36,18 +40,18 @@ export default function ContactInfo() {
         <div className="flex items-start">
           <Clock className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
-            <h3 className="font-semibold mb-1">Business Hours</h3>
+            <h3 className="font-semibold mb-1">{t('contact.hours')}</h3>
             <div className="text-gray-600">
-              <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
-              <p>Saturday: 9:00 AM - 4:00 PM</p>
-              <p>Emergency Services: 24/7</p>
+              <p>{t('footer.weekdays')}: 8:00 AM - 6:00 PM</p>
+              <p>{t('footer.saturday')}: 9:00 AM - 4:00 PM</p>
+              <p>{t('contact.emergency')}: 24/7</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="mt-8 pt-6 border-t border-gray-100">
-        <h3 className="font-semibold mb-3">Connect With Us</h3>
+        <h3 className="font-semibold mb-3">{t('footer.followUs')}</h3>
         <div className="flex space-x-4">
           <a
             href="https://www.instagram.com/ntdm_animal_hosipital?igsh=bjBuZW40YXpnN3Zm"
