@@ -578,7 +578,7 @@ const translations = {
     'home.portal.records.desc': 'Gera ku mateka yuzuye y\'ubuvuzi, imiti, n\'igenamigambi ry\'ubuvuzi bw\'amatungo yawe zose zanditswe',
     'home.portal.login': 'Injira ku Rubuga',
     'home.portal.createAccount': 'Fungura Konti',
-    'home.portal.trackTitle': 'Kurikirana Amtungo Yawe Hose',
+    'home.portal.trackTitle': 'Kurikirana Amatungo Yawe Hose',
     'home.portal.trackDesc': 'Gera ku makuru y\'ako kanya n\'amakuru y\'ubuzima uhereye kuri terefone yawe cyangwa mudasobwa',
     
     // Services
@@ -767,7 +767,7 @@ const translations = {
     'farmer.settings': 'Amagenamiterere',
     'farmer.logout': 'Gusohoka',
     'farmer.myAnimals': 'Amatungo Yanjye',
-    'farmer.registeredAnimals': 'Amtungo Yanditswe',
+    'farmer.registeredAnimals': 'Amatungo Yanditswe',
     'farmer.registerNewAnimal': 'Andika Itungo Rishya',
     'farmer.animalsInventory': 'Urutonde rw\'amatungo',
     'farmer.noAnimalsYet': 'Ntufite amatungo yanditswe',
