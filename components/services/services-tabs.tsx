@@ -258,8 +258,18 @@ const services = {
     },
   ],
   government: [
-    {
+        {
       id: "g1",
+      name: "Access RVSMS",
+      description: "Rwanda Veterinary SMS Management System - Access the government veterinary services portal.",
+      price: "Free Access",
+      duration: "Online portal",
+      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Mn99yF88tjmOB5fPByC1VgcKxCUhM.png",
+      link: "https://rvsms.vercel.app/",
+    },
+
+    {
+      id: "g2",
       name: "Farm Registration Assistance",
       description: "Help with all government farm registration requirements.",
       price: 10000,
@@ -268,7 +278,7 @@ const services = {
         "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
     {
-      id: "g2",
+      id: "g3",
       name: "Export Certification",
       description: "Preparation of all documents for animal product exports.",
       price: 15000,
@@ -277,7 +287,7 @@ const services = {
         "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
     {
-      id: "g3",
+      id: "g4",
       name: "Inspection Preparation",
       description: "Get your farm ready for government inspections.",
       price: 12000,
@@ -286,7 +296,7 @@ const services = {
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
     {
-      id: "g4",
+      id: "g5",
       name: "Subsidy Application",
       description: "Assistance with agricultural subsidy applications.",
       price: 8000,
@@ -295,7 +305,7 @@ const services = {
         "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
     {
-      id: "g5",
+      id: "g6",
       name: "Disease Reporting",
       description: "Proper documentation and reporting of notifiable diseases.",
       price: 5000,
@@ -303,15 +313,7 @@ const services = {
       image:
         "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
-    {
-      id: "g6",
-      name: "Access RVSMS",
-      description: "Rwanda Veterinary SMS Management System - Access the government veterinary services portal.",
-      price: "Free Access",
-      duration: "Online portal",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Mn99yF88tjmOB5fPByC1VgcKxCUhM.png",
-      link: "https://rvsms.vercel.app/",
-    },
+ 
   ],
   Ai: ["Coming Soon"],
 }
