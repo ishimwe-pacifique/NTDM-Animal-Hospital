@@ -534,14 +534,14 @@ const translations = {
     // Home Page
     'home.hero.titleStart': 'Gukurikirana, Kubaza Inama, no',
     'home.hero.titleEnd': 'Kwita ku Matungo Yawe',
-    'home.hero.subtitle': 'Ibisubizo bigezweho by\'abafite amatungo n\'inyamanswa zo mu rugo. Gukurikirana mu buryo bugezweho, kubaza inama inzobere, n\'ubuvuzi byuzuye - byose ahantu hamwe',
+    'home.hero.subtitle': 'Ibisubizo bigezweho by\'abafite amatungo n\'amatungo yo mu rugo. Gukurikirana mu buryo bugezweho, kubaza inama inzobere, n\'ubuvuzi byuzuye - byose ahantu hamwe',
     'home.hero.cta': 'Reba Amaserivisi Yacu',
     'home.hero.bookConsultation': 'Fata Randevu',
-    'home.hero.trusted': 'Byizerwemo n\'abafite inyamanswa barenga 5,000 muri Rwanda',
+    'home.hero.trusted': 'Byizerwemo n\'abafite amatungo barenga 5,000 muri Rwanda',
     'home.services.title': 'Amaserivisi Yacu Akomeye',
-    'home.services.subtitle': 'Ibisubizo byuzuye by\'ubuzima bw\'amatungo, gukurikirana, n\'imicungire kugira ngo twemeze ubuzima bwiza bw\'amatungo yawe n\'inyamanswa zo mu rugo',
+    'home.services.subtitle': 'Ibisubizo byuzuye by\'ubuzima bw\'amatungo, gukurikirana, n\'imicungire kugira ngo twemeze ubuzima bwiza bw\'amatungo yawe n\'amatungo yo mu rugo',
     'home.features.title': 'Impamvu wahitamo NTDM Animal Hospital?',
-    'home.features.subtitle': 'Menya itandukaniro hamwe n\'ubwiyunge bwacu bwo gukora neza, ubuhanga, n\'ubuvuzi byuzuye bw\'inyamanswa',
+    'home.features.subtitle': 'Menya itandukaniro hamwe n\'ubwiyunge bwacu bwo gukora neza, ubuhanga, n\'ubuvuzi byuzuye bw\'amatungo',
     'home.features.expert.title': 'Abaganga b\'amatungo b\'Inzobere',
     'home.features.expert.desc': 'Itsinda ryacu ry\'abaganga b\'amatungo bemerewe rizana uburambe bw\'imyaka myinshi n\'ubumenyi bwihariye muri buri kibazo',
     'home.features.technology.title': 'Ikoranabuhanga Rigezweho',
@@ -556,7 +556,7 @@ const translations = {
     'home.testimonials.dairyFarmer': 'Umworozi w\'Amata',
     'home.testimonials.quote1': 'Ibikoresho byo gukurikirana biva kuri NTDM byahinduye uburyo ncunga inka zanjye. Nshobora gukurikirana aho ziherereye n\'ubuzima bwazo mu gihe nyacyo, ibyo byongereye cyane umusaruro w\'ubworozi bwanjye',
     'home.testimonials.quote2': 'Inama za tekinoroji ni byoroshye cyane. Igihe imbwa yanjye yarwariye, nabonye inama z\'inzobere mu minota mike nta kugenda kwa muganga. Ndasaba cyane!',
-    'home.testimonials.quote3': 'Sisitemu yo gukurikirana indwara yantumye nkagaragaza vuba indwara mu bworozi bwanjye bw\'inkoko. Igisubizo cyihuse cy\'abaganga b\'inyamanswa ba NTDM cyarokoje inkoko nyinshi. Serivisi yabo ni nziza cyane',
+    'home.testimonials.quote3': 'Sisitemu yo gukurikirana indwara yantumye nkagaragaza vuba indwara mu bworozi bwanjye bw\'inkoko. Igisubizo cyihuse cy\'abaganga b\'amatungo ba NTDM cyarokoje inkoko nyinshi. Serivisi yabo ni nziza cyane',
     'home.testimonials.quote4': 'Naguze inka z\'amata binyuze mu isoko rya NTDM maze mbona amatungo asanzwe kandi zitanga amata menshi. Ubufasha bwabo bwo gukurikirana n\'ubushyigikire byari bitangaje. Umusaruro w\'amata wanjye wiyongereye 30%!',
     'home.cta.title': 'Witeguye Kubona Ubuvuzi Bwiza bw\'Amatungo?',
     'home.cta.subtitle': 'Teganya inama yawe uyu munsi kandi ureke abaganga bacu b\'inzobere b\'amatungo bagufashe kubungabunga ubuzima bwiza n\'umusaruro w\'amatungo yawe',
@@ -583,13 +583,13 @@ const translations = {
     
     // Services
     'services.title': 'Amaserivisi Yacu',
-    'services.subtitle': 'Ibisubizo byuzuye by\'ubuvuzi n\'imicungire y\'inyamanswa',
-    'services.tracking.title': 'Gukurikirana inyamanswa',
+    'services.subtitle': 'Ibisubizo byuzuye by\'ubuvuzi n\'imicungire y\'amatungo',
+    'services.tracking.title': 'Gukurikirana amatungo',
     'services.tracking.desc': 'Ibikoresho bya GPS bigezweho byo gukurikirana amatungo',
     'services.consultation.title': 'Inama z\'Ubuvuzi',
-    'services.consultation.desc': 'Inama n\'ubuvuzi bw\'ireme bw\'inyamanswa',
+    'services.consultation.desc': 'Inama n\'ubuvuzi bw\'ireme bw\'amatungo',
     'services.monitoring.title': 'Gukurikirana Indwara',
-    'services.monitoring.desc': 'Kumenya hakiri kare no gukumira indwara z\'inyamanswa',
+    'services.monitoring.desc': 'Kumenya hakiri kare no gukumira indwara z\'amatungo',
     
     // Pharmacy
     'pharmacy.title': 'Farumasi y\'amatungo',
@@ -631,7 +631,7 @@ const translations = {
     
     // About
     'about.title': 'Ibibazo kuri NTDM Animal Hospital',
-    'about.subtitle': 'Ikigo gikomeye cy\'ubuvuzi bw\'inyamanswa mu Rwanda',
+    'about.subtitle': 'Ikigo gikomeye cy\'ubuvuzi bw\'amatungo mu Rwanda',
     'about.mission': 'Intego Yacu',
     'about.vision': 'Icyerekezo Cyacu',
     'about.values': 'Indangagaciro Zacu',
@@ -663,7 +663,7 @@ const translations = {
     
     // Footer
     'footer.company': 'NTDM Animal Hospital',
-    'footer.description': 'Guhindura ubuzima bw\'inyamanswa hakoreshejwe tekinoroji igezweho yo gukurikirana, kubaza inama, n\'ubuvuzi bw\'amatungo n\'inyamanswa zo mu rugo',
+    'footer.description': 'Guhindura ubuzima bw\'amatungo hakoreshejwe tekinoroji igezweho yo gukurikirana, kubaza inama, n\'ubuvuzi bw\'amatungo yo mu rugo',
     'footer.quickLinks': 'Ihuza Ryihuse',
     'footer.services': 'Amaserivisi',
     'footer.contact': 'Amakuru yo Kuvugana',
