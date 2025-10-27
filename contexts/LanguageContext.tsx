@@ -559,7 +559,7 @@ const translations = {
     'home.testimonials.quote3': 'Sisitemu yo gukurikirana indwara yantumye nkagaragaza vuba indwara mu bworozi bwanjye bw\'inkoko. Igisubizo cyihuse cy\'abaganga b\'inyamanswa ba NTDM cyarokoje inkoko nyinshi. Serivisi yabo ni nziza cyane',
     'home.testimonials.quote4': 'Naguze inka z\'amata binyuze mu isoko rya NTDM maze mbona amatungo asanzwe kandi zitanga amata menshi. Ubufasha bwabo bwo gukurikirana n\'ubushyigikire byari bitangaje. Umusaruro w\'amata wanjye wiyongereye 30%!',
     'home.cta.title': 'Witeguye Kubona Ubuvuzi Bwiza bw\'Amatungo?',
-    'home.cta.subtitle': 'Teganya inama yawe uyu munsi kandi ureke abaganga bacu b\'inzobere b\'amatungo bagufashe kubungabunga ubuzima bwiza n\'umusaruro w\'amatungo zawe',
+    'home.cta.subtitle': 'Teganya inama yawe uyu munsi kandi ureke abaganga bacu b\'inzobere b\'amatungo bagufashe kubungabunga ubuzima bwiza n\'umusaruro w\'amatungo yawe',
     'home.cta.button': 'Teganya Inama Yawe Ubu',
     'home.locations.title': 'Aho Duherereye',
     'home.locations.subtitle': 'Dusure ku mwe mu bigo byacu byoroshye biri mu Rwanda. Buri bitaro gitanga serivisi zacu zose z\'ubuvuzi bw\'amatungo',
@@ -567,7 +567,7 @@ const translations = {
     
     // Portal Section
     'home.portal.title': 'Urubuga rw\'Abakiriya',
-    'home.portal.subtitle': 'Urubuga rwacu rwuzuye rw\'abakiriya ruguhera ubushobozi bwuzuye bwo kugenzura ubuzima n\'imicungire y\'amatungo zawe. Gukurikirana, kubaza inama, no kwita ku nyamaswa zawe byoroshye',
+    'home.portal.subtitle': 'Urubuga rwacu rwuzuye rw\'abakiriya ruguhera ubushobozi bwuzuye bwo kugenzura ubuzima n\'imicungire y\'amatungo yawe. Gukurikirana, kubaza inama, no kwita ku nyamaswa zawe byoroshye',
     'home.portal.management.title': 'Imicungire y\'Amatungo',
     'home.portal.management.desc': 'Kwandikisha no gukurikirana amatungo yawe yose ahantu hamwe hamwe n\'amakuru arambuye y\'ubuzima n\'amakuru y\'aho ziherereye',
     'home.portal.consultations.title': 'Inama z\'Ubuvuzi',
@@ -723,7 +723,7 @@ const translations = {
     'auth.haveAccount': 'Usanzwe ufite konti?',
     'auth.signIn': 'Injira',
     'auth.welcomeBack': 'Murakaza Neza Nanone kuri NTDM Animal Hospital',
-    'auth.loginWelcomeDesc': 'Injira kugira ngo ubone dashboard yawe, ukurikire amatungo zawe, kandi ucunge inama zawe',
+    'auth.loginWelcomeDesc': 'Injira kugira ngo ubone dashboard yawe, ukurikire amatungo yawe, kandi ucunge inama zawe',
     'auth.joinNTDM': 'Jya muri NTDM Animal Hospital',
     'auth.registerWelcomeDesc': 'Fungura konti kugira ngo ubone serivisi zacu, ukurikire amatungo yawe, kandi ucunge inama zawe',
     'auth.sector': 'Umurenge',
