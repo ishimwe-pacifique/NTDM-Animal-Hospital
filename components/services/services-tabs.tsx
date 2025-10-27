@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ServiceCard from "@/components/services/service-card"
-import { Activity, Video, ShieldAlert, ShoppingBag, Pill, Wheat, FileText, MapPin, Stethoscope, Shield, DollarSign, Brain } from "lucide-react"
+import { Pill, Wheat, FileText, MapPin, Stethoscope, Shield, DollarSign, Brain } from "lucide-react"
 
 // Service data
 const services = {
@@ -166,8 +166,7 @@ const services = {
       description: "Essential medications for common animal health issues.",
       price: 200,
       duration: "30 day supply",
-      image:
-        "https://th.bing.com/th/id/OIP.uvzZ5gbvONhZ_Iej4Q11TAHaEo?r=0&pid=ImgDet&w=199&h=124&c=7&dpr=1.5",
+      image: "https://th.bing.com/th/id/OIP.uvzZ5gbvONhZ_Iej4Q11TAHaEo?r=0&pid=ImgDet&w=199&h=124&c=7&dpr=1.5",
     },
     {
       id: "d2",
@@ -184,8 +183,7 @@ const services = {
       description: "Preventative vaccines for common livestock diseases.",
       price: 200,
       duration: "10 doses",
-      image:
-        "https://5.imimg.com/data5/FB/QY/MY-4841311/veterinary-vaccines-500x500.jpg",
+      image: "https://5.imimg.com/data5/FB/QY/MY-4841311/veterinary-vaccines-500x500.jpg",
     },
     {
       id: "d4",
@@ -213,8 +211,7 @@ const services = {
       description: "High-nutrition feed for dairy and beef cattle.",
       price: 200,
       duration: "50kg bag",
-      image:
-        "https://ruralhq.co.nz/wp-content/uploads/2019/03/shutterstock_659176180.jpg",
+      image: "https://ruralhq.co.nz/wp-content/uploads/2019/03/shutterstock_659176180.jpg",
     },
     {
       id: "f2",
@@ -222,8 +219,7 @@ const services = {
       description: "Balanced feed for layers and broilers.",
       price: 200,
       duration: "25kg bag",
-      image:
-        "https://th.bing.com/th/id/OIP.Qmi6sQ8jivUD_KCoVs-O6wHaEz?r=0&pid=ImgDet&w=199&h=128&c=7&dpr=1.5",
+      image: "https://th.bing.com/th/id/OIP.Qmi6sQ8jivUD_KCoVs-O6wHaEz?r=0&pid=ImgDet&w=199&h=128&c=7&dpr=1.5",
     },
     {
       id: "f3",
@@ -231,8 +227,7 @@ const services = {
       description: "Specially formulated for small ruminants.",
       price: 200,
       duration: "25kg bag",
-      image:
-        "https://th.bing.com/th/id/OIP.gc7yiDLMGglfb9tM-ZZegwHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1.5",
+      image: "https://th.bing.com/th/id/OIP.gc7yiDLMGglfb9tM-ZZegwHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1.5",
     },
     {
       id: "f4",
@@ -250,9 +245,9 @@ const services = {
       price: 200,
       duration: "10kg bag",
       image:
-        "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://images.unsplash.com/photo-1589924155672-6726b3ff858f?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
-     {
+    {
       id: "f6",
       name: "Pig",
       description: "High-quality food for pig.",
@@ -308,21 +303,25 @@ const services = {
       image:
         "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
+    {
+      id: "g6",
+      name: "Access RVSMS",
+      description: "Rwanda Veterinary SMS Management System - Access the government veterinary services portal.",
+      price: "Free Access",
+      duration: "Online portal",
+      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Mn99yF88tjmOB5fPByC1VgcKxCUhM.png",
+      link: "https://rvsms.vercel.app/",
+    },
   ],
-Ai: [
-
-  "Coming Soon"
-   
-],
-
+  Ai: ["Coming Soon"],
 }
 
 export default function ServicesTabs() {
   const [activeTab, setActiveTab] = useState("tracking")
-  const [categories, setCategories] = useState<{sales: any[], drugs: any[], feeds: any[]}>({
+  const [categories, setCategories] = useState<{ sales: any[]; drugs: any[]; feeds: any[] }>({
     sales: [],
     drugs: [],
-    feeds: []
+    feeds: [],
   })
 
   useEffect(() => {
@@ -331,17 +330,17 @@ export default function ServicesTabs() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories')
+      const response = await fetch("/api/categories")
       const data = await response.json()
       setCategories(data)
     } catch (error) {
-      console.error('Failed to fetch categories:', error)
+      console.error("Failed to fetch categories:", error)
     }
   }
 
   // Filter services based on active tab
   const getFilteredServices = () => {
-    if (activeTab === 'sales' || activeTab === 'drugs' || activeTab === 'feeds') {
+    if (activeTab === "sales" || activeTab === "drugs" || activeTab === "feeds") {
       return categories[activeTab as keyof typeof categories] || []
     }
     return services[activeTab as keyof typeof services] || []
@@ -355,46 +354,68 @@ export default function ServicesTabs() {
             <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 sm:hidden"></div>
             <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 sm:hidden"></div>
             <TabsList className="bg-muted/50 flex-nowrap min-w-max px-2">
-              <TabsTrigger value="tracking" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="tracking"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <MapPin className="h-4 w-4" />
                 <span className="hidden sm:inline">Tracking</span>
               </TabsTrigger>
-              <TabsTrigger value="consultations" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="consultations"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <Stethoscope className="h-4 w-4" />
                 <span className="hidden sm:inline">Consultations</span>
               </TabsTrigger>
-              <TabsTrigger value="monitoring" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="monitoring"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Monitoring</span>
               </TabsTrigger>
-              <TabsTrigger value="sales" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="sales"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <DollarSign className="h-4 w-4" />
                 <span className="hidden sm:inline">Animal Sales</span>
               </TabsTrigger>
-              <TabsTrigger value="drugs" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="drugs"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <Pill className="h-4 w-4" />
                 <span className="hidden sm:inline">Pharmacy</span>
               </TabsTrigger>
-              <TabsTrigger value="feeds" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="feeds"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <Wheat className="h-4 w-4" />
                 <span className="hidden sm:inline">Feeds</span>
               </TabsTrigger>
-              <TabsTrigger value="government" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="government"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Gov Support</span>
               </TabsTrigger>
-              <TabsTrigger value="Ai" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto">
+              <TabsTrigger
+                value="Ai"
+                className="flex items-center gap-1 sm:gap-2 whitespace-nowrap min-w-[44px] sm:min-w-auto"
+              >
                 <Brain className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Disease Prediction</span>
               </TabsTrigger>
             </TabsList>
           </div>
         </div>
-        
+
         {/* Mobile hint */}
-        <div className="text-center text-sm text-gray-500 mb-4 sm:hidden">
-          👈 Swipe to see more services 👉
-        </div>
+        <div className="text-center text-sm text-gray-500 mb-4 sm:hidden">👈 Swipe to see more services 👉</div>
 
         <TabsContent value="tracking" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -423,15 +444,18 @@ export default function ServicesTabs() {
         <TabsContent value="sales" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.sales.map((category) => (
-              <ServiceCard key={category.id} service={{
-                id: category.id,
-                name: category.name,
-                description: category.description,
-                price: 'View Items',
-                duration: '',
-                image: category.image,
-                category: 'sales'
-              }} />
+              <ServiceCard
+                key={category.id}
+                service={{
+                  id: category.id,
+                  name: category.name,
+                  description: category.description,
+                  price: "View Items",
+                  duration: "",
+                  image: category.image,
+                  category: "sales",
+                }}
+              />
             ))}
           </div>
         </TabsContent>
@@ -439,15 +463,18 @@ export default function ServicesTabs() {
         <TabsContent value="drugs" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.drugs.map((category) => (
-              <ServiceCard key={category.id} service={{
-                id: category.id,
-                name: category.name,
-                description: category.description,
-                price: 'View Items',
-                duration: '',
-                image: category.image,
-                category: 'drugs'
-              }} />
+              <ServiceCard
+                key={category.id}
+                service={{
+                  id: category.id,
+                  name: category.name,
+                  description: category.description,
+                  price: "View Items",
+                  duration: "",
+                  image: category.image,
+                  category: "drugs",
+                }}
+              />
             ))}
           </div>
         </TabsContent>
@@ -455,15 +482,18 @@ export default function ServicesTabs() {
         <TabsContent value="feeds" className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.feeds.map((category) => (
-              <ServiceCard key={category.id} service={{
-                id: category.id,
-                name: category.name,
-                description: category.description,
-                price: 'View Items',
-                duration: '',
-                image: category.image,
-                category: 'feeds'
-              }} />
+              <ServiceCard
+                key={category.id}
+                service={{
+                  id: category.id,
+                  name: category.name,
+                  description: category.description,
+                  price: "View Items",
+                  duration: "",
+                  image: category.image,
+                  category: "feeds",
+                }}
+              />
             ))}
           </div>
         </TabsContent>
