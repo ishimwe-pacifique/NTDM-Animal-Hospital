@@ -16,6 +16,8 @@ import {
 import { Bell, Menu, Settings, LogOut, User } from "lucide-react"
 import { logoutUser } from "@/lib/actions/auth"
 import { useRouter } from "next/navigation"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 
 interface AdminHeaderProps {
   onMenuClick: () => void
@@ -24,6 +26,7 @@ interface AdminHeaderProps {
 export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const [notifications] = useState(3)
   const router = useRouter()
+  const { t } = useLanguage()
 
   const handleLogout = async () => {
     try {
@@ -49,15 +52,16 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
           </Button>
           
           <div className="hidden md:block">
-            <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
-            <p className="text-sm text-gray-500">Regional Management Portal</p>
+            <h1 className="text-xl font-semibold text-gray-900">{t('admin.dashboard')}</h1>
+            <p className="text-sm text-gray-500">{t('admin.regionalManagementPortal')}</p>
           </div>
         </div>
 
 
 
-        {/* Right side - Notifications and profile */}
+        {/* Right side - Language switcher, notifications and profile */}
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
@@ -77,26 +81,26 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                   <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">Admin User</p>
-                  <p className="text-xs text-gray-500">Kigali District</p>
+                  <p className="text-sm font-medium">{t('admin.adminUser')}</p>
+                  <p className="text-xs text-gray-500">{t('admin.kigaliDistrict')}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                Profile
+                {t('admin.profile')}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                Settings
+                {t('admin.settings')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
+                {t('admin.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

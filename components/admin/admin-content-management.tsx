@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileText, Plus, Edit, Trash2, Eye, Calendar, DollarSign, Pill, Wheat } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Service {
   id: string
@@ -70,6 +71,7 @@ const mockBlogPosts = [
 ]
 
 export default function AdminContentManagement() {
+  const { t } = useLanguage()
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false)
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false)
   const [isEditServiceOpen, setIsEditServiceOpen] = useState(false)
@@ -330,28 +332,28 @@ export default function AdminContentManagement() {
 
   const getCategoryName = (categoryId: string, type: string) => {
     const category = categories[type as keyof typeof categories]?.find(c => c.id === categoryId)
-    return category?.name || 'Unknown'
+    return category?.name || t('content.unknown')
   }
 
   return (
     <div className="space-y-6">
       <Tabs defaultValue="blog" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="blog">Blog Posts</TabsTrigger>
-          <TabsTrigger value="sales">Animal Sales</TabsTrigger>
-          <TabsTrigger value="drugs">Pharmacy</TabsTrigger>
-          <TabsTrigger value="feeds">Feeds</TabsTrigger>
-          <TabsTrigger value="announcements">Announcements</TabsTrigger>
+          <TabsTrigger value="blog">{t('content.blogPosts')}</TabsTrigger>
+          <TabsTrigger value="sales">{t('content.animalSales')}</TabsTrigger>
+          <TabsTrigger value="drugs">{t('content.pharmacy')}</TabsTrigger>
+          <TabsTrigger value="feeds">{t('content.feeds')}</TabsTrigger>
+          <TabsTrigger value="announcements">{t('content.announcements')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="blog" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Blog Posts</CardTitle>
+                <CardTitle>{t('content.blogPosts')}</CardTitle>
                 <Button onClick={() => setIsCreatePostOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  New Post
+                  {t('content.newPost')}
                 </Button>
               </div>
             </CardHeader>
@@ -359,11 +361,11 @@ export default function AdminContentManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Views</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('content.title')}</TableHead>
+                    <TableHead>{t('content.status')}</TableHead>
+                    <TableHead>{t('content.views')}</TableHead>
+                    <TableHead>{t('content.date')}</TableHead>
+                    <TableHead className="text-right">{t('content.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -372,7 +374,7 @@ export default function AdminContentManagement() {
                       <TableCell className="font-medium">{post.title}</TableCell>
                       <TableCell>
                         <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                          {post.status}
+                          {post.status === 'published' ? t('content.published') : t('content.draft')}
                         </Badge>
                       </TableCell>
                       <TableCell>{post.views}</TableCell>
@@ -404,11 +406,11 @@ export default function AdminContentManagement() {
               <div className="flex justify-between items-center">
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
-                  Animal Sales Categories
+                  {t('content.animalSalesCategories')}
                 </CardTitle>
                 <Button onClick={() => { setCurrentCategory('sales'); setIsCreateCategoryOpen(true) }}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Category
+                  {t('content.addCategory')}
                 </Button>
               </div>
             </CardHeader>
@@ -416,10 +418,10 @@ export default function AdminContentManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Items Count</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('content.categoryName')}</TableHead>
+                    <TableHead>{t('content.description')}</TableHead>
+                    <TableHead>{t('content.itemsCount')}</TableHead>
+                    <TableHead className="text-right">{t('content.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -450,18 +452,18 @@ export default function AdminContentManagement() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Animals</CardTitle>
+              <CardTitle>{t('content.animals')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Animal Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Duration</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('content.animalName')}</TableHead>
+                    <TableHead>{t('content.category')}</TableHead>
+                    <TableHead>{t('content.price')}</TableHead>
+                    <TableHead>{t('content.duration')}</TableHead>
+                    <TableHead>{t('content.description')}</TableHead>
+                    <TableHead className="text-right">{t('content.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -496,11 +498,11 @@ export default function AdminContentManagement() {
               <div className="flex justify-between items-center">
                 <CardTitle className="flex items-center gap-2">
                   <Pill className="h-5 w-5" />
-                  Pharmacy Categories
+                  {t('content.pharmacyCategories')}
                 </CardTitle>
                 <Button onClick={() => { setCurrentCategory('drugs'); setIsCreateCategoryOpen(true) }}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Category
+                  {t('content.addCategory')}
                 </Button>
               </div>
             </CardHeader>
@@ -542,18 +544,18 @@ export default function AdminContentManagement() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Drugs</CardTitle>
+              <CardTitle>{t('content.drugs')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Drug Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Package</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('content.drugName')}</TableHead>
+                    <TableHead>{t('content.category')}</TableHead>
+                    <TableHead>{t('content.price')}</TableHead>
+                    <TableHead>{t('content.package')}</TableHead>
+                    <TableHead>{t('content.description')}</TableHead>
+                    <TableHead className="text-right">{t('content.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -588,11 +590,11 @@ export default function AdminContentManagement() {
               <div className="flex justify-between items-center">
                 <CardTitle className="flex items-center gap-2">
                   <Wheat className="h-5 w-5" />
-                  Feed Categories
+                  {t('content.feedCategories')}
                 </CardTitle>
                 <Button onClick={() => { setCurrentCategory('feeds'); setIsCreateCategoryOpen(true) }}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Category
+                  {t('content.addCategory')}
                 </Button>
               </div>
             </CardHeader>
@@ -634,18 +636,18 @@ export default function AdminContentManagement() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Feeds</CardTitle>
+              <CardTitle>{t('content.feeds')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Feed Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Package</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('content.feedName')}</TableHead>
+                    <TableHead>{t('content.category')}</TableHead>
+                    <TableHead>{t('content.price')}</TableHead>
+                    <TableHead>{t('content.package')}</TableHead>
+                    <TableHead>{t('content.description')}</TableHead>
+                    <TableHead className="text-right">{t('content.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -677,15 +679,15 @@ export default function AdminContentManagement() {
         <TabsContent value="announcements" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>System Announcements</CardTitle>
+              <CardTitle>{t('content.systemAnnouncements')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8 text-gray-500">
                 <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No announcements yet. Create your first announcement.</p>
+                <p>{t('content.noAnnouncements')}</p>
                 <Button className="mt-4">
                   <Plus className="h-4 w-4 mr-2" />
-                  New Announcement
+                  {t('content.newAnnouncement')}
                 </Button>
               </div>
             </CardContent>
@@ -697,36 +699,36 @@ export default function AdminContentManagement() {
       <Dialog open={isCreatePostOpen} onOpenChange={setIsCreatePostOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create New Blog Post</DialogTitle>
-            <DialogDescription>Write a new blog post for your users</DialogDescription>
+            <DialogTitle>{t('content.createNewPost')}</DialogTitle>
+            <DialogDescription>{t('content.writeNewPost')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div>
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" placeholder="Post title" />
+              <Label htmlFor="title">{t('content.title')}</Label>
+              <Input id="title" placeholder={t('content.postTitle')} />
             </div>
             <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea id="content" placeholder="Write your post content..." rows={8} />
+              <Label htmlFor="content">{t('content.content')}</Label>
+              <Textarea id="content" placeholder={t('content.writeContent')} rows={8} />
             </div>
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">{t('content.status')}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder={t('content.selectStatus')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="draft">{t('content.draft')}</SelectItem>
+                  <SelectItem value="published">{t('content.published')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreatePostOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
-            <Button>Create Post</Button>
+            <Button>{t('content.createPost')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -735,30 +737,30 @@ export default function AdminContentManagement() {
       <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
         <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Category</DialogTitle>
-            <DialogDescription>Add a new category for {currentCategory}</DialogDescription>
+            <DialogTitle>{t('content.createNewCategory')}</DialogTitle>
+            <DialogDescription>{t('content.addNewCategory')} {currentCategory}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div>
-              <Label htmlFor="categoryName">Category Name</Label>
+              <Label htmlFor="categoryName">{t('content.categoryName')}</Label>
               <Input 
                 id="categoryName" 
-                placeholder="Category name"
+                placeholder={t('content.categoryName')}
                 value={categoryFormData.name}
                 onChange={(e) => setCategoryFormData({...categoryFormData, name: e.target.value})}
               />
             </div>
             <div>
-              <Label htmlFor="categoryDescription">Description</Label>
+              <Label htmlFor="categoryDescription">{t('content.description')}</Label>
               <Textarea 
                 id="categoryDescription" 
-                placeholder="Category description"
+                placeholder={t('content.categoryDescription')}
                 value={categoryFormData.description}
                 onChange={(e) => setCategoryFormData({...categoryFormData, description: e.target.value})}
               />
             </div>
             <div>
-              <Label htmlFor="categoryImage">Image URL</Label>
+              <Label htmlFor="categoryImage">{t('content.imageUrl')}</Label>
               <Input 
                 id="categoryImage" 
                 placeholder="https://..."
@@ -769,9 +771,9 @@ export default function AdminContentManagement() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setIsCreateCategoryOpen(false); setCategoryFormData({ name: '', description: '', image: '' }) }}>
-              Cancel
+              {t('common.cancel')}
             </Button>
-            <Button onClick={handleCreateCategory}>Create Category</Button>
+            <Button onClick={handleCreateCategory}>{t('content.createCategory')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -780,8 +782,8 @@ export default function AdminContentManagement() {
       <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
         <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Category</DialogTitle>
-            <DialogDescription>Update category details</DialogDescription>
+            <DialogTitle>{t('content.editCategory')}</DialogTitle>
+            <DialogDescription>{t('content.updateCategoryDetails')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div>
@@ -813,7 +815,7 @@ export default function AdminContentManagement() {
             <Button variant="outline" onClick={() => { setIsEditCategoryOpen(false); setCurrentCategoryEdit(null); setCategoryFormData({ name: '', description: '', image: '' }) }}>
               Cancel
             </Button>
-            <Button onClick={handleEditCategory}>Update Category</Button>
+            <Button onClick={handleEditCategory}>{t('content.updateCategory')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -822,15 +824,15 @@ export default function AdminContentManagement() {
       <Dialog open={isCreateServiceOpen} onOpenChange={setIsCreateServiceOpen}>
         <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add {currentCategory === 'sales' ? 'Animal' : currentCategory === 'drugs' ? 'Drug' : 'Feed'}</DialogTitle>
-            <DialogDescription>Add item to category</DialogDescription>
+            <DialogTitle>{currentCategory === 'sales' ? t('content.addAnimal') : currentCategory === 'drugs' ? t('content.addDrug') : t('content.addFeed')}</DialogTitle>
+            <DialogDescription>{t('content.addItemToCategory')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t('content.category')}</Label>
               <Select value={formData.categoryId || undefined} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t('content.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories[currentCategory as keyof typeof categories]?.map((category) => (
@@ -840,16 +842,16 @@ export default function AdminContentManagement() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('common.name')}</Label>
               <Input 
                 id="name" 
-                placeholder="Item name"
+                placeholder={t('content.itemName')}
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
               />
             </div>
             <div>
-              <Label htmlFor="price">Price (RWF)</Label>
+              <Label htmlFor="price">{t('content.priceRWF')}</Label>
               <Input 
                 id="price" 
                 type="number" 
@@ -859,16 +861,16 @@ export default function AdminContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="duration">Unit/Package</Label>
+              <Label htmlFor="duration">{t('content.unitPackage')}</Label>
               <Input 
                 id="duration" 
-                placeholder="Per head, Per bag, etc."
+                placeholder={t('content.perHeadPerBag')}
                 value={formData.duration}
                 onChange={(e) => setFormData({...formData, duration: e.target.value})}
               />
             </div>
             <div>
-              <Label htmlFor="image">Image URL</Label>
+              <Label htmlFor="image">{t('content.imageUrl')}</Label>
               <Input 
                 id="image" 
                 placeholder="https://..."
@@ -877,10 +879,10 @@ export default function AdminContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('common.description')}</Label>
               <Textarea 
                 id="description" 
-                placeholder="Description"
+                placeholder={t('common.description')}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
@@ -891,27 +893,27 @@ export default function AdminContentManagement() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="animalType">Animal Type</Label>
+                    <Label htmlFor="animalType">{t('content.animalType')}</Label>
                     <Select value={formData.animalType || undefined} onValueChange={(value) => setFormData({...formData, animalType: value})}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select animal type" />
+                        <SelectValue placeholder={t('content.selectAnimalType')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Cow">Cow</SelectItem>
-                        <SelectItem value="Goat">Goat</SelectItem>
-                        <SelectItem value="Sheep">Sheep</SelectItem>
-                        <SelectItem value="Dog">Dog</SelectItem>
-                        <SelectItem value="Cat">Cat</SelectItem>
-                        <SelectItem value="Chicken">Chicken</SelectItem>
-                        <SelectItem value="Pig">Pig</SelectItem>
+                        <SelectItem value="Cow">{t('content.cow')}</SelectItem>
+                        <SelectItem value="Goat">{t('content.goat')}</SelectItem>
+                        <SelectItem value="Sheep">{t('content.sheep')}</SelectItem>
+                        <SelectItem value="Dog">{t('content.dog')}</SelectItem>
+                        <SelectItem value="Cat">{t('content.cat')}</SelectItem>
+                        <SelectItem value="Chicken">{t('content.chicken')}</SelectItem>
+                        <SelectItem value="Pig">{t('content.pig')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="breed">Breed</Label>
+                    <Label htmlFor="breed">{t('content.breed')}</Label>
                     <Input 
                       id="breed" 
-                      placeholder="Animal breed"
+                      placeholder={t('content.animalBreed')}
                       value={formData.breed}
                       onChange={(e) => setFormData({...formData, breed: e.target.value})}
                     />
@@ -1154,7 +1156,7 @@ export default function AdminContentManagement() {
             <Button variant="outline" onClick={() => { setIsCreateServiceOpen(false); resetForm() }}>
               Cancel
             </Button>
-            <Button onClick={handleCreateService}>Add Item</Button>
+            <Button onClick={handleCreateService}>{t('content.addItem')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1163,8 +1165,8 @@ export default function AdminContentManagement() {
       <Dialog open={isEditServiceOpen} onOpenChange={setIsEditServiceOpen}>
         <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit {currentService?.category === 'sales' ? 'Animal' : currentService?.category === 'drugs' ? 'Drug' : 'Feed'}</DialogTitle>
-            <DialogDescription>Update the details</DialogDescription>
+            <DialogTitle>{currentService?.category === 'sales' ? t('content.editAnimal') : currentService?.category === 'drugs' ? t('content.editDrug') : t('content.editFeed')}</DialogTitle>
+            <DialogDescription>{t('content.updateDetails')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
             <div>
@@ -1226,7 +1228,7 @@ export default function AdminContentManagement() {
             <Button variant="outline" onClick={() => { setIsEditServiceOpen(false); setCurrentService(null); resetForm() }}>
               Cancel
             </Button>
-            <Button onClick={handleEditService}>Update</Button>
+            <Button onClick={handleEditService}>{t('content.update')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

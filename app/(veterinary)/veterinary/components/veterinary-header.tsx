@@ -5,6 +5,8 @@ import { UserNav } from "./user-nav"
 import { Bell, Search, Menu } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 
 interface VeterinaryHeaderProps {
   onMenuClick?: () => void
@@ -13,6 +15,7 @@ interface VeterinaryHeaderProps {
 export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
   const [showSearch, setShowSearch] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const { t } = useLanguage()
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -34,13 +37,13 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
           onClick={onMenuClick}
         >
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Menu</span>
+          <span className="sr-only">{t('vet.toggleMenu')}</span>
         </Button>
 
         {/* Page title */}
         <div className="flex-1">
           <h1 className="text-lg font-semibold text-foreground truncate">
-            Veterinary Dashboard
+            {t('vet.dashboard')}
           </h1>
         </div>
 
@@ -50,7 +53,7 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
           <div className="hidden md:flex items-center space-x-2">
             {showSearch ? (
               <Input
-                placeholder="Search patients, appointments..."
+                placeholder={t('vet.searchPatients')}
                 className="w-64"
                 onBlur={() => setShowSearch(false)}
                 autoFocus
@@ -62,7 +65,7 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
                 onClick={() => setShowSearch(true)}
               >
                 <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
+                <span className="sr-only">{t('vet.search')}</span>
               </Button>
             )}
           </div>
@@ -70,15 +73,18 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
           {/* Mobile search */}
           <Button variant="ghost" size="icon" className="md:hidden">
             <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
+            <span className="sr-only">{t('vet.search')}</span>
           </Button>
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
-            <span className="sr-only">Notifications</span>
+            <span className="sr-only">{t('vet.notifications')}</span>
           </Button>
+
+          {/* Language Switcher */}
+          <LanguageSwitcher />
 
           {/* User menu */}
           <UserNav />

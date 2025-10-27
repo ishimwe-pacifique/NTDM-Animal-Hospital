@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Calendar, Clock, User, MapPin, Phone, Plus, Edit, CheckCircle, XCircle } from "lucide-react"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 const mockAppointments = [
   {
@@ -71,6 +72,7 @@ export default function AdminAppointments() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false)
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false)
+  const { t } = useLanguage()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -96,9 +98,9 @@ export default function AdminAppointments() {
     <div className="space-y-6">
       <Tabs defaultValue="appointments" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="appointments">Appointments</TabsTrigger>
-          <TabsTrigger value="doctors">Doctor Availability</TabsTrigger>
-          <TabsTrigger value="schedule">Schedule Management</TabsTrigger>
+          <TabsTrigger value="appointments">{t('admin.appointments')}</TabsTrigger>
+          <TabsTrigger value="doctors">{t('admin.doctorAvailability')}</TabsTrigger>
+          <TabsTrigger value="schedule">{t('admin.scheduleManagement')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="appointments" className="space-y-4">
@@ -107,25 +109,25 @@ export default function AdminAppointments() {
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-blue-600">18</div>
-                <p className="text-sm text-muted-foreground">Today's Appointments</p>
+                <p className="text-sm text-muted-foreground">{t('appointments.todaysAppointments')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-green-600">12</div>
-                <p className="text-sm text-muted-foreground">Confirmed</p>
+                <p className="text-sm text-muted-foreground">{t('appointments.confirmed')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-yellow-600">4</div>
-                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-sm text-muted-foreground">{t('appointments.pending')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-red-600">2</div>
-                <p className="text-sm text-muted-foreground">Emergency</p>
+                <p className="text-sm text-muted-foreground">{t('appointments.emergency')}</p>
               </CardContent>
             </Card>
           </div>
@@ -133,10 +135,10 @@ export default function AdminAppointments() {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Appointment Management</CardTitle>
+                <CardTitle>{t('appointments.appointmentManagement')}</CardTitle>
                 <Button onClick={() => setIsScheduleDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Schedule Appointment
+                  {t('appointments.scheduleAppointment')}
                 </Button>
               </div>
             </CardHeader>
@@ -144,12 +146,12 @@ export default function AdminAppointments() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Appointment</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Date & Time</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('appointments.appointment')}</TableHead>
+                    <TableHead>{t('appointments.doctor')}</TableHead>
+                    <TableHead>{t('appointments.dateTime')}</TableHead>
+                    <TableHead>{t('appointments.type')}</TableHead>
+                    <TableHead>{t('appointments.status')}</TableHead>
+                    <TableHead className="text-right">{t('appointments.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -216,7 +218,7 @@ export default function AdminAppointments() {
         <TabsContent value="doctors" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Doctor Availability</CardTitle>
+              <CardTitle>{t('appointments.doctorAvailability')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -241,17 +243,17 @@ export default function AdminAppointments() {
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-blue-600">{doctor.appointments}</div>
-                          <p className="text-xs text-gray-500">Today's appointments</p>
+                          <p className="text-xs text-gray-500">{t('appointments.todaysAppointments')}</p>
                         </div>
                       </div>
                       <div className="mt-4 flex gap-2">
                         <Button variant="outline" size="sm" className="flex-1">
                           <Calendar className="h-4 w-4 mr-2" />
-                          View Schedule
+                          {t('appointments.viewSchedule')}
                         </Button>
                         <Button variant="outline" size="sm" className="flex-1">
                           <Phone className="h-4 w-4 mr-2" />
-                          Contact
+                          {t('appointments.contact')}
                         </Button>
                       </div>
                     </CardContent>
@@ -265,54 +267,54 @@ export default function AdminAppointments() {
         <TabsContent value="schedule" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Schedule Management</CardTitle>
+              <CardTitle>{t('appointments.scheduleManagement')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium mb-4">Emergency Routing</h4>
+                  <h4 className="font-medium mb-4">{t('appointments.emergencyRouting')}</h4>
                   <div className="space-y-3">
                     <div className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-sm">Emergency Protocol</p>
-                          <p className="text-xs text-gray-600">Auto-assign nearest available doctor</p>
+                          <p className="font-medium text-sm">{t('appointments.emergencyProtocol')}</p>
+                          <p className="text-xs text-gray-600">{t('appointments.autoAssign')}</p>
                         </div>
-                        <Badge variant="default">Active</Badge>
+                        <Badge variant="default">{t('appointments.active')}</Badge>
                       </div>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-sm">Response Time Target</p>
-                          <p className="text-xs text-gray-600"> 30 minutes for emergencies</p>
+                          <p className="font-medium text-sm">{t('appointments.responseTimeTarget')}</p>
+                          <p className="text-xs text-gray-600">{t('appointments.thirtyMinutes')}</p>
                         </div>
-                        <span className="text-sm font-medium text-green-600">On Track</span>
+                        <span className="text-sm font-medium text-green-600">{t('appointments.onTrack')}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <div>
-                  <h4 className="font-medium mb-4">Appointment Slots</h4>
+                  <h4 className="font-medium mb-4">{t('appointments.appointmentSlots')}</h4>
                   <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="p-3 bg-green-50 rounded-lg">
                         <div className="text-lg font-bold text-green-600">24</div>
-                        <p className="text-xs text-gray-600">Available</p>
+                        <p className="text-xs text-gray-600">{t('appointments.available')}</p>
                       </div>
                       <div className="p-3 bg-blue-50 rounded-lg">
                         <div className="text-lg font-bold text-blue-600">18</div>
-                        <p className="text-xs text-gray-600">Booked</p>
+                        <p className="text-xs text-gray-600">{t('appointments.booked')}</p>
                       </div>
                       <div className="p-3 bg-red-50 rounded-lg">
                         <div className="text-lg font-bold text-red-600">2</div>
-                        <p className="text-xs text-gray-600">Blocked</p>
+                        <p className="text-xs text-gray-600">{t('appointments.blocked')}</p>
                       </div>
                     </div>
                     <Button className="w-full">
                       <Clock className="h-4 w-4 mr-2" />
-                      Manage Time Slots
+                      {t('appointments.manageTimeSlots')}
                     </Button>
                   </div>
                 </div>
@@ -326,7 +328,7 @@ export default function AdminAppointments() {
       <Dialog open={isAppointmentDialogOpen} onOpenChange={setIsAppointmentDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Appointment Details</DialogTitle>
+            <DialogTitle>{t('appointments.appointmentDetails')}</DialogTitle>
             <DialogDescription>
               {selectedAppointment && `Appointment #${selectedAppointment.id}`}
             </DialogDescription>
@@ -335,35 +337,35 @@ export default function AdminAppointments() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Farmer</Label>
+                  <Label>{t('appointments.farmer')}</Label>
                   <p className="text-sm">{selectedAppointment.farmer}</p>
                 </div>
                 <div>
-                  <Label>Doctor</Label>
+                  <Label>{t('appointments.doctor')}</Label>
                   <p className="text-sm">{selectedAppointment.doctor}</p>
                 </div>
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>{t('appointments.status')}</Label>
                 <Select defaultValue={selectedAppointment.status}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="scheduled">Scheduled</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="scheduled">{t('appointments.scheduled')}</SelectItem>
+                    <SelectItem value="confirmed">{t('appointments.confirmed')}</SelectItem>
+                    <SelectItem value="completed">{t('appointments.completed')}</SelectItem>
+                    <SelectItem value="cancelled">{t('appointments.cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Date</Label>
+                  <Label>{t('appointments.date')}</Label>
                   <Input type="date" defaultValue={selectedAppointment.date} />
                 </div>
                 <div>
-                  <Label>Time</Label>
+                  <Label>{t('appointments.time')}</Label>
                   <Input type="time" defaultValue="10:00" />
                 </div>
               </div>
@@ -371,9 +373,9 @@ export default function AdminAppointments() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAppointmentDialogOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
-            <Button>Update Appointment</Button>
+            <Button>{t('appointments.updateAppointment')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -382,15 +384,15 @@ export default function AdminAppointments() {
       <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Schedule New Appointment</DialogTitle>
-            <DialogDescription>Create a new appointment for a farmer</DialogDescription>
+            <DialogTitle>{t('appointments.scheduleNewAppointment')}</DialogTitle>
+            <DialogDescription>{t('appointments.createNewAppointment')}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Farmer</Label>
+              <Label>{t('appointments.farmer')}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select farmer" />
+                  <SelectValue placeholder={t('appointments.selectFarmer')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="john">John Doe</SelectItem>
@@ -400,10 +402,10 @@ export default function AdminAppointments() {
               </Select>
             </div>
             <div>
-              <Label>Doctor</Label>
+              <Label>{t('appointments.doctor')}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select doctor" />
+                  <SelectValue placeholder={t('appointments.selectDoctor')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sarah">Dr. Sarah Wilson</SelectItem>
@@ -413,33 +415,33 @@ export default function AdminAppointments() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Date</Label>
+                <Label>{t('appointments.date')}</Label>
                 <Input type="date" />
               </div>
               <div>
-                <Label>Time</Label>
+                <Label>{t('appointments.time')}</Label>
                 <Input type="time" />
               </div>
             </div>
             <div>
-              <Label>Type</Label>
+              <Label>{t('appointments.type')}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={t('appointments.selectType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="routine">Routine</SelectItem>
-                  <SelectItem value="emergency">Emergency</SelectItem>
-                  <SelectItem value="consultation">Consultation</SelectItem>
+                  <SelectItem value="routine">{t('appointments.routine')}</SelectItem>
+                  <SelectItem value="emergency">{t('appointments.emergency')}</SelectItem>
+                  <SelectItem value="consultation">{t('appointments.consultation')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
-            <Button>Schedule Appointment</Button>
+            <Button>{t('appointments.scheduleAppointment')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

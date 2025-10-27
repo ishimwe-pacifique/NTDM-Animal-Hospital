@@ -6,6 +6,7 @@ import VeterinaryConsultations from "@/components/dashboard/veterinary-consultat
 import { getCurrentUser } from "@/lib/actions/auth"
 import { redirect } from "next/navigation"
 import ClientWrapper from "../components/client-wrapper"
+import AppointmentsPageClient from "./appointments-page-client"
 
 export const metadata: Metadata = {
   title: "Appointments - Veterinary Dashboard",
@@ -24,15 +25,7 @@ export default async function AppointmentsPage() {
 
   return (
     <ClientWrapper>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Appointments</h1>
-          <div className="text-sm text-gray-500">
-            Manage your consultation requests and appointments
-          </div>
-        </div>
-        <VeterinaryConsultations consultations={consultations} />
-      </div>
+      <AppointmentsPageClient consultations={consultations} />
     </ClientWrapper>
   )
 } 

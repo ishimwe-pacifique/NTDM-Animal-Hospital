@@ -14,49 +14,51 @@ import {
   Users,
 } from "lucide-react"
 import { useEffect, useState } from "react"
-
-const sidebarNavItems = [
-  {
-    title: "Dashboard",
-    href: "/veterinary",
-    icon: Home,
-  },
-  {
-    title: "Appointments",
-    href: "/veterinary/appointments",
-    icon: Calendar,
-  },
-  {
-    title: "Patients",
-    href: "/veterinary/patients",
-    icon: Users,
-  },
-  {
-    title: "Tracking",
-    href: "/veterinary/tracking",
-    icon: Activity,
-  },
-  {
-    title: "Consultations",
-    href: "/veterinary/consultations",
-    icon: ClipboardList,
-  },
-  {
-    title: "Messages",
-    href: "/veterinary/messages",
-    icon: MessageSquare,
-  },
-  {
-    title: "Settings",
-    href: "/veterinary/settings",
-    icon: Settings,
-  },
-]
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export function VeterinarySidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const { t } = useLanguage()
+
+  const sidebarNavItems = [
+    {
+      title: t('vet.dashboard'),
+      href: "/veterinary",
+      icon: Home,
+    },
+    {
+      title: t('vet.appointments'),
+      href: "/veterinary/appointments",
+      icon: Calendar,
+    },
+    {
+      title: t('vet.patients'),
+      href: "/veterinary/patients",
+      icon: Users,
+    },
+    {
+      title: t('vet.tracking'),
+      href: "/veterinary/tracking",
+      icon: Activity,
+    },
+    {
+      title: t('vet.consultations'),
+      href: "/veterinary/consultations",
+      icon: ClipboardList,
+    },
+    {
+      title: t('vet.messages'),
+      href: "/veterinary/messages",
+      icon: MessageSquare,
+    },
+    {
+      title: t('vet.settings'),
+      href: "/veterinary/settings",
+      icon: Settings,
+    },
+  ]
 
   // Track screen size for responsive behavior
   useEffect(() => {
@@ -108,7 +110,7 @@ export function VeterinarySidebar() {
       <div className="flex h-14 items-center border-b px-4 justify-between">
         {!collapsed && (
           <Link href="/veterinary" className="flex items-center gap-2 font-semibold truncate">
-            <span className="text-primary">Veterinary Portal</span>
+            <span className="text-primary">{t('vet.portal')}</span>
           </Link>
         )}
         <Button
@@ -125,7 +127,7 @@ export function VeterinarySidebar() {
             collapsed && "rotate-180"
           )} />
           <span className="sr-only">
-            {collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            {collapsed ? t('vet.expandSidebar') : t('vet.collapseSidebar')}
           </span>
         </Button>
       </div>

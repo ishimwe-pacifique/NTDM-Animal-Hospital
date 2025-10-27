@@ -14,15 +14,7 @@ import {
   X
 } from "lucide-react"
 import Image from "next/image"
-
-const navItems = [
-  { name: "Dashboard", href: "/admin", icon: Home },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Content", href: "/admin/content", icon: FileText },
-  { name: "Reports", href: "/admin/reports", icon: BarChart3 },
-  { name: "Support", href: "/admin/support", icon: MessageSquare },
-  { name: "Appointments", href: "/admin/appointments", icon: Calendar },
-]
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface AdminSidebarProps {
   isOpen: boolean
@@ -31,6 +23,16 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
+  const { t } = useLanguage()
+
+  const navItems = [
+    { name: t('admin.dashboard'), href: "/admin", icon: Home },
+    { name: t('admin.users'), href: "/admin/users", icon: Users },
+    { name: t('admin.content'), href: "/admin/content", icon: FileText },
+    { name: t('admin.reports'), href: "/admin/reports", icon: BarChart3 },
+    { name: t('admin.support'), href: "/admin/support", icon: MessageSquare },
+    { name: t('admin.appointments'), href: "/admin/appointments", icon: Calendar },
+  ]
 
   return (
     <>
@@ -60,8 +62,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Admin Panel</h2>
-              <p className="text-xs text-gray-500">Regional Management</p>
+              <h2 className="text-lg font-bold text-gray-800">{t('admin.panel')}</h2>
+              <p className="text-xs text-gray-500">{t('admin.regionalManagement')}</p>
             </div>
           </div>
           <Button
@@ -102,10 +104,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         {/* Footer */}
         <div className="absolute bottom-6 left-3 right-3">
           <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 mb-2">Quick Stats</p>
+            <p className="text-xs text-gray-600 mb-2">{t('admin.quickStats')}</p>
             <div className="flex justify-between text-xs">
-              <span>Active Users:  <strong>245</strong></span>
-              <span>Tickets: <strong>7</strong></span>
+              <span>{t('admin.activeUsersCount')} <strong>245</strong></span>
+              <span>{t('admin.ticketsCount')} <strong>7</strong></span>
             </div>
           </div>
         </div>
