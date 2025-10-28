@@ -1,7 +1,7 @@
-import AddConsultationForm from "@/components/dashboard/add-consultation-form";
-import { getDoctorsList } from "@/lib/actions";
 import { getCurrentUser } from "@/lib/actions/auth";
 import { redirect } from "next/navigation";
+import NewConsultationContent from "./new-consultation-content";
+import { getDoctorsList } from "@/lib/actions";
 
 export default async function NewConsultationPage() {
   const currentUser = await getCurrentUser();
@@ -12,11 +12,11 @@ export default async function NewConsultationPage() {
   }
   
   const doctors = await getDoctorsList();
-
+  
   return (
-    <div className="max-w-xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Add New Consultation</h1>
-      <AddConsultationForm doctors={doctors} farmerId={currentUser._id.toString()} />
-    </div>
+    <NewConsultationContent 
+      doctors={doctors} 
+      farmerId={currentUser._id.toString()} 
+    />
   );
 } 
