@@ -1,11 +1,9 @@
-"use client"
-
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { ExternalLink } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Clock} from "lucide-react"
 
-interface ServiceCardProps {
+interface ServiceProps {
   service: {
     id: string
     name: string
@@ -13,64 +11,62 @@ interface ServiceCardProps {
     price: number | string
     duration: string
     image: string
-    link?: string
     category?: string
+    link?: string
   }
 }
 
-export default function ServiceCard({ service }: ServiceCardProps) {
-  const handleClick = () => {
-    if (service.link) {
-      // Open external link in new tab
-      window.open(service.link, "_blank", "noopener,noreferrer")
-    } else if (service.category) {
-      // Navigate to category page
-      window.location.href = `/services/${service.category}/${service.id}`
-    } else {
-      // Navigate to service details
-      window.location.href = `/services/${service.id}`
-    }
-  }
+function getServiceLink(service: ServiceProps['service']) {
+  // Check for external link (RVSMS)
+  if (service.link) return service.link
+  
+  // Check if service has category (dynamic services)
+  if (service.category === 'sales') return `/animal-sales?category=${service.id}`
+  if (service.category === 'drugs') return `/pharmacy?category=${service.id}`
+  if (service.category === 'feeds') return `/feeds?category=${service.id}`
+  
+  // For static services, use booking page
+  return `/booking?service=${encodeURIComponent(service.name)}`
+}
 
+export default function ServiceCard({ service }: ServiceProps) {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="relative h-48 w-full">
+    <div className="salon-card overflow-hidden shadow-salon hover:shadow-salon-hover transition-all group">
+      <div className="relative h-48">
         <Image
           src={service.image || "/placeholder.svg"}
           alt={service.name}
           fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       </div>
-      <CardHeader>
-        <CardTitle className="text-xl">{service.name}</CardTitle>
-        <CardDescription>{service.description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-2xl font-bold text-primary">
-              {typeof service.price === "number" ? `RWF ${service.price.toLocaleString()}` : service.price}
-            </p>
-            {service.duration && <p className="text-sm text-muted-foreground">{service.duration}</p>}
+
+      <div className="p-6">
+        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{service.name}</h3>
+        <p className="text-gray-600 mb-4">{service.description}</p>
+
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center text-primary font-semibold">
+            
+            <span>{typeof service.price === "number" ? `RWF ${service.price.toLocaleString()}` : service.price}</span>
+          </div>
+
+          <div className="flex items-center text-gray-500 text-sm">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>{service.duration}</span>
           </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={handleClick} className="w-full" variant={service.link ? "default" : "outline"}>
-          {service.link ? (
-            <>
-              Access RVSMS
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </>
-          ) : service.category ? (
-            "View Items"
-          ) : (
-            "Book Now"
-          )}
+
+        <Button
+          asChild
+          className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shadow-md"
+        >
+          <Link href={getServiceLink(service)} target={service.link ? "_blank" : "_self"}>
+            {service.name === "Access RVSMS" ? "Access RVSMS" : "Order Now"}
+          </Link>
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }
