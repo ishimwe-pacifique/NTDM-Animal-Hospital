@@ -292,7 +292,7 @@ export default function AdminUsersManagement() {
                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(user.status)}>
-                        {t(`admin.${user.status}`)}
+                        {user.status === 'active' ? t('admin.active') : t('admin.suspended')}
                       </Badge>
                     </TableCell>
                     <TableCell>

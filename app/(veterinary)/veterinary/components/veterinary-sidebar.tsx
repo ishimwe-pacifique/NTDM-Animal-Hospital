@@ -20,7 +20,7 @@ export function VeterinarySidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const sidebarNavItems = [
     {
@@ -107,10 +107,12 @@ export function VeterinarySidebar() {
           collapsed ? "w-16" : "w-64"
         )
       )}>
-      <div className="flex h-14 items-center border-b px-4 justify-between">
+      <div className="flex min-h-16 h-auto items-start border-b px-2 py-3 justify-between">
         {!collapsed && (
-          <Link href="/veterinary" className="flex items-center gap-2 font-semibold truncate">
-            <span className="text-primary">{t('vet.portal')}</span>
+          <Link href="/veterinary" className="flex items-start gap-1 font-semibold flex-1 pr-2">
+            <span className={`text-primary leading-relaxed whitespace-normal word-break break-all ${
+              language === 'rw' ? 'text-[10px]' : 'text-xs'
+            }`}>{language === 'rw' ? 'Umuganga w\'Amatungo' : t('vet.portal')}</span>
           </Link>
         )}
         <Button
@@ -118,7 +120,7 @@ export function VeterinarySidebar() {
           size="icon"
           onClick={toggleCollapsed}
           className={cn(
-            "h-8 w-8",
+            "h-8 w-8 flex-shrink-0",
             collapsed && "mx-auto"
           )}
         >
