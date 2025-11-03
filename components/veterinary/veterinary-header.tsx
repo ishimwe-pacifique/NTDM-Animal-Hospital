@@ -5,6 +5,8 @@ import { UserNav } from "@/app/(veterinary)/veterinary/components/user-nav"
 import { Bell, Search, Menu, Stethoscope, Heart } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 
 interface VeterinaryHeaderProps {
   onMenuClick: () => void
@@ -12,6 +14,7 @@ interface VeterinaryHeaderProps {
 
 export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
   const [showSearch, setShowSearch] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <header className="sticky top-0 z-30 bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 shadow-lg">
@@ -33,7 +36,7 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">
-                Veterinary
+                {t('vet.dashboard')}
               </h1>
               <p className="text-xs text-blue-100">Professional Animal Care</p>
             </div>
@@ -53,7 +56,7 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
           <div className="hidden md:block">
             {showSearch ? (
               <Input
-                placeholder="Search patients, cases..."
+                placeholder={t('vet.searchPatients')}
                 className="w-64 bg-white/10 border-white/20 text-white placeholder:text-blue-100"
                 onBlur={() => setShowSearch(false)}
                 autoFocus
@@ -74,10 +77,15 @@ export function VeterinaryHeader({ onMenuClick }: VeterinaryHeaderProps) {
             <Search className="h-5 w-5" />
           </Button>
 
+          {/* Language Switcher */}
+          <div className="text-white">
+            <LanguageSwitcher />
+          </div>
+
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative text-white hover:bg-blue-500">
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border border-white"></span>
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border border-white" title={t('vet.notifications')}></span>
           </Button>
 
           <UserNav />

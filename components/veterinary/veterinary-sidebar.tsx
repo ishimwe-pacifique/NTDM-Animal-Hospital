@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/contexts/LanguageContext"
 import {
   Calendar,
   ClipboardCheck,
@@ -16,16 +17,6 @@ import {
   PawPrint
 } from "lucide-react"
 
-const sidebarNavItems = [
-  { title: "Dashboard", href: "/veterinary", icon: Stethoscope, color: "text-blue-600" },
-  { title: "Appointments", href: "/veterinary/appointments", icon: Calendar, color: "text-green-600" },
-  { title: "Patients", href: "/veterinary/patients", icon: Heart, color: "text-red-500" },
-  { title: "Tracking", href: "/veterinary/tracking", icon: Activity, color: "text-purple-600" },
-  { title: "Consultations", href: "/veterinary/consultations", icon: ClipboardCheck, color: "text-orange-600" },
-  { title: "Messages", href: "/veterinary/messages", icon: MessageSquare, color: "text-indigo-600" },
-  { title: "Settings", href: "/veterinary/settings", icon: Settings, color: "text-gray-600" },
-]
-
 interface VeterinarySidebarProps {
   isOpen: boolean
   onClose: () => void
@@ -34,6 +25,17 @@ interface VeterinarySidebarProps {
 
 export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySidebarProps) {
   const pathname = usePathname()
+  const { t } = useLanguage()
+
+  const sidebarNavItems = [
+    { title: t('vet.dashboard'), href: "/veterinary", icon: Stethoscope, color: "text-blue-600" },
+    { title: t('vet.appointments'), href: "/veterinary/appointments", icon: Calendar, color: "text-green-600" },
+    { title: t('vet.patients'), href: "/veterinary/patients", icon: Heart, color: "text-red-500" },
+    { title: t('vet.tracking'), href: "/veterinary/tracking", icon: Activity, color: "text-purple-600" },
+    { title: t('vet.consultations'), href: "/veterinary/consultations", icon: ClipboardCheck, color: "text-orange-600" },
+    { title: t('vet.messages'), href: "/veterinary/messages", icon: MessageSquare, color: "text-indigo-600" },
+    { title: t('vet.settings'), href: "/veterinary/settings", icon: Settings, color: "text-gray-600" },
+  ]
 
   return (
     <aside className={cn(
@@ -51,7 +53,7 @@ export function VeterinarySidebar({ isOpen, onClose, isMobile }: VeterinarySideb
             <PawPrint className="h-5 w-5 text-white" />
           </div>
           <div>
-            <span className="text-lg font-bold text-blue-700">VetPortal</span>
+            <span className="text-lg font-bold text-blue-700">{t('vet.portal')}</span>
             <p className="text-xs text-blue-500">Animal Hospital</p>
           </div>
         </Link>

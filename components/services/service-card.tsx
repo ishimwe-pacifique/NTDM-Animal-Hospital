@@ -12,10 +12,14 @@ interface ServiceProps {
     duration: string
     image: string
     category?: string
+    link?: string
   }
 }
 
 function getServiceLink(service: ServiceProps['service']) {
+  // Check for external link (RVSMS)
+  if (service.link) return service.link
+  
   // Check if service has category (dynamic services)
   if (service.category === 'sales') return `/animal-sales?category=${service.id}`
   if (service.category === 'drugs') return `/pharmacy?category=${service.id}`
@@ -58,7 +62,9 @@ export default function ServiceCard({ service }: ServiceProps) {
           asChild
           className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shadow-md"
         >
-          <Link href={getServiceLink(service)}>Order Now</Link>
+          <Link href={getServiceLink(service)} target={service.link ? "_blank" : "_self"}>
+            {service.name === "Access RVSMS" ? "Access RVSMS" : "Order Now"}
+          </Link>
         </Button>
       </div>
     </div>

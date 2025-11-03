@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useLanguage } from "@/contexts/LanguageContext"
 import {
   Table,
   TableBody,
@@ -49,6 +50,7 @@ interface VeterinaryConsultationsProps {
 
 export default function VeterinaryConsultations({ consultations }: VeterinaryConsultationsProps) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [isUpdating, setIsUpdating] = useState(false)
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null)
   const [feedback, setFeedback] = useState("")
@@ -135,6 +137,21 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
     }
   }
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "pending":
+        return t('vet.pending')
+      case "accepted":
+        return t('vet.accepted')
+      case "rejected":
+        return t('vet.rejected')
+      case "completed":
+        return t('vet.completed')
+      default:
+        return status
+    }
+  }
+
   const pendingConsultations = consultations.filter(c => c.status === "pending")
   const acceptedConsultations = consultations.filter(c => c.status === "accepted")
   const rejectedConsultations = consultations.filter(c => c.status === "rejected")
@@ -217,12 +234,12 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="whitespace-nowrap">Farmer</TableHead>
-            <TableHead className="whitespace-nowrap">Animal</TableHead>
-            <TableHead className="whitespace-nowrap">Symptoms</TableHead>
-            <TableHead className="whitespace-nowrap">Status</TableHead>
-            <TableHead className="whitespace-nowrap">Date</TableHead>
-            <TableHead className="whitespace-nowrap">Actions</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.farmer')}</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.animal')}</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.symptoms')}</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.status')}</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.date')}</TableHead>
+            <TableHead className="whitespace-nowrap">{t('vet.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -335,7 +352,7 @@ export default function VeterinaryConsultations({ consultations }: VeterinaryCon
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Consultation Requests</CardTitle>
+          <CardTitle>{t('vet.consultationRequests')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="pending" className="space-y-4">

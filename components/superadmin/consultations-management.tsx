@@ -36,6 +36,7 @@ import {
   Users
 } from "lucide-react"
 import { format } from "date-fns"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Consultation {
   _id: string
@@ -59,6 +60,7 @@ interface ConsultationsManagementProps {
 }
 
 export default function ConsultationsManagement({ consultations }: ConsultationsManagementProps) {
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null)
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
@@ -119,7 +121,7 @@ export default function ConsultationsManagement({ consultations }: Consultations
         <Card>
           <CardContent className="p-3 sm:p-6">
             <div className="text-xl sm:text-2xl font-bold">{filteredConsultations.length}</div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.total')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -127,7 +129,7 @@ export default function ConsultationsManagement({ consultations }: Consultations
             <div className="text-xl sm:text-2xl font-bold text-yellow-600">
               {pendingConsultations.length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Pending</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.pending')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -135,7 +137,7 @@ export default function ConsultationsManagement({ consultations }: Consultations
             <div className="text-xl sm:text-2xl font-bold text-green-600">
               {acceptedConsultations.length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Approved</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.approved')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -143,7 +145,7 @@ export default function ConsultationsManagement({ consultations }: Consultations
             <div className="text-xl sm:text-2xl font-bold text-blue-600">
               {completedConsultations.length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Completed</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.completed')}</p>
           </CardContent>
         </Card>
       </div>
@@ -151,13 +153,13 @@ export default function ConsultationsManagement({ consultations }: Consultations
       {/* Search */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg sm:text-xl">Consultations Management</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">{t('superadmin.consultationsManagement')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search by patient, service, doctor, or farmer..."
+              placeholder={t('superadmin.searchPatientService')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -171,24 +173,24 @@ export default function ConsultationsManagement({ consultations }: Consultations
         <ScrollArea className="w-full">
           <TabsList className="grid w-full grid-cols-5 min-w-fit">
             <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">
-              All
+              {t('superadmin.all')}
               <span className="hidden sm:inline ml-1">({filteredConsultations.length})</span>
             </TabsTrigger>
             <TabsTrigger value="pending" className="text-xs sm:text-sm px-2 sm:px-3">
-              Pending
+              {t('superadmin.pending')}
               <span className="hidden sm:inline ml-1">({pendingConsultations.length})</span>
             </TabsTrigger>
             <TabsTrigger value="accepted" className="text-xs sm:text-sm px-2 sm:px-3">
-              <span className="hidden sm:inline">Approved</span>
+              <span className="hidden sm:inline">{t('superadmin.approved')}</span>
               <span className="sm:hidden">OK</span>
               <span className="hidden sm:inline ml-1">({acceptedConsultations.length})</span>
             </TabsTrigger>
             <TabsTrigger value="rejected" className="text-xs sm:text-sm px-2 sm:px-3">
-              Rejected
+              {t('superadmin.rejected')}
               <span className="hidden sm:inline ml-1">({rejectedConsultations.length})</span>
             </TabsTrigger>
             <TabsTrigger value="completed" className="text-xs sm:text-sm px-2 sm:px-3">
-              Done
+              {t('superadmin.done')}
               <span className="hidden sm:inline ml-1">({completedConsultations.length})</span>
             </TabsTrigger>
           </TabsList>
@@ -244,9 +246,9 @@ export default function ConsultationsManagement({ consultations }: Consultations
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
         <DialogContent className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Consultation Details</DialogTitle>
+            <DialogTitle>{t('superadmin.consultationDetails')}</DialogTitle>
             <DialogDescription>
-              Complete information about this consultation
+              {t('superadmin.completeInformation')}
             </DialogDescription>
           </DialogHeader>
           {selectedConsultation && (
@@ -256,10 +258,10 @@ export default function ConsultationsManagement({ consultations }: Consultations
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Patient Information
+                    {t('superadmin.patientInformation')}
                   </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Name:</span> {selectedConsultation.fullName}</p>
+                    <p><span className="font-medium">{t('superadmin.name')}:</span> {selectedConsultation.fullName}</p>
                     <p className="flex items-center gap-1">
                       <Phone className="h-3 w-3" />
                       {selectedConsultation.phoneNumber}
@@ -269,11 +271,11 @@ export default function ConsultationsManagement({ consultations }: Consultations
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                     <Stethoscope className="h-4 w-4" />
-                    Service Details
+                    {t('superadmin.serviceDetails')}
                   </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Service:</span> {selectedConsultation.service}</p>
-                    <p><span className="font-medium">Type:</span> {selectedConsultation.type}</p>
+                    <p><span className="font-medium">{t('superadmin.service')}:</span> {selectedConsultation.service}</p>
+                    <p><span className="font-medium">{t('superadmin.type')}:</span> {selectedConsultation.type}</p>
                   </div>
                 </div>
               </div>
@@ -365,7 +367,7 @@ function ConsultationsView({
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <FileText className="h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-gray-500">No consultations found</p>
+          <p className="text-gray-500">{t('superadmin.noConsultationsFound')}</p>
         </CardContent>
       </Card>
     )

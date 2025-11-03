@@ -13,6 +13,7 @@ import { Search, MoreHorizontal, Edit, UserCheck, UserX, Key, Plus, Loader2 } fr
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 type User = {
   _id: string
@@ -40,6 +41,7 @@ export default function AdminUsersManagement() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const { t } = useLanguage()
   
   // Create user form state
   const [newUser, setNewUser] = useState({
@@ -68,10 +70,10 @@ export default function AdminUsersManagement() {
       if (response.ok) {
         setUsers(data.users)
       } else {
-        setError(data.error || 'Failed to fetch users')
+        setError(data.error || t('admin.failedToFetchUsers'))
       }
     } catch (error) {
-      setError('Failed to fetch users')
+      setError(t('admin.failedToFetchUsers'))
     } finally {
       setLoading(false)
     }
@@ -102,7 +104,7 @@ export default function AdminUsersManagement() {
         setError(data.error)
       }
     } catch (error) {
-      setError('Failed to update user status')
+      setError(t('admin.failedToUpdateUserStatus'))
     }
   }
 
@@ -139,7 +141,7 @@ export default function AdminUsersManagement() {
         setError(data.error)
       }
     } catch (error) {
-      setError('Failed to create user')
+      setError(t('admin.failedToCreateUser'))
     } finally {
       setCreating(false)
     }
@@ -168,7 +170,7 @@ export default function AdminUsersManagement() {
         <Card>
           <CardContent className="p-6">
             <div className="text-2xl font-bold">{users.length}</div>
-            <p className="text-sm text-muted-foreground">Total Users</p>
+            <p className="text-sm text-muted-foreground">{t('admin.totalUsers')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -176,7 +178,7 @@ export default function AdminUsersManagement() {
             <div className="text-2xl font-bold text-green-600">
               {users.filter(u => u.status === 'active').length}
             </div>
-            <p className="text-sm text-muted-foreground">Active Users</p>
+            <p className="text-sm text-muted-foreground">{t('admin.activeUsers')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -184,7 +186,7 @@ export default function AdminUsersManagement() {
             <div className="text-2xl font-bold text-blue-600">
               {users.filter(u => u.role === 'doctor').length}
             </div>
-            <p className="text-sm text-muted-foreground">Doctors</p>
+            <p className="text-sm text-muted-foreground">{t('admin.doctors')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -192,7 +194,7 @@ export default function AdminUsersManagement() {
             <div className="text-2xl font-bold text-orange-600">
               {users.filter(u => u.role === 'farmer').length}
             </div>
-            <p className="text-sm text-muted-foreground">Farmers</p>
+            <p className="text-sm text-muted-foreground">{t('admin.farmers')}</p>
           </CardContent>
         </Card>
       </div>
@@ -201,10 +203,10 @@ export default function AdminUsersManagement() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Regional Users</CardTitle>
+            <CardTitle>{t('admin.regionalUsers')}</CardTitle>
             <Button onClick={() => setIsCreateDialogOpen(true)} size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Add User
+              {t('admin.addUser')}
             </Button>
           </div>
         </CardHeader>
@@ -213,7 +215,7 @@ export default function AdminUsersManagement() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search users..."
+                placeholder={t('admin.searchUsers')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -224,9 +226,9 @@ export default function AdminUsersManagement() {
                 <SelectValue placeholder="All Roles" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="farmer">Farmers</SelectItem>
-                <SelectItem value="doctor">Doctors</SelectItem>
+                <SelectItem value="all">{t('admin.allRoles')}</SelectItem>
+                <SelectItem value="farmer">{t('admin.farmers')}</SelectItem>
+                <SelectItem value="doctor">{t('admin.doctors')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -234,9 +236,9 @@ export default function AdminUsersManagement() {
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="all">{t('admin.allStatus')}</SelectItem>
+                <SelectItem value="active">{t('admin.active')}</SelectItem>
+                <SelectItem value="suspended">{t('admin.suspended')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -266,11 +268,11 @@ export default function AdminUsersManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Location/Specialization</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('admin.user')}</TableHead>
+                  <TableHead>{t('admin.role')}</TableHead>
+                  <TableHead>{t('admin.status')}</TableHead>
+                  <TableHead>{t('admin.locationSpecialization')}</TableHead>
+                  <TableHead className="text-right">{t('admin.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -285,12 +287,12 @@ export default function AdminUsersManagement() {
                     </TableCell>
                     <TableCell>
                       <Badge className={getRoleColor(user.role)}>
-                        {user.role}
+                        {t(`admin.${user.role}`)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(user.status)}>
-                        {user.status}
+                        {user.status === 'active' ? t('admin.active') : t('admin.suspended')}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -307,12 +309,12 @@ export default function AdminUsersManagement() {
                           {user.status === "active" ? (
                             <DropdownMenuItem onClick={() => handleStatusChange(user._id, "suspend")}>
                               <UserX className="mr-2 h-4 w-4" />
-                              Suspend
+                              {t('admin.suspend')}
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={() => handleStatusChange(user._id, "activate")}>
                               <UserCheck className="mr-2 h-4 w-4" />
-                              Activate
+                              {t('admin.activate')}
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -323,7 +325,7 @@ export default function AdminUsersManagement() {
                 {filteredUsers.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                      No users found
+                      {t('admin.noUsersFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -337,19 +339,19 @@ export default function AdminUsersManagement() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Add New User</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">{t('admin.addNewUser')}</DialogTitle>
             <DialogDescription>
-              Create a new farmer or doctor account for the regional system
+              {t('admin.createNewAccount')}
             </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={handleCreateUser} className="space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Basic Information</h3>
+              <h3 className="text-lg font-medium">{t('admin.basicInformation')}</h3>
               
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('admin.fullName')}</Label>
                 <Input
                   id="name"
                   placeholder="John Doe"
@@ -360,7 +362,7 @@ export default function AdminUsersManagement() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('admin.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -373,7 +375,7 @@ export default function AdminUsersManagement() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('admin.password')}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -385,7 +387,7 @@ export default function AdminUsersManagement() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">{t('admin.phoneNumber')}</Label>
                   <Input
                     id="phone"
                     placeholder="+250 78 123 4567"
@@ -399,7 +401,7 @@ export default function AdminUsersManagement() {
             
             {/* Account Type */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Account Type</h3>
+              <h3 className="text-lg font-medium">{t('admin.accountType')}</h3>
               <RadioGroup
                 value={newUser.role}
                 onValueChange={(value) => setNewUser({...newUser, role: value as "farmer" | "doctor"})}
@@ -408,13 +410,13 @@ export default function AdminUsersManagement() {
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="farmer" id="farmer-role" />
                   <Label htmlFor="farmer-role" className="cursor-pointer">
-                    Farmer/Pet Owner
+                    {t('admin.farmerPetOwner')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="doctor" id="doctor-role" />
                   <Label htmlFor="doctor-role" className="cursor-pointer">
-                    Veterinarian
+                    {t('admin.veterinarian')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -423,10 +425,10 @@ export default function AdminUsersManagement() {
             {/* Role-specific fields */}
             {newUser.role === "farmer" && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Location Information</h3>
+                <h3 className="text-lg font-medium">{t('admin.locationInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="district">District</Label>
+                    <Label htmlFor="district">{t('admin.district')}</Label>
                     <Input
                       id="district"
                       placeholder="e.g., Kigali"
@@ -436,7 +438,7 @@ export default function AdminUsersManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="sector">Sector</Label>
+                    <Label htmlFor="sector">{t('admin.sector')}</Label>
                     <Input
                       id="sector"
                       placeholder="e.g., Nyarugenge"
@@ -451,10 +453,10 @@ export default function AdminUsersManagement() {
             
             {newUser.role === "doctor" && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Professional Information</h3>
+                <h3 className="text-lg font-medium">{t('admin.professionalInformation')}</h3>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="licenseNumber">License Number</Label>
+                    <Label htmlFor="licenseNumber">{t('admin.licenseNumber')}</Label>
                     <Input
                       id="licenseNumber"
                       placeholder="VET-12345"
@@ -464,7 +466,7 @@ export default function AdminUsersManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="specialization">Specialization</Label>
+                    <Label htmlFor="specialization">{t('admin.specialization')}</Label>
                     <Input
                       id="specialization"
                       placeholder="e.g., Large Animal Medicine"
@@ -496,16 +498,16 @@ export default function AdminUsersManagement() {
                   })
                 }}
               >
-                Cancel
+                {t('admin.cancel')}
               </Button>
               <Button type="submit" disabled={creating} className="bg-blue-600 hover:bg-blue-700">
                 {creating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Creating...
+                    {t('admin.creating')}
                   </>
                 ) : (
-                  "Create User"
+                  t('admin.createUser')
                 )}
               </Button>
             </DialogFooter>
