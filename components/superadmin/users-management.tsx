@@ -53,6 +53,7 @@ import { registerUser } from "@/lib/actions/auth"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface User {
   _id: string
@@ -76,6 +77,7 @@ interface UsersManagementProps {
 }
 
 export default function UsersManagement({ users }: UsersManagementProps) {
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -250,6 +252,26 @@ export default function UsersManagement({ users }: UsersManagementProps) {
   const roles = [...new Set(users.map(user => user.role))]
   const statuses = [...new Set(users.map(user => user.status))]
 
+  // Helper functions to translate role and status values
+  const translateRole = (role: string) => {
+    switch (role) {
+      case 'farmer': return t('superadmin.farmer')
+      case 'doctor': return t('superadmin.veterinarian')
+      case 'admin': return t('superadmin.admin')
+      case 'superadmin': return t('superadmin.superAdmin')
+      default: return role
+    }
+  }
+
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'active': return t('superadmin.active')
+      case 'suspended': return t('superadmin.suspended')
+      case 'inactive': return 'Inactive' // Add this key if needed
+      default: return status
+    }
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header with Stats */}
@@ -257,7 +279,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
         <Card>
           <CardContent className="p-3 sm:p-6">
             <div className="text-xl sm:text-2xl font-bold">{filteredUsers.length}</div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Total Users</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.totalUsers')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -265,7 +287,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
             <div className="text-xl sm:text-2xl font-bold text-green-600">
               {filteredUsers.filter(u => u.status === 'active').length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Active</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.active')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -273,7 +295,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
             <div className="text-xl sm:text-2xl font-bold text-blue-600">
               {filteredUsers.filter(u => u.isOnline).length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Online</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.online')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -281,7 +303,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
             <div className="text-xl sm:text-2xl font-bold text-red-600">
               {filteredUsers.filter(u => u.status === 'suspended').length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Suspended</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('superadmin.suspended')}</p>
           </CardContent>
         </Card>
       </div>
@@ -290,7 +312,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <CardTitle className="text-lg sm:text-xl">Users Management</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">{t('superadmin.usersManagement')}</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setIsCreateDialogOpen(true)}
@@ -298,7 +320,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 className="bg-primary hover:bg-primary/90"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Create User
+                {t('superadmin.createUser')}
               </Button>
               <Button
                 variant={viewMode === 'table' ? 'default' : 'outline'}
@@ -324,7 +346,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search users by name, email, or role..."
+              placeholder={t('superadmin.searchUsers')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -335,13 +357,13 @@ export default function UsersManagement({ users }: UsersManagementProps) {
           <div className="flex flex-col sm:flex-row gap-3">
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="All Roles" />
+                <SelectValue placeholder={t('superadmin.allRoles')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="all">{t('superadmin.allRoles')}</SelectItem>
                 {roles.map(role => (
                   <SelectItem key={role} value={role}>
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                    {translateRole(role)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -349,13 +371,13 @@ export default function UsersManagement({ users }: UsersManagementProps) {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="All Status" />
+                <SelectValue placeholder={t('superadmin.allStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="all">{t('superadmin.allStatus')}</SelectItem>
                 {statuses.map(status => (
                   <SelectItem key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {translateStatus(status)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -391,7 +413,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" />
-                        Edit
+                        {t('superadmin.editUser')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
@@ -400,7 +422,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                         }}
                       >
                         <Key className="mr-2 h-4 w-4" />
-                        Change Password
+                        {t('superadmin.changePassword')}
                       </DropdownMenuItem>
                       {user.isOnline && (
                         <DropdownMenuItem
@@ -411,7 +433,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                           className="text-orange-600"
                         >
                           <LogOut className="mr-2 h-4 w-4" />
-                          Force Logout
+                          {t('superadmin.forceLogout')}
                         </DropdownMenuItem>
                       )}
                       {user.status === "active" ? (
@@ -420,7 +442,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                           disabled={isUpdating}
                         >
                           <UserX className="mr-2 h-4 w-4" />
-                          Suspend
+                          {t('superadmin.suspend')}
                         </DropdownMenuItem>
                       ) : (
                         <DropdownMenuItem
@@ -428,7 +450,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                           disabled={isUpdating}
                         >
                           <UserCheck className="mr-2 h-4 w-4" />
-                          Activate
+                          {t('superadmin.activate')}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
@@ -439,7 +461,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                         className="text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t('superadmin.deleteUser')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -448,21 +470,21 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 {/* Badges and Status */}
                 <div className="flex flex-wrap gap-2">
                   <Badge className={getRoleColor(user.role)} variant="secondary">
-                    {user.role}
+                    {translateRole(user.role)}
                   </Badge>
                   <Badge className={getStatusColor(user.status)} variant="secondary">
-                    {user.status}
+                    {translateStatus(user.status)}
                   </Badge>
                   <div className="flex items-center gap-1">
                     {user.isOnline ? (
                       <>
                         <Wifi className="h-3 w-3 text-green-500" />
-                        <span className="text-green-600 text-xs">Online</span>
+                        <span className="text-green-600 text-xs">{t('superadmin.online')}</span>
                       </>
                     ) : (
                       <>
                         <WifiOff className="h-3 w-3 text-gray-400" />
-                        <span className="text-gray-500 text-xs">Offline</span>
+                        <span className="text-gray-500 text-xs">{t('superadmin.offline')}</span>
                       </>
                     )}
                   </div>
@@ -471,14 +493,14 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 {/* Metadata */}
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                   <div>
-                    <span className="font-medium">Joined:</span><br />
+                    <span className="font-medium">{t('superadmin.joined')}:</span><br />
                     {format(new Date(user.createdAt), "MMM dd, yyyy")}
                   </div>
                   <div>
-                    <span className="font-medium">Last Login:</span><br />
+                    <span className="font-medium">{t('superadmin.lastLogin')}:</span><br />
                     {user.lastLoginAt 
                       ? format(new Date(user.lastLoginAt), "MMM dd, yyyy")
-                      : "Never"
+                      : t('superadmin.never')
                     }
                   </div>
                 </div>
@@ -495,13 +517,13 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[200px]">User</TableHead>
-                    <TableHead className="min-w-[100px]">Role</TableHead>
-                    <TableHead className="min-w-[100px]">Status</TableHead>
-                    <TableHead className="min-w-[100px]">Online</TableHead>
-                    <TableHead className="min-w-[120px]">Created</TableHead>
-                    <TableHead className="min-w-[160px]">Last Login</TableHead>
-                    <TableHead className="text-right min-w-[80px]">Actions</TableHead>
+                    <TableHead className="min-w-[200px]">{t('superadmin.user')}</TableHead>
+                    <TableHead className="min-w-[100px]">{t('superadmin.role')}</TableHead>
+                    <TableHead className="min-w-[100px]">{t('superadmin.status')}</TableHead>
+                    <TableHead className="min-w-[100px]">{t('superadmin.online')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('superadmin.created')}</TableHead>
+                    <TableHead className="min-w-[160px]">{t('superadmin.lastLogin')}</TableHead>
+                    <TableHead className="text-right min-w-[80px]">{t('superadmin.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -516,12 +538,12 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                       </TableCell>
                       <TableCell>
                         <Badge className={getRoleColor(user.role)}>
-                          {user.role}
+                          {translateRole(user.role)}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(user.status)}>
-                          {user.status}
+                          {translateStatus(user.status)}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -529,12 +551,12 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                           {user.isOnline ? (
                             <>
                               <Wifi className="h-4 w-4 text-green-500" />
-                              <span className="text-green-600 text-sm">Online</span>
+                              <span className="text-green-600 text-sm">{t('superadmin.online')}</span>
                             </>
                           ) : (
                             <>
                               <WifiOff className="h-4 w-4 text-gray-400" />
-                              <span className="text-gray-500 text-sm">Offline</span>
+                              <span className="text-gray-500 text-sm">{t('superadmin.offline')}</span>
                             </>
                           )}
                         </div>
@@ -545,7 +567,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                       <TableCell>
                         {user.lastLoginAt 
                           ? format(new Date(user.lastLoginAt), "MMM dd, yyyy 'at' h:mm a")
-                          : "Never"
+                          : t('superadmin.never')
                         }
                       </TableCell>
                       <TableCell className="text-right">
@@ -563,7 +585,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                               }}
                             >
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              {t('superadmin.editUser')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
@@ -572,7 +594,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                               }}
                             >
                               <Key className="mr-2 h-4 w-4" />
-                              Change Password
+                              {t('superadmin.changePassword')}
                             </DropdownMenuItem>
                             {user.isOnline && (
                               <DropdownMenuItem
@@ -583,7 +605,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                                 className="text-orange-600"
                               >
                                 <LogOut className="mr-2 h-4 w-4" />
-                                Force Logout
+                                {t('superadmin.forceLogout')}
                               </DropdownMenuItem>
                             )}
                             {user.status === "active" ? (
@@ -592,7 +614,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                                 disabled={isUpdating}
                               >
                                 <UserX className="mr-2 h-4 w-4" />
-                                Suspend
+                                {t('superadmin.suspend')}
                               </DropdownMenuItem>
                             ) : (
                               <DropdownMenuItem
@@ -600,7 +622,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                                 disabled={isUpdating}
                               >
                                 <UserCheck className="mr-2 h-4 w-4" />
-                                Activate
+                                {t('superadmin.activate')}
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
@@ -611,7 +633,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                               className="text-red-600"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              {t('superadmin.deleteUser')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -628,9 +650,9 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>{t('superadmin.editUser')}</DialogTitle>
             <DialogDescription>
-              Update user information and settings.
+              {t('superadmin.updateUserInfo')}
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
@@ -647,7 +669,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
             >
               <div className="grid gap-4">
                 <div>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{t('superadmin.name')}</Label>
                   <Input
                     id="name"
                     name="name"
@@ -656,7 +678,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('superadmin.email')}</Label>
                   <Input
                     id="email"
                     name="email"
@@ -666,7 +688,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t('superadmin.phone')}</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -675,23 +697,23 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">{t('superadmin.role')}</Label>
                   <Select name="role" defaultValue={selectedUser.role}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="farmer">Farmer</SelectItem>
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="superadmin">Super Admin</SelectItem>
+                      <SelectItem value="farmer">{t('superadmin.farmer')}</SelectItem>
+                      <SelectItem value="doctor">{t('superadmin.veterinarian')}</SelectItem>
+                      <SelectItem value="admin">{t('superadmin.admin')}</SelectItem>
+                      <SelectItem value="superadmin">{t('superadmin.superAdmin')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {selectedUser.role === "farmer" && (
                   <>
                     <div>
-                      <Label htmlFor="district">District</Label>
+                      <Label htmlFor="district">{t('superadmin.district')}</Label>
                       <Input
                         id="district"
                         name="district"
@@ -699,7 +721,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="sector">Sector</Label>
+                      <Label htmlFor="sector">{t('superadmin.sector')}</Label>
                       <Input
                         id="sector"
                         name="sector"
@@ -711,7 +733,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 {selectedUser.role === "doctor" && (
                   <>
                     <div>
-                      <Label htmlFor="licenseNumber">License Number</Label>
+                      <Label htmlFor="licenseNumber">{t('superadmin.licenseNumber')}</Label>
                       <Input
                         id="licenseNumber"
                         name="licenseNumber"
@@ -719,7 +741,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="specialization">Specialization</Label>
+                      <Label htmlFor="specialization">{t('superadmin.specialization')}</Label>
                       <Input
                         id="specialization"
                         name="specialization"
@@ -736,10 +758,10 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                   onClick={() => setIsEditDialogOpen(false)}
                   className="w-full sm:w-auto"
                 >
-                  Cancel
+                  {t('superadmin.cancel')}
                 </Button>
                 <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto">
-                  {isUpdating ? "Updating..." : "Update User"}
+                  {isUpdating ? t('superadmin.updating') : t('superadmin.updateUser')}
                 </Button>
               </DialogFooter>
             </form>
@@ -751,21 +773,21 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="w-full max-w-md mx-4">
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{t('superadmin.deleteUser')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone.
+              {t('superadmin.deleteUserConfirm')}
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
             <div className="py-4 space-y-2">
               <p className="text-sm text-gray-600">
-                <strong>Name:</strong> {selectedUser.name}
+                <strong>{t('superadmin.name')}:</strong> {selectedUser.name}
               </p>
               <p className="text-sm text-gray-600">
                 <strong>Email:</strong> {selectedUser.email}
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Role:</strong> {selectedUser.role}
+                <strong>{t('superadmin.role')}:</strong> {translateRole(selectedUser.role)}
               </p>
             </div>
           )}
@@ -775,7 +797,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               onClick={() => setIsDeleteDialogOpen(false)}
               className="w-full sm:w-auto"
             >
-              Cancel
+              {t('superadmin.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -783,7 +805,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               disabled={isUpdating}
               className="w-full sm:w-auto"
             >
-              {isUpdating ? "Deleting..." : "Delete User"}
+              {isUpdating ? t('superadmin.deleting') : t('superadmin.deleteUser')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -793,26 +815,26 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
         <DialogContent className="w-full max-w-md mx-4">
           <DialogHeader>
-            <DialogTitle>Change Password</DialogTitle>
+            <DialogTitle>{t('superadmin.changePassword')}</DialogTitle>
             <DialogDescription>
-              Set a new password for this user.
+              {t('superadmin.setNewPassword')}
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword">{t('superadmin.newPassword')}</Label>
                 <Input
                   id="newPassword"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder={t('superadmin.enterNewPassword')}
                   required
                 />
               </div>
               <div className="text-sm text-gray-600 space-y-1">
-                <p><strong>User:</strong> {selectedUser.name}</p>
+                <p><strong>{t('superadmin.name')}:</strong> {selectedUser.name}</p>
                 <p><strong>Email:</strong> {selectedUser.email}</p>
               </div>
             </div>
@@ -827,14 +849,14 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               }}
               className="w-full sm:w-auto"
             >
-              Cancel
+              {t('superadmin.cancel')}
             </Button>
             <Button
               onClick={() => selectedUser && handlePasswordChange(selectedUser._id, newPassword)}
               disabled={isUpdating || !newPassword.trim()}
               className="w-full sm:w-auto"
             >
-              {isUpdating ? "Updating..." : "Update Password"}
+              {isUpdating ? t('superadmin.updating') : t('superadmin.updatePassword')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -844,30 +866,30 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
         <DialogContent className="w-full max-w-md mx-4">
           <DialogHeader>
-            <DialogTitle>Force Logout User</DialogTitle>
+            <DialogTitle>{t('superadmin.forceLogoutUser')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to force logout this user? They will be immediately disconnected from all their active sessions.
+              {t('superadmin.forceLogoutConfirm')}
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
             <div className="py-4 space-y-3">
               <div className="flex items-center space-x-2 mb-3">
                 <Wifi className="h-4 w-4 text-green-500" />
-                <span className="text-green-600 text-sm font-medium">Currently Online</span>
+                <span className="text-green-600 text-sm font-medium">{t('superadmin.currentlyOnline')}</span>
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-gray-600">
-                  <strong>Name:</strong> {selectedUser.name}
+                  <strong>{t('superadmin.name')}:</strong> {selectedUser.name}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Email:</strong> {selectedUser.email}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Role:</strong> {selectedUser.role}
+                  <strong>{t('superadmin.role')}:</strong> {selectedUser.role}
                 </p>
                 {selectedUser.lastLoginAt && (
                   <p className="text-sm text-gray-600">
-                    <strong>Last Login:</strong> {format(new Date(selectedUser.lastLoginAt), "MMM dd, yyyy 'at' h:mm a")}
+                    <strong>{t('superadmin.lastLogin')}:</strong> {format(new Date(selectedUser.lastLoginAt), "MMM dd, yyyy 'at' h:mm a")}
                   </p>
                 )}
               </div>
@@ -882,7 +904,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               }}
               className="w-full sm:w-auto"
             >
-              Cancel
+              {t('superadmin.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -890,7 +912,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               disabled={isUpdating}
               className="w-full sm:w-auto"
             >
-              {isUpdating ? "Logging out..." : "Force Logout"}
+              {isUpdating ? t('superadmin.loggingOut') : t('superadmin.forceLogout')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -900,15 +922,15 @@ export default function UsersManagement({ users }: UsersManagementProps) {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New User</DialogTitle>
+            <DialogTitle>{t('superadmin.createNewUser')}</DialogTitle>
             <DialogDescription>
-              Add a new user to the system with their role and information.
+              {t('superadmin.addNewUserSystem')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div className="grid gap-4">
               <div>
-                <Label htmlFor="create-name">Full Name</Label>
+                <Label htmlFor="create-name">{t('superadmin.fullName')}</Label>
                 <Input
                   id="create-name"
                   value={createUserData.name}
@@ -929,7 +951,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="create-password">Password</Label>
+                <Label htmlFor="create-password">{t('superadmin.password')}</Label>
                 <Input
                   id="create-password"
                   type="password"
@@ -940,7 +962,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="create-phone">Phone Number</Label>
+                <Label htmlFor="create-phone">{t('superadmin.phoneNumber')}</Label>
                 <Input
                   id="create-phone"
                   value={createUserData.phone}
@@ -950,7 +972,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 />
               </div>
               <div>
-                <Label>Role</Label>
+                <Label>{t('superadmin.role')}</Label>
                 <RadioGroup
                   value={createUserData.role}
                   onValueChange={(value) => setCreateUserData({...createUserData, role: value as any})}
@@ -958,19 +980,19 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="farmer" id="create-farmer" />
-                    <Label htmlFor="create-farmer">Farmer/Pet Owner</Label>
+                    <Label htmlFor="create-farmer">{t('superadmin.farmerPetOwner')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="doctor" id="create-doctor" />
-                    <Label htmlFor="create-doctor">Veterinarian</Label>
+                    <Label htmlFor="create-doctor">{t('superadmin.veterinarian')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="admin" id="create-admin" />
-                    <Label htmlFor="create-admin">Administrator</Label>
+                    <Label htmlFor="create-admin">{t('superadmin.administrator')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="superadmin" id="create-superadmin" />
-                    <Label htmlFor="create-superadmin">Super Administrator</Label>
+                    <Label htmlFor="create-superadmin">{t('superadmin.superAdministrator')}</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -978,7 +1000,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               {createUserData.role === "doctor" && (
                 <>
                   <div>
-                    <Label htmlFor="create-license">License Number</Label>
+                    <Label htmlFor="create-license">{t('superadmin.licenseNumber')}</Label>
                     <Input
                       id="create-license"
                       value={createUserData.licenseNumber}
@@ -988,7 +1010,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="create-specialization">Specialization</Label>
+                    <Label htmlFor="create-specialization">{t('superadmin.specialization')}</Label>
                     <Input
                       id="create-specialization"
                       value={createUserData.specialization}
@@ -1003,7 +1025,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
               {createUserData.role === "farmer" && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="create-district">District</Label>
+                    <Label htmlFor="create-district">{t('superadmin.district')}</Label>
                     <Input
                       id="create-district"
                       value={createUserData.district}
@@ -1013,7 +1035,7 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="create-sector">Sector</Label>
+                    <Label htmlFor="create-sector">{t('superadmin.sector')}</Label>
                     <Input
                       id="create-sector"
                       value={createUserData.sector}
@@ -1046,10 +1068,10 @@ export default function UsersManagement({ users }: UsersManagementProps) {
                 }}
                 className="w-full sm:w-auto"
               >
-                Cancel
+                {t('superadmin.cancel')}
               </Button>
               <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto">
-                {isUpdating ? "Creating..." : "Create User"}
+                {isUpdating ? t('superadmin.creating') : t('superadmin.createUser')}
               </Button>
             </DialogFooter>
           </form>

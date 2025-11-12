@@ -4,36 +4,20 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { 
   LayoutDashboard, 
   Users, 
   FileText, 
   Settings,
-  Shield
+  Shield,
+  BarChart3,
+  Edit3,
+  Bell,
+  Download
 } from "lucide-react"
 
-const navigation = [
-  {
-    name: "Dashboard",
-    href: "/superadmin",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Users",
-    href: "/superadmin/users",
-    icon: Users,
-  },
-  {
-    name: "Consultations",
-    href: "/superadmin/consultations",
-    icon: FileText,
-  },
-  {
-    name: "Settings",
-    href: "/superadmin/settings",
-    icon: Settings,
-  },
-]
+
 
 interface SuperAdminSidebarProps {
   onNavigate?: () => void // For mobile menu close functionality
@@ -41,6 +25,50 @@ interface SuperAdminSidebarProps {
 
 export default function SuperAdminSidebar({ onNavigate }: SuperAdminSidebarProps) {
   const pathname = usePathname()
+  const { t } = useLanguage()
+
+  const navigation = [
+    {
+      name: t('superadmin.dashboard'),
+      href: "/superadmin",
+      icon: LayoutDashboard,
+    },
+    {
+      name: t('superadmin.analytics') || 'Analytics',
+      href: "/superadmin/analytics",
+      icon: BarChart3,
+    },
+    {
+      name: t('superadmin.contentManagement') || 'Content',
+      href: "/superadmin/content",
+      icon: Edit3,
+    },
+    {
+      name: t('superadmin.notifications') || 'Notifications',
+      href: "/superadmin/notifications",
+      icon: Bell,
+    },
+    {
+      name: t('superadmin.dataExports') || 'Data Exports',
+      href: "/superadmin/exports",
+      icon: Download,
+    },
+    {
+      name: t('superadmin.manageUsers'),
+      href: "/superadmin/users",
+      icon: Users,
+    },
+    {
+      name: t('superadmin.reviewConsultations'),
+      href: "/superadmin/consultations",
+      icon: FileText,
+    },
+    {
+      name: t('superadmin.settings'),
+      href: "/superadmin/settings",
+      icon: Settings,
+    },
+  ]
 
   const handleNavClick = () => {
     // Close mobile menu when navigating (if callback provided)
@@ -89,7 +117,7 @@ export default function SuperAdminSidebar({ onNavigate }: SuperAdminSidebarProps
       <div className="hidden lg:block p-4 border-t border-gray-200">
         <div className="flex items-center space-x-2 text-xs text-gray-500">
           <Shield className="h-4 w-4" />
-          <span>Super Admin Panel</span>
+          <span>{t('superadmin.systemControlPanel')}</span>
         </div>
         <p className="text-xs text-gray-400 mt-1">Version 1.0</p>
       </div>

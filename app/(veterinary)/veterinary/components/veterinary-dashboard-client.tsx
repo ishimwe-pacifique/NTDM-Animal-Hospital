@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Stethoscope, Heart, ClipboardCheck, Mail, Clock, User, Phone } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import AnnouncementsBanner from "@/components/ui/announcements-banner"
 
 interface VeterinaryDashboardClientProps {
   currentUser: any
@@ -27,6 +28,9 @@ export default function VeterinaryDashboardClient({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      {/* System Announcements */}
+      <AnnouncementsBanner />
+      
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-2">

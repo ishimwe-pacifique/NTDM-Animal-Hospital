@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/contexts/LanguageContext"
+import AnnouncementsBanner from "@/components/ui/announcements-banner"
 
 import {
   PlusCircle,
@@ -73,6 +74,9 @@ export default function FarmerDashboardContent({
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-indigo-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* System Announcements */}
+        <AnnouncementsBanner />
+
         {/* Enhanced Header Section */}
         <div className="text-center space-y-3 py-4">
           <div className="flex items-center justify-center gap-2 mb-3">

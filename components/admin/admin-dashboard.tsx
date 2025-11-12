@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Users, FileText, Calendar, MessageSquare, TrendingUp, AlertCircle, Plus, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "@/contexts/LanguageContext"
+import AnnouncementsBanner from "@/components/ui/announcements-banner"
 
 type DashboardData = {
   stats: {
@@ -79,6 +80,9 @@ export default function AdminDashboard() {
   }
   return (
     <div className="space-y-6">
+      {/* System Announcements */}
+      <AnnouncementsBanner />
+      
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between">

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const session = request.cookies.get("session")?.value
   const { pathname } = request.nextUrl
 
@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
     "/superadmin/users",
     "/superadmin/consultations",
     "/superadmin/dashboard",
+    "/superadmin/settings",
 
     "/admin",
     "/admin/users",
@@ -34,12 +35,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // Let login and register pages handle their own redirects
-  // This allows the login form to properly redirect based on user role
-
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/farmer/:path*", "/veterinary/:path*", "/superadmin/:path*", "/login", "/register", "/admin/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 }

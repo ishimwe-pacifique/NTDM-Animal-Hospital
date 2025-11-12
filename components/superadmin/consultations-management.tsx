@@ -285,28 +285,28 @@ export default function ConsultationsManagement({ consultations }: Consultations
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    Schedule
+                    {t('superadmin.schedule')}
                   </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Date:</span> {selectedConsultation.date}</p>
-                    <p><span className="font-medium">Time:</span> {selectedConsultation.time}</p>
+                    <p><span className="font-medium">{t('superadmin.date')}:</span> {selectedConsultation.date}</p>
+                    <p><span className="font-medium">{t('superadmin.time')}:</span> {selectedConsultation.time}</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Assignment
+                    {t('superadmin.assignment')}
                   </h4>
                   <div className="space-y-2 text-sm">
-                    <p><span className="font-medium">Doctor:</span> {selectedConsultation.doctor}</p>
-                    <p><span className="font-medium">Farmer:</span> {selectedConsultation.farmer}</p>
+                    <p><span className="font-medium">{t('superadmin.doctor')}:</span> {selectedConsultation.doctor}</p>
+                    <p><span className="font-medium">{t('superadmin.farmer')}:</span> {selectedConsultation.farmer}</p>
                   </div>
                 </div>
               </div>
 
               {/* Status */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900">Status</h4>
+                <h4 className="font-semibold text-gray-900">{t('superadmin.status')}</h4>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(selectedConsultation.status)}
                   <Badge className={getStatusColor(selectedConsultation.status)}>
@@ -318,7 +318,7 @@ export default function ConsultationsManagement({ consultations }: Consultations
               {/* Feedback - Full width */}
               {selectedConsultation.feedback && (
                 <div className="space-y-3">
-                  <h4 className="font-semibold text-gray-900">Feedback</h4>
+                  <h4 className="font-semibold text-gray-900">{t('superadmin.feedback')}</h4>
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-700">{selectedConsultation.feedback}</p>
                   </div>
@@ -328,14 +328,14 @@ export default function ConsultationsManagement({ consultations }: Consultations
               {/* Timestamps - Stack on mobile */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <h4 className="font-medium text-gray-900">Created</h4>
+                  <h4 className="font-medium text-gray-900">{t('superadmin.created')}</h4>
                   <p className="text-sm text-gray-600">
                     {format(new Date(selectedConsultation.createdAt), "MMM dd, yyyy 'at' h:mm a")}
                   </p>
                 </div>
                 {selectedConsultation.updatedAt && (
                   <div className="space-y-2">
-                    <h4 className="font-medium text-gray-900">Last Updated</h4>
+                    <h4 className="font-medium text-gray-900">{t('superadmin.lastUpdated')}</h4>
                     <p className="text-sm text-gray-600">
                       {format(new Date(selectedConsultation.updatedAt), "MMM dd, yyyy 'at' h:mm a")}
                     </p>
@@ -362,6 +362,8 @@ function ConsultationsView({
   getStatusColor: (status: string) => string
   getStatusIcon: (status: string) => React.ReactNode
 }) {
+  const { t } = useLanguage()
+  
   if (consultations.length === 0) {
     return (
       <Card>
@@ -416,11 +418,11 @@ function ConsultationsView({
               {/* Doctor and farmer info */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <p className="font-medium text-muted-foreground">Doctor</p>
+                  <p className="font-medium text-muted-foreground">{t('superadmin.doctor')}</p>
                   <p className="truncate">{consultation.doctor}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Farmer</p>
+                  <p className="font-medium text-muted-foreground">{t('superadmin.farmer')}</p>
                   <p className="truncate">{consultation.farmer}</p>
                 </div>
               </div>
@@ -428,12 +430,12 @@ function ConsultationsView({
               {/* Schedule and created date */}
               <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
                 <div>
-                  <p className="font-medium">Schedule</p>
+                  <p className="font-medium">{t('superadmin.schedule')}</p>
                   <p>{consultation.date}</p>
                   <p>{consultation.time}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Created</p>
+                  <p className="font-medium">{t('superadmin.created')}</p>
                   <p>{format(new Date(consultation.createdAt), "MMM dd, yyyy")}</p>
                   <p>{format(new Date(consultation.createdAt), "h:mm a")}</p>
                 </div>
@@ -450,14 +452,14 @@ function ConsultationsView({
             <Table>
              <TableHeader>
               <TableRow>
-                <TableHead className="w-[18%]">Patient Details</TableHead>
-                <TableHead className="w-[16%]">Service & Type</TableHead>
-                <TableHead className="w-[12%]">Doctor</TableHead>
-                <TableHead className="w-[12%]">Farmer</TableHead>
-                <TableHead className="w-[10%]">Status</TableHead>
-                <TableHead className="w-[12%]">Schedule</TableHead>
-                <TableHead className="w-[10%]">Created</TableHead>
-                <TableHead className="text-right w-[10%]">Actions</TableHead>
+                <TableHead className="w-[18%]">{t('superadmin.patientDetails')}</TableHead>
+                <TableHead className="w-[16%]">{t('superadmin.serviceType')}</TableHead>
+                <TableHead className="w-[12%]">{t('superadmin.doctor')}</TableHead>
+                <TableHead className="w-[12%]">{t('superadmin.farmer')}</TableHead>
+                <TableHead className="w-[10%]">{t('superadmin.status')}</TableHead>
+                <TableHead className="w-[12%]">{t('superadmin.schedule')}</TableHead>
+                <TableHead className="w-[10%]">{t('superadmin.created')}</TableHead>
+                <TableHead className="text-right w-[10%]">{t('superadmin.actions')}</TableHead>
               </TableRow>
             </TableHeader>
                             <TableBody>
@@ -481,13 +483,13 @@ function ConsultationsView({
                     <TableCell className="text-sm">
                       <div className="truncate max-w-[100px]">
                         <div className="font-medium truncate">{consultation.doctor}</div>
-                        <div className="text-gray-500">Doctor</div>
+                        <div className="text-gray-500">{t('superadmin.doctor')}</div>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
                       <div className="truncate max-w-[100px]">
                         <div className="font-medium truncate">{consultation.farmer}</div>
-                        <div className="text-gray-500">Farmer</div>
+                        <div className="text-gray-500">{t('superadmin.farmer')}</div>
                       </div>
                     </TableCell>
                     <TableCell>
