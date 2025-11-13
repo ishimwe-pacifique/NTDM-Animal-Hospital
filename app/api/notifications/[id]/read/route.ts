@@ -1,3 +1,5 @@
+export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/db"
 import { ObjectId } from "mongodb"
