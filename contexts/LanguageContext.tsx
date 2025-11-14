@@ -459,6 +459,8 @@ const translations = {
     'farmer.viewAll': 'View All',
     'farmer.back': 'Back',
     'farmer.noNotificationsDesc': 'You have no notifications at this time',
+    'farmer.channel': 'Channel',
+    'farmer.totalEntries': 'total entries',
     
     // Animal Details
     'animal.details': 'Animal Details',
@@ -1678,6 +1680,8 @@ const translations = {
     'farmer.back': 'Inyuma',
     'farmer.markAllRead': 'Byose bya somwe',
     'farmer.noNotificationsDesc': 'Nta menyesha ufite',
+    'farmer.channel': 'Umuyoboro',
+    'farmer.totalEntries': 'ibyanditswe byose',
     
     // Animal Details
     'animal.details': 'Amakuru y\'Itungo',

@@ -394,7 +394,7 @@ export default function PetTrackingPage() {
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Database className="w-4 h-4" />
                   <span>
-                    Channel #{apiResponse.channel.id} • {apiResponse.channel.last_entry_id} total entries
+                    {t('farmer.channel')} #{apiResponse.channel.id} • {apiResponse.channel.last_entry_id} {t('farmer.totalEntries')}
                   </span>
                 </div>
               )}
