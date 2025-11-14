@@ -415,15 +415,15 @@ export default function PetTrackingPage() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => exportToPDF()}>
                       <FileText className="mr-2 h-4 w-4" />
-                      Export as PDF
+                      {t('farmer.exportAsPDF')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => exportToCSV()}>
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Export as CSV
+                      {t('farmer.exportAsCSV')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => exportToExcel()}>
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Export as Excel
+                      {t('farmer.exportAsExcel')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -461,6 +461,9 @@ const translations = {
     'farmer.noNotificationsDesc': 'You have no notifications at this time',
     'farmer.channel': 'Channel',
     'farmer.totalEntries': 'total entries',
+    'farmer.exportAsPDF': 'Export as PDF',
+    'farmer.exportAsCSV': 'Export as CSV',
+    'farmer.exportAsExcel': 'Export as Excel',
     
     // Animal Details
     'animal.details': 'Animal Details',
@@ -1682,6 +1685,9 @@ const translations = {
     'farmer.noNotificationsDesc': 'Nta menyesha ufite',
     'farmer.channel': 'Umuyoboro',
     'farmer.totalEntries': 'ibyanditswe byose',
+    'farmer.exportAsPDF': 'Kurura PDF',
+    'farmer.exportAsCSV': 'Kurura CSV',
+    'farmer.exportAsExcel': 'Kurura Excel',
     
     // Animal Details
     'animal.details': 'Amakuru y\'Itungo',
