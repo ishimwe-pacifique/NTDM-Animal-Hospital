@@ -32,6 +32,12 @@ export default function FarmerNotificationsPage() {
         setUser(userData)
         if (userData?._id) {
           await fetchNotifications(userData._id)
+          // Set up real-time polling
+          const interval = setInterval(() => {
+            fetchNotifications(userData._id)
+          }, 10000) // Poll every 10 seconds
+          
+          return () => clearInterval(interval)
         }
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -82,46 +88,56 @@ export default function FarmerNotificationsPage() {
   }
 
   const markAsRead = async (notificationId: string) => {
-    // Don't mark announcements as read via API
+    // Optimistic update - mark as read immediately
+    setNotifications(prev => 
+      prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
+    )
+    
+    // Don't make API call for announcements
     if (notificationId.startsWith('announcement-')) {
-      setNotifications(prev => 
-        prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
-      )
       return
     }
     
     try {
-      await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' })
-      setNotifications(prev => 
-        prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
-      )
+      const response = await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' })
       
-      // Refresh notifications after marking as read
-      if (user?._id) {
-        setTimeout(() => fetchNotifications(user._id), 1000)
+      if (!response.ok) {
+        // Revert optimistic update on failure
+        setNotifications(prev => 
+          prev.map(n => n._id === notificationId ? { ...n, read: false } : n)
+        )
       }
     } catch (error) {
       console.error("Error marking notification as read:", error)
+      // Revert optimistic update on error
+      setNotifications(prev => 
+        prev.map(n => n._id === notificationId ? { ...n, read: false } : n)
+      )
     }
   }
 
   const markAllAsRead = async () => {
+    // Optimistic update - mark all non-announcements as read immediately
+    const previousNotifications = notifications
+    setNotifications(prev => prev.map(n => 
+      n._id.startsWith('announcement-') ? n : { ...n, read: true }
+    ))
+    
     try {
-      await fetch(`/api/notifications/mark-all-read`, {
+      const response = await fetch(`/api/notifications/mark-all-read`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user._id, role: 'farmer' })
       })
-      setNotifications(prev => prev.map(n => 
-        n._id.startsWith('announcement-') ? n : { ...n, read: true }
-      ))
       
-      // Refresh notifications after marking all as read
-      if (user?._id) {
-        setTimeout(() => fetchNotifications(user._id), 1000)
+      if (!response.ok) {
+        // Revert optimistic update on failure
+        setNotifications(previousNotifications)
       }
     } catch (error) {
       console.error("Error marking all as read:", error)
+      // Revert optimistic update on error
+      setNotifications(previousNotifications)
     }
   }
 

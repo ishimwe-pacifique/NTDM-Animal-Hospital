@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useState, useEffect } from "react"
 
 interface AdminSidebarProps {
   isOpen: boolean
@@ -24,6 +25,24 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const { t } = useLanguage()
+  const [activeUsersCount, setActiveUsersCount] = useState(0)
+  const [supportTickets, setSupportTickets] = useState(0)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/admin-dashboard')
+        if (response.ok) {
+          const data = await response.json()
+          setActiveUsersCount(data.stats.activeUsers)
+          setSupportTickets(data.stats.supportTickets)
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
 
   const navItems = [
     { name: t('admin.dashboard'), href: "/admin", icon: Home },
@@ -106,8 +125,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-600 mb-2">{t('admin.quickStats')}</p>
             <div className="flex justify-between text-xs">
-              <span>{t('admin.activeUsersCount')} <strong>245</strong></span>
-              <span>{t('admin.ticketsCount')} <strong>7</strong></span>
+              <span>{t('admin.activeUsersCount')} <strong>{activeUsersCount}</strong></span>
+              <span>{t('admin.ticketsCount')} <strong>{supportTickets}</strong></span>
             </div>
           </div>
         </div>

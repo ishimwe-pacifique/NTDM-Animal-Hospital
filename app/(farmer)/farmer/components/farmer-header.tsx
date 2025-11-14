@@ -48,7 +48,7 @@ export default function FarmerHeader() {
           // Set up polling for notifications
           const interval = setInterval(() => {
             fetchNotifications(userData._id)
-          }, 3000) // Poll every 30 seconds
+          }, 10000) // Poll every 10 seconds
           
           return () => clearInterval(interval)
         }
@@ -110,24 +110,34 @@ export default function FarmerHeader() {
   }
 
   const markAsRead = async (notificationId: string) => {
-    // Don't mark announcements as read
+    // Optimistic update - mark as read immediately
+    setNotifications(prev => 
+      prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
+    )
+    setNotificationCount(prev => Math.max(0, prev - 1))
+    
+    // Don't make API call for announcements
     if (notificationId.startsWith('announcement-')) {
       return
     }
     
     try {
-      await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' })
-      setNotifications(prev => 
-        prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
-      )
-      setNotificationCount(prev => Math.max(0, prev - 1))
+      const response = await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' })
       
-      // Refresh notifications after marking as read
-      if (user?._id) {
-        setTimeout(() => fetchNotifications(user._id), 1000)
+      if (!response.ok) {
+        // Revert optimistic update on failure
+        setNotifications(prev => 
+          prev.map(n => n._id === notificationId ? { ...n, read: false } : n)
+        )
+        setNotificationCount(prev => prev + 1)
       }
     } catch (error) {
       console.error("Error marking notification as read:", error)
+      // Revert optimistic update on error
+      setNotifications(prev => 
+        prev.map(n => n._id === notificationId ? { ...n, read: false } : n)
+      )
+      setNotificationCount(prev => prev + 1)
     }
   }
 

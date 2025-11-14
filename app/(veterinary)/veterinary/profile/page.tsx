@@ -99,7 +99,7 @@ export default function VeterinaryProfilePage() {
               <User className="h-6 w-6" />
               {t('vet.profile') || 'Profile'}
             </h1>
-            <p className="text-gray-600">Manage your professional information</p>
+            <p className="text-gray-600">{t('vet.manageProfile') || 'Manage your professional information'}</p>
           </div>
         </div>
 

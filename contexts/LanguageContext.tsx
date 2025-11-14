@@ -458,6 +458,7 @@ const translations = {
     'farmer.addNewConsultation': 'Add New Consultation',
     'farmer.viewAll': 'View All',
     'farmer.back': 'Back',
+    'farmer.noNotificationsDesc': 'You have no notifications at this time',
     
     // Animal Details
     'animal.details': 'Animal Details',
@@ -562,6 +563,9 @@ const translations = {
     'vet.notifications': 'Notifications',
     'vet.manageAppointments': 'Manage your consultation requests and appointments',
 
+    // Veterinary profile
+    'vet.manageProfile': 'Manage your veterinary profile',
+
     // Admin Dashboard
     'admin.dashboard': 'Admin Dashboard',
     'admin.portal': 'Admin Portal',
@@ -606,6 +610,10 @@ const translations = {
     'admin.logout': 'Logout',
     'admin.adminUser': 'Admin User',
     'admin.kigaliDistrict': 'Kigali District',
+    'admin.notifications': 'Notifications',
+    'admin.totalNotifications': 'total notifications',
+    'admin.markAllRead': 'Mark all as read',
+    'admin.noNotifications': 'No notifications',
     'admin.retry': 'Retry',
     'admin.noDataAvailable': 'No data available',
     'admin.failedToFetchData': 'Failed to fetch dashboard data',
@@ -625,7 +633,8 @@ const translations = {
     'admin.suspend': 'Suspend',
     'admin.activate': 'Activate',
     'admin.noUsersFound': 'No users found',
-    // 'admin.addNewUser': 'Add New User',
+    'admin.back': 'Back',
+    'admin.refresh': 'Refresh',
     'admin.createNewAccount': 'Create a new farmer or doctor account for the regional system',
     'admin.basicInformation': 'Basic Information',
     'admin.fullName': 'Full Name',
@@ -985,8 +994,9 @@ const translations = {
     'superadmin.dashboard': 'Dashboard',
     'superadmin.manageUsersConsultations': 'Manage users, consultations, and system settings',
     'superadmin.systemHealthy': 'System Healthy',
-    // 'superadmin.actions': 'Actions',
-    // 'superadmin.totalUsers': 'Total Users',
+    'superadmin.confirmDelete': 'Are you sure you want to delete this',
+    'superadmin.confirmAction': 'This action cannot be undone',
+    'superadmin.deleteAnnouncement': 'Delete Announcement',
     'superadmin.totalConsultations': 'Total Consultations',
     'superadmin.farmers': 'Farmers',
     'superadmin.doctors': 'Doctors',
@@ -1182,7 +1192,7 @@ const translations = {
     'superadmin.selectRecurring': 'Select recurring option',
     'superadmin.deleteTemplate' : 'Delete Template',
     'superadmin.deleteTemplateConfirm': 'Are you sure you want to delete this template? This action cannot be undone.',
-
+    'superadmin.sendEmailNotification': 'Send email notification to all users',
 
     // Data Exports
     'superadmin.dataExports': 'Data Exports',
@@ -1667,6 +1677,7 @@ const translations = {
     'farmer.viewAll': 'Reba Amamenyesha Yose',
     'farmer.back': 'Inyuma',
     'farmer.markAllRead': 'Byose bya somwe',
+    'farmer.noNotificationsDesc': 'Nta menyesha ufite',
     
     // Animal Details
     'animal.details': 'Amakuru y\'Itungo',
@@ -1771,6 +1782,10 @@ const translations = {
     'vet.noNotifications': 'Nta menyesha',
     'vet.manageAppointments': 'Genzura gusaba randevu n\'amahuriro yawe',
 
+    // Veterinary Profile
+    'vet.manageProfile': 'Gucunga amakuru yawe yumwuga',
+
+
     // Admin Dashboard
     'admin.dashboard': 'Ikibaho cy\'Umuyobozi',
     'admin.portal': 'Urubuga rw\'Umuyobozi',
@@ -1788,9 +1803,9 @@ const translations = {
     'admin.inactive': 'ntibakora',
     'admin.allResolved': 'Byose byakemuwe',
     'admin.last24Hours': 'Amasaha 24 ashize',
-    'admin.recentAlerts': 'Imenyesha ya Vuba',
+    'admin.recentAlerts': 'Imenyesha rya Vuba',
     'admin.viewAll': 'Reba Byose',
-    'admin.noRecentAlerts': 'Nta menyesha ya vuba',
+    'admin.noRecentAlerts': 'Nta menyesha rya vuba',
     'admin.performance': 'Imikorere',
     'admin.userSatisfaction': 'Kunyurwa kw\'Abakoresha',
     'admin.responseTime': 'Igihe cyo Gusubiza',
@@ -1815,6 +1830,9 @@ const translations = {
     'admin.logout': 'Gusohoka',
     'admin.adminUser': 'Umukoresha w\'Ubuyobozi',
     'admin.kigaliDistrict': 'Akarere ka Kigali',
+    'admin.notifications': 'Imenyesha',
+    'admin.markAllRead': 'Byose bya somwe',
+    'admin.noNotifications': 'Nta menyesha',
     'admin.retry': 'Ongera Ugerageze',
     'admin.noDataAvailable': 'Nta makuru aboneka',
     'admin.failedToFetchData': 'Byanze gukuramo amakuru y\'ikibaho',
@@ -1912,6 +1930,8 @@ const translations = {
     'admin.inprogress': 'Biragenda',
     'admin.assign': 'Gushyira',
     'admin.resolve': 'Gukemura',
+    'admin.back': 'Inyuma',
+    'admin.refresh': 'Vugurura',
     'admin.supportCommunication': 'Ubufasha n\'Itumanaho',
     'admin.handleUserSupportTickets': 'Gukemura ibibazo by\'abakoresha n\'itumanaho',
     'admin.userActivityReport': 'Raporo y\'Ibikorwa by\'Abakoresha',
@@ -1934,6 +1954,7 @@ const translations = {
     'admin.generateCustomReport': 'Koza Raporo Yihariye',
     'admin.scheduleReport': 'Teganya Raporo',
     'admin.exportAllData': 'Kohereza Amakuru Yose',
+    'admin.totalNotifications': 'umubare w\'amamenyesha',
 
     // Content Management
     'content.blogPosts': 'Inyandiko za Blog',
@@ -2196,7 +2217,7 @@ const translations = {
     'superadmin.doctors': 'Abaganga',
     'superadmin.allTimeConsultations': 'Randevu zose z\'igihe cyose',
     'superadmin.approvedConsultations': 'Randevu zemejwe',
-    'superadmin.rejectedConsultations': 'Randevu zanze',
+    'superadmin.rejectedConsultations': 'Randevu zanzwe',
     'superadmin.recentActivity': 'Ibikorwa bya Vuba',
     'superadmin.latestSystemActivities': 'Ibikorwa bya vuba bya sisitemu n\'ibintu',
     'superadmin.viewAll': 'Reba Byose',
@@ -2391,7 +2412,8 @@ const translations = {
     'superadmin.noTemplates': 'Nta nyandikorugero',
     'superadmin.createFirstTemplate': 'Kora inyandikorugero yawe ya mbere y\'imenyesha',
     'superadmin.createTemplate': 'Kora Inyandikorugero',
-    // 'superadmin.active': 'Birakora',
+    'superadmin.deleteAnnouncement': 'Gusiba Itangazo',
+    'superadmin.confirmDelete': 'Uremeza ko ushaka gusiba iri itangazo',
     'superadmin.targetRole': 'Intego',
     'superadmin.noScheduledNotifications': 'Nta menyesha zateganijwe',
     'superadmin.scheduleNotificationsDesc': 'Teganya imenyesha zikoherezwe nyuma',
@@ -2404,7 +2426,7 @@ const translations = {
     'superadmin.notificationTitlePlaceholder': 'Injiza umutwe w\'imenyesha',
     'superadmin.message': 'Ubutumwa',
     'superadmin.messagePlaceholder': 'Injiza ubutumwa bw\'imenyesha',
-    // 'superadmin.type': 'Ubwoko',
+    'superadmin.confirmAction': 'Iki gikorwa ntigishobora gusubirwaho',
     'superadmin.system': 'Sisitemu',
     // 'superadmin.user': 'Umukoresha',
     'superadmin.activeTemplate': 'Inyandikorugero ikora',
@@ -2427,7 +2449,7 @@ const translations = {
     'superadmin.selectRecurring': 'Hitamo uburyo bwo gusubiramo',
     // 'superadmin.schedule': 'Teganya',
     'superadmin.scheduling': 'Guteganya...',
-    // 'superadmin.allUsers': 'Abakoresha Bose',
+    'superadmin.sendEmailNotification': 'Ohereza imenyesha rya imeri kubakoresha bose',
     // 'superadmin.farmers': 'Abahinzi',
     // 'superadmin.doctors': 'Abaganga',
     // 'superadmin.admins': 'Abayobozi'

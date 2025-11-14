@@ -949,18 +949,83 @@ export async function createAnnouncement(data: {
   type: "general" | "maintenance" | "feature" | "security"
   priority: "low" | "normal" | "high" | "critical"
   active: boolean
+  sendEmail?: boolean
 }) {
   try {
     const client = await clientPromise
     const db = client.db("ntdm_animal_hospital")
 
     const announcement = {
-      ...data,
+      title: data.title,
+      content: data.content,
+      type: data.type,
+      priority: data.priority,
+      active: data.active,
       createdAt: new Date(),
       updatedAt: new Date()
     }
 
     const result = await db.collection("announcements").insertOne(announcement)
+    
+    // Send email notifications if requested
+    if (data.sendEmail) {
+      try {
+        const { sendAnnouncementEmail } = await import('../email.js')
+        
+        // Get all active users with valid emails
+        const users = await db.collection("users").find({
+          status: { $ne: "suspended" },
+          email: { $exists: true, $ne: "" }
+        }).toArray()
+
+        console.log(`Found ${users.length} users to send announcement emails to`)
+        
+        if (users.length > 0) {
+          // Send emails in batches to avoid overwhelming the email service
+          const batchSize = 5
+          let successCount = 0
+          let failCount = 0
+          
+          for (let i = 0; i < users.length; i += batchSize) {
+            const batch = users.slice(i, i + batchSize)
+            console.log(`Sending batch ${Math.floor(i/batchSize) + 1} of ${Math.ceil(users.length/batchSize)} (${batch.length} emails)`)
+            
+            const emailPromises = batch.map(async (user) => {
+              try {
+                const result = await sendAnnouncementEmail(user.email, user.name, announcement)
+                if (result.success) {
+                  successCount++
+                  console.log(`✓ Email sent to ${user.email}`)
+                } else {
+                  failCount++
+                  console.log(`✗ Failed to send email to ${user.email}: ${result.error}`)
+                }
+                return result
+              } catch (error) {
+                failCount++
+                console.log(`✗ Error sending email to ${user.email}:`, error)
+                return { success: false, error: error.message }
+              }
+            })
+            
+            await Promise.allSettled(emailPromises)
+            
+            // Small delay between batches
+            if (i + batchSize < users.length) {
+              await new Promise(resolve => setTimeout(resolve, 2000))
+            }
+          }
+          
+          console.log(`Email summary: ${successCount} sent, ${failCount} failed out of ${users.length} total`)
+        } else {
+          console.log('No users found to send emails to')
+        }
+      } catch (emailError) {
+        console.error("Error in email sending process:", emailError)
+        // Don't fail the announcement creation if email fails
+      }
+    }
+
     revalidatePath("/superadmin/content")
     return { success: true, id: result.insertedId.toString() }
   } catch (error) {

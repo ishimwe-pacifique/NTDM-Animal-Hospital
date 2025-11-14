@@ -4,22 +4,24 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Bell, Check, ArrowLeft } from "lucide-react"
+import { Bell, Check, ArrowLeft, AlertCircle, CheckCircle, Clock, UserX, UserPlus, Calendar, Timer, TrendingDown, BarChart3, Target, FileText, Database, Shield, Settings } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { getCurrentUser } from "@/lib/actions/auth"
 import Link from "next/link"
 
 interface Notification {
   _id: string
+  id?: string
   title: string
   message: string
   type: string
-  priority: string
+  priority?: string
   read: boolean
   createdAt: string
+  time?: string
 }
 
-export default function VeterinaryNotificationsPage() {
+export default function AdminNotificationsPage() {
   const { t } = useLanguage()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,11 +32,11 @@ export default function VeterinaryNotificationsPage() {
       try {
         const userData = await getCurrentUser()
         setUser(userData)
-        if (userData?._id) {
-          await fetchNotifications(userData._id)
+        if (userData?.role === 'admin') {
+          await fetchNotifications()
           // Set up real-time polling
           const interval = setInterval(() => {
-            fetchNotifications(userData._id)
+            fetchNotifications()
           }, 10000) // Poll every 10 seconds
           
           return () => clearInterval(interval)
@@ -48,35 +50,45 @@ export default function VeterinaryNotificationsPage() {
     fetchData()
   }, [])
 
-  const fetchNotifications = async (userId: string) => {
+  const fetchNotifications = async () => {
     try {
-      const [notificationsRes, announcementsRes] = await Promise.all([
-        fetch(`/api/notifications?userId=${userId}&role=doctor`),
+      const [adminNotificationsRes, announcementsRes] = await Promise.all([
+        fetch('/api/admin/notifications'),
         fetch('/api/announcements')
       ])
       
-      const notificationsData = await notificationsRes.json()
-      const announcementsData = await announcementsRes.json()
-      
       let allNotifications: Notification[] = []
       
-      if (notificationsData.success && notificationsData.notifications) {
-        allNotifications = [...allNotifications, ...notificationsData.notifications]
+      if (adminNotificationsRes.ok) {
+        const adminData = await adminNotificationsRes.json()
+        if (adminData.success) {
+          const formattedAdminNotifications = adminData.notifications.map((n: any) => ({
+            ...n,
+            _id: n.id,
+            createdAt: n.createdAt,
+            type: n.type || 'admin'
+          }))
+          allNotifications = [...allNotifications, ...formattedAdminNotifications]
+        }
       }
       
-      if (announcementsData.success && announcementsData.announcements) {
-        const announcementNotifications = announcementsData.announcements.map((a: any) => ({
-          _id: `announcement-${a._id}`,
-          title: `📢 ${a.title}`,
-          message: a.content,
-          type: a.type,
-          priority: a.priority,
-          read: false,
-          createdAt: a.createdAt
-        }))
-        allNotifications = [...allNotifications, ...announcementNotifications]
+      if (announcementsRes.ok) {
+        const announcementsData = await announcementsRes.json()
+        if (announcementsData.success && announcementsData.announcements) {
+          const announcementNotifications = announcementsData.announcements.map((a: any) => ({
+            _id: `announcement-${a._id}`,
+            title: `📢 ${a.title}`,
+            message: a.content,
+            type: 'announcement',
+            priority: a.priority,
+            read: false,
+            createdAt: a.createdAt
+          }))
+          allNotifications = [...allNotifications, ...announcementNotifications]
+        }
       }
       
+      // Sort by creation date
       allNotifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       setNotifications(allNotifications)
     } catch (error) {
@@ -96,7 +108,11 @@ export default function VeterinaryNotificationsPage() {
     }
     
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' })
+      const response = await fetch('/api/admin/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId })
+      })
       
       if (!response.ok) {
         // Revert optimistic update on failure
@@ -105,7 +121,7 @@ export default function VeterinaryNotificationsPage() {
         )
       }
     } catch (error) {
-      console.error("Error marking notification as read:", error)
+      console.error('Error marking notification as read:', error)
       // Revert optimistic update on error
       setNotifications(prev => 
         prev.map(n => n._id === notificationId ? { ...n, read: false } : n)
@@ -114,17 +130,13 @@ export default function VeterinaryNotificationsPage() {
   }
 
   const markAllAsRead = async () => {
-    // Optimistic update - mark all non-announcements as read immediately
+    // Optimistic update - mark all as read immediately
     const previousNotifications = notifications
-    setNotifications(prev => prev.map(n => 
-      n._id.startsWith('announcement-') ? n : { ...n, read: true }
-    ))
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     
     try {
-      const response = await fetch(`/api/notifications/mark-all-read`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id, role: 'doctor' })
+      const response = await fetch('/api/admin/notifications/read', {
+        method: 'PATCH'
       })
       
       if (!response.ok) {
@@ -132,9 +144,29 @@ export default function VeterinaryNotificationsPage() {
         setNotifications(previousNotifications)
       }
     } catch (error) {
-      console.error("Error marking all as read:", error)
+      console.error('Error marking all notifications as read:', error)
       // Revert optimistic update on error
       setNotifications(previousNotifications)
+    }
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'urgent': return <AlertCircle className="h-5 w-5 text-red-500" />
+      case 'warning': return <Clock className="h-5 w-5 text-yellow-500" />
+      case 'doctor_unavailable': return <UserX className="h-5 w-5 text-orange-500" />
+      case 'new_user': return <UserPlus className="h-5 w-5 text-green-500" />
+      case 'consultation_status': return <CheckCircle className="h-5 w-5 text-blue-500" />
+      case 'appointment_conflict': return <Calendar className="h-5 w-5 text-red-500" />
+      case 'response_time': return <Timer className="h-5 w-5 text-yellow-500" />
+      case 'daily_summary': return <BarChart3 className="h-5 w-5 text-purple-500" />
+      case 'activity_anomaly': return <TrendingDown className="h-5 w-5 text-orange-500" />
+      case 'quality_alert': return <Target className="h-5 w-5 text-red-500" />
+      case 'policy_update': return <FileText className="h-5 w-5 text-blue-500" />
+      case 'maintenance_scheduled': return <Settings className="h-5 w-5 text-gray-500" />
+      case 'backup_status': return <Database className="h-5 w-5 text-green-500" />
+      case 'compliance_deadline': return <Shield className="h-5 w-5 text-orange-500" />
+      default: return <CheckCircle className="h-5 w-5 text-blue-500" />
     }
   }
 
@@ -149,7 +181,7 @@ export default function VeterinaryNotificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/3"></div>
@@ -165,36 +197,36 @@ export default function VeterinaryNotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/veterinary">
+            <Link href="/admin">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('vet.back') || 'Back'}
+                {t('admin.back') || 'Back'}
               </Button>
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 <Bell className="h-6 w-6" />
-                {t('vet.notifications') || 'Notifications'}
+                {t('admin.notifications') || 'Notifications'}
               </h1>
-              <p className="text-gray-600">{notifications.length} total notifications</p>
+              <p className="text-gray-600">{notifications.length} {t('admin.totalNotifications')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Button 
-              onClick={() => user?._id && fetchNotifications(user._id)} 
+              onClick={fetchNotifications} 
               variant="ghost" 
               size="sm"
             >
-              ↻ {t('vet.refresh') || 'Refresh'}
+              ↻ {t('admin.refresh') || 'Refresh'}
             </Button>
             {notifications.some(n => !n.read && !n._id.startsWith('announcement-')) && (
               <Button onClick={markAllAsRead} variant="outline" size="sm">
                 <Check className="h-4 w-4 mr-2" />
-                {t('vet.markAllRead') || 'Mark All Read'}
+                {t('admin.markAllRead') || 'Mark All Read'}
               </Button>
             )}
           </div>
@@ -205,8 +237,8 @@ export default function VeterinaryNotificationsPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <Bell className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium mb-2">{t('vet.noNotifications') || 'No Notifications'}</h3>
-                <p className="text-gray-600">{t('vet.noNotificationsDesc') || 'You have no notifications at this time.'}</p>
+                <h3 className="text-lg font-medium mb-2">{t('admin.noNotifications') || 'No Notifications'}</h3>
+                <p className="text-gray-600">You have no notifications at this time.</p>
               </CardContent>
             </Card>
           ) : (
@@ -220,13 +252,18 @@ export default function VeterinaryNotificationsPage() {
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <CardTitle className={`text-lg ${!notification.read ? 'text-gray-900' : 'text-gray-600'}`}>
-                      {notification.title}
-                    </CardTitle>
+                    <div className="flex items-center gap-3">
+                      {getNotificationIcon(notification.type)}
+                      <CardTitle className={`text-lg ${!notification.read ? 'text-gray-900' : 'text-gray-600'}`}>
+                        {notification.title}
+                      </CardTitle>
+                    </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={getPriorityColor(notification.priority)}>
-                        {notification.priority}
-                      </Badge>
+                      {notification.priority && (
+                        <Badge variant="outline" className={getPriorityColor(notification.priority)}>
+                          {notification.priority}
+                        </Badge>
+                      )}
                       <Badge variant="outline">
                         {notification.type}
                       </Badge>

@@ -25,13 +25,23 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingAnnouncement, setEditingAnnouncement] = useState<any>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [announcementToDelete, setAnnouncementToDelete] = useState<any>(null)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string
+    content: string
+    type: "general" | "maintenance" | "feature" | "security"
+    priority: "low" | "normal" | "high" | "critical"
+    active: boolean
+    sendEmail: boolean
+  }>({
     title: "",
     content: "",
     type: "general",
     priority: "normal",
-    active: true
+    active: true,
+    sendEmail: false
   })
 
   const resetForm = () => {
@@ -40,7 +50,8 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
       content: "",
       type: "general",
       priority: "normal",
-      active: true
+      active: true,
+      sendEmail: false
     })
   }
 
@@ -93,20 +104,28 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this announcement?")) return
+  const handleDelete = async () => {
+    if (!announcementToDelete) return
 
     try {
-      const result = await deleteAnnouncement(id)
+      const result = await deleteAnnouncement(announcementToDelete._id)
       if (result.success) {
         toast.success("Announcement deleted successfully")
-        setAnnouncements(prev => prev.filter(a => a._id !== id))
+        setAnnouncements(prev => prev.filter(a => a._id !== announcementToDelete._id))
       } else {
         toast.error(result.message || "Failed to delete announcement")
       }
     } catch (error) {
       toast.error("Failed to delete announcement")
+    } finally {
+      setDeleteDialogOpen(false)
+      setAnnouncementToDelete(null)
     }
+  }
+
+  const openDeleteDialog = (announcement: any) => {
+    setAnnouncementToDelete(announcement)
+    setDeleteDialogOpen(true)
   }
 
   const openEditDialog = (announcement: any) => {
@@ -114,9 +133,10 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
     setFormData({
       title: announcement.title,
       content: announcement.content,
-      type: announcement.type,
-      priority: announcement.priority,
-      active: announcement.active
+      type: announcement.type as "general" | "maintenance" | "feature" | "security",
+      priority: announcement.priority as "low" | "normal" | "high" | "critical",
+      active: announcement.active,
+      sendEmail: false
     })
   }
 
@@ -183,7 +203,7 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>{t('superadmin.type') || 'Type'}</Label>
-                  <Select value={formData.type} onValueChange={(value) => setFormData({...formData, type: value})}>
+                  <Select value={formData.type} onValueChange={(value: "general" | "maintenance" | "feature" | "security") => setFormData({...formData, type: value})}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -197,7 +217,7 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
                 </div>
                 <div>
                   <Label>{t('superadmin.priority') || 'Priority'}</Label>
-                  <Select value={formData.priority} onValueChange={(value) => setFormData({...formData, priority: value})}>
+                  <Select value={formData.priority} onValueChange={(value: "low" | "normal" | "high" | "critical") => setFormData({...formData, priority: value})}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -210,13 +230,23 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
                   </Select>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="active"
-                  checked={formData.active}
-                  onCheckedChange={(checked) => setFormData({...formData, active: checked})}
-                />
-                <Label htmlFor="active">{t('superadmin.activeAnnouncement') || 'Active announcement'}</Label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="active"
+                    checked={formData.active}
+                    onCheckedChange={(checked) => setFormData({...formData, active: checked})}
+                  />
+                  <Label htmlFor="active">{t('superadmin.activeAnnouncement') || 'Active announcement'}</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="sendEmail"
+                    checked={formData.sendEmail}
+                    onCheckedChange={(checked) => setFormData({...formData, sendEmail: checked})}
+                  />
+                  <Label htmlFor="sendEmail">{t('superadmin.sendEmailNotification') || 'Send email notification to all users'}</Label>
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
@@ -278,7 +308,7 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(announcement._id)}
+                      onClick={() => openDeleteDialog(announcement)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -374,6 +404,26 @@ export default function ContentPageClient({ initialAnnouncements }: ContentPageC
                 {isSubmitting ? (t('superadmin.updating') || 'Updating...') : (t('superadmin.update') || 'Update')}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('superadmin.deleteAnnouncement')}</DialogTitle>
+            <DialogDescription>
+              {t('superadmin.confirmDelete')} "{announcementToDelete?.title}"? {t('superadmin.confirmAction')}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              {t('superadmin.cancel')}
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              {t('superadmin.delete')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
