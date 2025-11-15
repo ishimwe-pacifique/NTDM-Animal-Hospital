@@ -73,7 +73,7 @@ export default function AboutContent() {
                 image: "/WhatsApp Image 2025-03-28 at 12.07.22_620388c5.jpg",
                 name: "Dr. Theophile Niyonizeye",
                 role: "Chief Veterinarian",
-                specialty: "Large Animal Medicine",
+                specialty: "Large Animal Medicine & Certified in IoT",
               },
               {
                 image: "/NEW PHOTO.jpg",
@@ -91,7 +91,7 @@ export default function AboutContent() {
                 image: "/WhatsApp Image 2025-05-15 at 15.48.58_74fbf054.jpg",
                 name: "Dr. Benitte Ikuzwe",
                 role: "Managing Director",
-                specialty: "Veterinanry Technician",
+                specialty: "Veterinanry Technician & Certified in Finance",
               },
             ].map((member, index) => (
               <div key={index} className="salon-card text-center p-6">

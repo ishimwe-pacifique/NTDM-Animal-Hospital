@@ -465,6 +465,11 @@ const translations = {
     'farmer.exportAsPDF': 'Export as PDF',
     'farmer.exportAsCSV': 'Export as CSV',
     'farmer.exportAsExcel': 'Export as Excel',
+    'farmer.selectDistrictFirst': 'Select district first',
+    'farmer.editAnimal': 'Edit Animal Information',
+    'farmer.animalName': 'Animal Name',
+    'farmer.diary': 'Diary',
+    'farmer.updateAnimal': 'Update Animal',
     
     // Animal Details
     'animal.details': 'Animal Details',
@@ -1543,8 +1548,8 @@ const translations = {
     'farmer.price': 'Igiciro',
     'farmer.actions': 'Ibikorwa',
     'farmer.healthy': 'Ifite ubuzima bwiza',
-    'farmer.sick': 'Irwaye',
-    'farmer.underTreatment': 'Iravurwa',
+    'farmer.sick': 'Irarwaye',
+    'farmer.underTreatment': 'Iri kuvurwa',
     'farmer.viewDetails': 'Reba Amakuru',
     'farmer.edit': 'Hindura',
     'farmer.myConsultations': 'Randevu Zanjye',
@@ -1689,6 +1694,13 @@ const translations = {
     'farmer.exportAsPDF': 'Kurura PDF',
     'farmer.exportAsCSV': 'Kurura CSV',
     'farmer.exportAsExcel': 'Kurura Excel',
+    'farmer.selectDistrictFirst': 'Banza uhitemo akarere',
+
+    // Edit Animal
+    'farmer.editAnimal': 'Hindura umwirondoro w\'itungo',
+    'farmer.animalName': 'Izina ry\'itungo',
+    'farmer.diary': 'Umukamo',
+    'farmer.updateAnimal': 'Vugurura',
     
     // Animal Details
     'animal.details': 'Amakuru y\'Itungo',

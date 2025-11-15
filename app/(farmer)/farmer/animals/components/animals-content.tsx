@@ -94,7 +94,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                           </Link>
                         </Button>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/farmer/animals/${animal._id}/edit`}>
+                          <Link href={`/farmer/animals/edit/${animal._id}`}>
                             {t('farmer.edit')}
                           </Link>
                         </Button>

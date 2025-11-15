@@ -16,6 +16,39 @@ interface AddAnimalFormProps {
   userId: string;
 }
 
+const rwandaData = {
+  "Nyarugenge": ["Gitega", "Kanyinya", "Kigali", "Kimisagara", "Mageragere", "Muhima", "Nyakabanda", "Nyamirambo", "Rwezamenyo", "Nyarugenge"],
+  "Gasabo": ["Bumbogo", "Gatsata", "Jali", "Gikomero", "Gisozi", "Jabana", "Kacyiru", "Kimihurura", "Kimironko", "Kinyinya", "Ndera", "Nduba", "Remera", "Rusororo", "Rutunga"],
+  "Kicukiro": ["Gahanga", "Gatenga", "Gikondo", "Kagarama", "Kanombe", "Kicukiro", "Kigarama", "Masaka", "Niboye", "Nyarugunga"],
+  "Nyagatare": ["Gatunda", "Karangazi", "Katabagemu", "Kiyombe", "Matimba", "Mimuli", "Mukama", "Musheli", "Nyagatare", "Rukomo", "Rwempasha", "Rwimiyaga", "Tabagwe"],
+  "Gatsibo": ["Gasange", "Gatsibo", "Gitoki", "Kabarore", "Kageyo", "Kiramuruzi", "Kiziguro", "Muhura", "Murambi", "Ngarama", "Nyagihanga", "Remera", "Rugarama", "Rwimbogo"],
+  "Kayonza": ["Gahini", "Kabare", "Kabarondo", "Mukarange", "Murama", "Murundi", "Mwiri", "Ndego", "Nyamirama", "Rukara", "Ruramira", "Rwinkwavu"],
+  "Kirehe": ["Gatore", "Kigarama", "Kigina", "Kirehe", "Mahama", "Mpanga", "Musaza", "Mushikiri", "Nasho", "Nyamugali", "Nyarubuye"],
+  "Ngoma": ["Gashanda", "Jarama", "Karembo", "Kazo", "Mugesera", "Murama", "Remera", "Rukira", "Rukumberi", "Sake", "Zaza"],
+  "Bugesera": ["Gashora", "Juru", "Kamabuye", "Mayange", "Musenyi", "Mwogo", "Ngeruka", "Ntarama", "Nyamata", "Nyarugenge", "Rilima", "Ruhuha", "Rweru", "Shyara"],
+  "Rwamagana": ["Fumbwe", "Gahengeri", "Gishari", "Karenge", "Kigabiro", "Muhazi", "Munyaga", "Munyiginya", "Musha", "Muyumbu", "Mwulire", "Nyakariro", "Nzige", "Rubona"],
+  "Musanze": ["Busogo", "Cyuve", "Gacaca", "Gashaki", "Gataraga", "Kimonyi", "Kinigi", "Muhoza", "Muko", "Musanze", "Nkotsi", "Nyange", "Remera", "Rwaza", "Shingiro"],
+  "Burera": ["Bungwe", "Butaro", "Cyanika", "Cyeru", "Gahunga", "Gatebe", "Gitovu", "Kagogo", "Kinoni", "Kinyababa", "Kivuye", "Nemba", "Rugarama", "Rugendabari", "Ruhunde", "Rusarabuye", "Rwerere"],
+  "Gakenke": ["Busengo", "Coko", "Cyabingo", "Gakenke", "Gashenyi", "Mugunga", "Janja", "Kamubuga", "Karambo", "Kivuruga", "Mataba", "Minazi", "Muhondo", "Muyongwe", "Nemba", "Ruli", "Rusasa", "Rushashi", "Rusoro"],
+  "Gicumbi": ["Bukure", "Bwisige", "Byumba", "Cyumba", "Gicumbi", "Kaniga", "Manyagiro", "Miyove", "Kageyo", "Mukarange", "Muko", "Mutete", "Nyamiyaga", "Nyundo", "Rubaya", "Rukomo", "Rushaki", "Rutare", "Ruvune", "Rwamiko", "Shangasha"],
+  "Rulindo": ["Base", "Burega", "Bushoki", "Buyoga", "Cyinzuzi", "Cyungo", "Kinihira", "Kisaro", "Masoro", "Mbogo", "Murambi", "Ngoma", "Ntarabana", "Rukozo", "Rusiga", "Shyorongi", "Tumba"],
+  "Nyanza": ["Busasamana", "Busoro", "Cyabakamyi", "Kibirizi", "Kigoma", "Mukingo", "Muyira", "Ntyazo", "Nyagisozi", "Rwabicuma", "Rwdhuha", "Mukingo"],
+  "Gisagara": ["Gikonko", "Gishubi", "Kansi", "Kibayi", "Kigembe", "Mamba", "Muganza", "Mugombwa", "Mukindo", "Musha", "Ndora", "Nyanza", "Save"],
+  "Nyaruguru": ["Cyahinda", "Kibeho", "Kibumbwe", "Kivu", "Macuba", "Mata", "Munini", "Ngera", "Ngoma", "Nyabimata", "Nyagisozi", "Ruramba", "Rusenge", "Rwaniro"],
+  "Huye": ["Gishamvu", "Karama", "Kigoma", "Kinazi", "Maraba", "Mbazi", "Mukura", "Ngoma", "Ruhashya", "Rusatira", "Rwaniro", "Simbi", "Tumba"],
+  "Nyamagabe": ["Buruhukiro", "Cyanika", "Gasaka", "Gatare", "Kaduha", "Kamegeri", "Kibirizi", "Kibumbwe", "Kitabi", "Mbazi", "Munini", "Musebeya", "Mushubi", "Nkomane", "Tare", "Uwinkingi"],
+  "Ruhango": ["Bweramana", "Byimana", "Kabagali", "Kinazi", "Kinihira", "Muhanga", "Mbuye", "Ntongwe", "Ruhango"],
+  "Muhanga": ["Cyeza", "Kiyumba", "Muhanga", "Mukura", "Musambira", "Nyabinoni", "Nyamabuye", "Nyarubaka", "Rongi", "Rugendabari", "Shyogwe"],
+  "Kamonyi": ["Gacurabwenge", "Karama", "Kayenzi", "Kayumbu", "Mugina", "Musambira", "Nyamiyaga", "Nyarubaka", "Runda", "Rugalika", "Rugarika", "Rukoma"],
+  "Karongi": ["Bwishyura", "Gashari", "Gishyita", "Gitesi", "Murambi", "Mutuntu", "Rugabano", "Ruganda", "Rwankuba"],
+  "Rutsiro": ["Boneza", "Gihango", "Kigeyo", "Kivumu", "Manihira", "Mukura", "Musasa", "Mushonyi", "Mushubati", "Nyabirasi", "Ruhango"],
+  "Rubavu": ["Bugeshi", "Busasamana", "Cyanzarwe", "Gisenyi", "Kanama", "Kanzenze", "Mudende", "Nyakiliba", "Nyamyumba", "Rubavu", "Rugerero"],
+  "Nyabihu": ["Bigogwe", "Jenda", "Jomba", "Kabatwa", "Karago", "Kintobo", "Mukamira", "Muringa", "Rambura", "Rugera", "Rurembo", "Shyira"],
+  "Ngororero": ["Bwira", "Gatumba", "Hindiro", "Kabaya", "Kageyo", "Matyazo", "Muhanda", "Muhororo", "Ndaro", "Ngororero", "Nyange", "Sovu"],
+  "Rusizi": ["Butare", "Bugarama", "Gashonga", "Gikundamvura", "Gisuma", "Kamembe", "Muganza", "Mururu", "Nkanka", "Nkombo", "Nkungu", "Nyakabuye", "Nyakarenzo", "Rwimbogo"],
+  "Nyamasheke": ["Bushekeri", "Bushenge", "Cyato", "Gihombo", "Kanjongo", "Karambi", "Karengera", "Kirimbi", "Macuba", "Mahembe", "Nyabitekeri", "Rangiro", "Ruharambuga", "Shangi"]
+}
+
 export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
   const { t } = useLanguage()
   const router = useRouter()
@@ -38,7 +71,11 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
   }
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    if (name === "district") {
+      setFormData((prev) => ({ ...prev, [name]: value, sector: "" }))
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,27 +179,28 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
                   <SelectValue placeholder={t('farmer.selectDistrict')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="kigali">Kigali</SelectItem>
-                  <SelectItem value="musanze">Musanze</SelectItem>
-                  <SelectItem value="huye">Huye</SelectItem>
-                  <SelectItem value="rubavu">Rubavu</SelectItem>
-                  <SelectItem value="nyagatare">Nyagatare</SelectItem>
+                  {Object.keys(rwandaData).sort().map((district) => (
+                    <SelectItem key={district} value={district}>{district}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="sector">{t('farmer.sector')}</Label>
-              <Select value={formData.sector} onValueChange={(value) => handleSelectChange("sector", value)} required>
+              <Select 
+                value={formData.sector} 
+                onValueChange={(value) => handleSelectChange("sector", value)} 
+                required
+                disabled={!formData.district}
+              >
                 <SelectTrigger id="sector">
-                  <SelectValue placeholder={t('farmer.selectSector')} />
+                  <SelectValue placeholder={formData.district ? t('farmer.selectSector') : t('farmer.selectDistrictFirst')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="nyarugenge">Nyarugenge</SelectItem>
-                  <SelectItem value="kicukiro">Kicukiro</SelectItem>
-                  <SelectItem value="gasabo">Gasabo</SelectItem>
-                  <SelectItem value="kinigi">Kinigi</SelectItem>
-                  <SelectItem value="ngoma">Ngoma</SelectItem>
+                  {formData.district && rwandaData[formData.district as keyof typeof rwandaData]?.map((sector) => (
+                    <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
