@@ -273,15 +273,6 @@ const services = {
       link: "https://rvsms.vercel.app/",
     },
     {
-      id: "g2",
-      name: "Farm Registration Assistance",
-      description: "Help with all government farm registration requirements.",
-      price: 10000,
-      duration: "Complete package",
-      image:
-        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
-    },
-    {
       id: "g3",
       name: "Export Certification",
       description: "Preparation of all documents for animal product exports.",
@@ -289,24 +280,6 @@ const services = {
       duration: "Per certification",
       image:
         "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
-    },
-    {
-      id: "g4",
-      name: "Inspection Preparation",
-      description: "Get your farm ready for government inspections.",
-      price: 12000,
-      duration: "Includes follow-up",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
-    },
-    {
-      id: "g5",
-      name: "Subsidy Application",
-      description: "Assistance with agricultural subsidy applications.",
-      price: 8000,
-      duration: "Per application",
-      image:
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=350&fit=crop&crop=focalpoint&auto=format&q=80",
     },
     {
       id: "g6",

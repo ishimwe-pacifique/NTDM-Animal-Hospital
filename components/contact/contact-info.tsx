@@ -25,7 +25,7 @@ export default function ContactInfo() {
           <Phone className="h-6 w-6 text-primary shrink-0 mt-0.5 mr-3" />
           <div>
             <h3 className="font-semibold mb-1">{t('common.phone')}</h3>
-            <p className="text-gray-600">+250 78 051 9960</p>
+            <p className="text-gray-600">+250 780 721 800</p>
           </div>
         </div>
 

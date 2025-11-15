@@ -19,9 +19,9 @@ export default function CTASection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {[
-            { name: "Kigali Main Hospital", address: "123 Animal Care Road, Kigali", phone: "+250 78 123 4567" },
-            { name: "Musanze Branch", address: "45 Veterinary Street, Musanze", phone: "+250 78 234 5678" },
-            { name: "Huye Branch", address: "78 Livestock Avenue, Huye", phone: "+250 78 345 6789" },
+            { name: "Nyagatare Main Hospital", address: "EN 32 Ave street, Nyagatare City", phone: "+250 78 072 1800" },
+            { name: "Kigali Branch", address: "45 Veterinary Street, Kigali", phone: "+250 78 051 9960" },
+            { name: "Kayonza Branch", address: "78 Livestock Avenue, Kayonza", phone: "+250 78 072 1800" },
           ].map((location, index) => (
             <div key={index} className="salon-card p-6 text-center hover-lift">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">

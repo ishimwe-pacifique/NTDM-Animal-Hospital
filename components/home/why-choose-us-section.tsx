@@ -15,21 +15,21 @@ export default function WhyChooseUsSection() {
       title: t('home.features.expert.title'),
       description: t('home.features.expert.desc'),
       image:
-        "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://www.shutterstock.com/image-photo/african-american-man-veterinarian-inspecting-600nw-2519389149.jpg",
     },
     {
       icon: <Zap className="h-8 w-8 text-primary" />,
       title: t('home.features.technology.title'),
       description: t('home.features.technology.desc'),
       image:
-        "https://images.unsplash.com/photo-1581092921461-7d65ca45393a?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://supplyingthefuture.weebly.com/uploads/1/1/7/3/117383900/sensor-technology-jpg-2000x900-q70-crop-smart-subsampling-2-upscale_orig.jpg",
     },
     {
       icon: <Globe className="h-8 w-8 text-primary" />,
       title: t('home.features.comprehensive.title'),
       description: t('home.features.comprehensive.desc'),
       image:
-        "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600&h=400&fit=crop&crop=focalpoint&auto=format&q=80",
+        "https://farmersreviewafrica.com/wp-content/uploads/2022/03/DSC_1457.jpg",
     },
   ]
   return (
