@@ -2,7 +2,7 @@ export default function LocationMap() {
   return (
     <div className="rounded-lg overflow-hidden shadow-md h-[400px]">
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63692.10661814218!2d30.30571116606362!3d1.3120195923807633!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dbe7eb2f8f9f2f%3A0x24b3fd0aab633514!2sNyagatare!5e0!3m2!1sen!2srw!4v1715763402462!5m2!1sen!2srw"
+        src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d416.6172288167306!2d30.33274696022951!3d-1.2991557206547872!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMcKwMTcnNTcuMCJTIDMwwrAxOSc1OS4xIkU!5e1!3m2!1sen!2sus!4v1763169601231!5m2!1sen!2sus"
         width="100%"
         height="100%"
         style={{ border: 0 }}
