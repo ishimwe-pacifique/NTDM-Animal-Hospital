@@ -65,7 +65,7 @@ export default function AddConsultationForm({ doctors, farmerId }: AddConsultati
               <Input
                 id="fullName"
                 name="fullName"
-                placeholder="Enter your full name"
+                placeholder={t("farmer.enterFullName")}
                 required
               />
             </div>
@@ -75,7 +75,7 @@ export default function AddConsultationForm({ doctors, farmerId }: AddConsultati
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
-                placeholder="Enter your phone number"
+                placeholder={t('farmer.enterPhoneNumber')}
                 required
               />
             </div>
@@ -85,7 +85,7 @@ export default function AddConsultationForm({ doctors, farmerId }: AddConsultati
               <Input
                 id="service"
                 name="service"
-                placeholder="Enter service required"
+                placeholder={t("farmer.enterService")}
                 required
               />
             </div>
@@ -94,7 +94,7 @@ export default function AddConsultationForm({ doctors, farmerId }: AddConsultati
               <Label htmlFor="doctor">{t('farmer.selectDoctor')}</Label>
               <Select name="doctor" required>
                 <SelectTrigger id="doctor">
-                  <SelectValue placeholder="Select a doctor" />
+                  <SelectValue placeholder={t('farmer.selectDoctor')} />
                 </SelectTrigger>
                 <SelectContent>
                   {doctors.map((doc) => (
@@ -130,7 +130,7 @@ export default function AddConsultationForm({ doctors, farmerId }: AddConsultati
               <Label htmlFor="type">{t('farmer.consultationType')}</Label>
               <Select name="type" required>
                 <SelectTrigger id="type">
-                  <SelectValue placeholder="Select consultation type" />
+                  <SelectValue placeholder={t('farmer.selectConsultationType')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Virtual">{t('farmer.virtual')}</SelectItem>

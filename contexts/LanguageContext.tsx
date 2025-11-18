@@ -435,6 +435,7 @@ const translations = {
     'farmer.acceptedWithFeedback': 'Accepted with feedback',
     'farmer.rejectedWithFeedback': 'Rejected with feedback',
     'farmer.completedWithFeedback': 'Completed with feedback',
+    'farmer.withFeedback': 'with feedback',
     'farmer.totalNotifications': 'total notifications',
     'farmer.unknownDoctor': 'Unknown Doctor',
     'farmer.createdAt': 'Created At',
@@ -474,6 +475,17 @@ const translations = {
     'farmer.consultationType': 'Consultation Type',
     'farmer.virtual': 'Virtual',
     'farmer.inPerson': 'In-Person',
+    'farmer.updateConsultation': 'Update Consultation',
+    'farmer.confirmDelete': 'Confirm Deletion',
+    'farmer.warning': 'Warning',
+    'farmer.at': 'at',
+    'farmer.deleteConsultationConfirm': 'You are about to delete this consultation',
+    'farmer.deleteConsultationConfirmDesc': 'This action cannot be undone',
+
+    // Farmer Consultation
+    'farmer.enterFullName': 'Enter your full name',
+    'farmer.enterService': 'Enter service',
+    'farmer.selectConsultationType': 'Select consultation type',
 
     // Generated reports
     'farmer.genName': 'Farmer Name',
@@ -1671,6 +1683,7 @@ const translations = {
     'farmer.acceptedWithFeedback': 'Yemewe hamwe n\'igitekerezo',
     'farmer.rejectedWithFeedback': 'Yanze hamwe n\'igitekerezo',
     'farmer.completedWithFeedback': 'Yarangiye hamwe n\'igitekerezo',
+    'farmer.withFeedback': 'hamwe n\'igitekerezo',
     'farmer.unknownDoctor': 'Muganga Utazwi',
     'farmer.createdAt': 'Byakozwe',
     'farmer.editConsultation': 'Hindura Randevu',
@@ -1706,6 +1719,17 @@ const translations = {
     'farmer.consultationType': 'Ubwoko bwa Randevu',
     'farmer.virtual': 'Ikoreshwa rya Televiziyo',
     'farmer.inPerson': 'Imbonankubone',
+    'farmer.updateConsultation': 'Vugurura Randevu',
+    'farmer.confirmDelete': 'Emeza Gusiba',
+    'farmer.warning': 'Itonde',
+    'farmer.at': 'saa',
+    'farmer.deleteConsultationConfirm': 'Ugiye gusiba iyi randevu',
+    'farmer.deleteConsultationConfirmDesc': 'Ibi ntibishobora gusubizwa inyuma',
+
+    // Farmer Consulation
+    'farmer.enterFullName': 'Injiza amazina yawe yose',
+    'farmer.enterService': 'Injiza serivisi',
+    'farmer.selectConsultationType': 'Hitamo ubwoko bwa randevu',
 
     // Generated Reports
     'farmer.genName': 'Izina ry\'umworozi',
