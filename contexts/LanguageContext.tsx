@@ -470,6 +470,13 @@ const translations = {
     'farmer.animalName': 'Animal Name',
     'farmer.diary': 'Diary',
     'farmer.updateAnimal': 'Update Animal',
+    'farmer.selectDoctor': 'Select Doctor',
+    'farmer.consultationType': 'Consultation Type',
+    'farmer.virtual': 'Virtual',
+    'farmer.inPerson': 'In-Person',
+
+    // Generated reports
+    'farmer.genName': 'Farmer Name',
     
     // Animal Details
     'animal.details': 'Animal Details',
@@ -1520,9 +1527,9 @@ const translations = {
     'farmer.recentActivity': 'Ibikorwa bya Vuba',
     'farmer.items': 'ibintu',
     'farmer.animalRegistered': 'Itungo ryanditswe',
-    'farmer.addedOn': 'Yongerwemo ku',
+    'farmer.addedOn': 'Yongerwemo kuwa',
     'farmer.consultation': 'randevu',
-    'farmer.bookedOn': 'Yagenewe ku',
+    'farmer.bookedOn': 'Yagenewe kuwa',
     'farmer.noRecentActivity': 'Nta bikorwa bya vuba',
     'farmer.farmActivitiesAppear': 'Ibikorwa by\'ubworozi bwawe bizagaragara hano',
     'farmer.portal': 'Urubuga rw\'Umworozi',
@@ -1608,10 +1615,10 @@ const translations = {
     'farmer.cowHealthMonitor': 'Gukurikirana Ubuzima bw\'Inka',
     'farmer.realTimeTracking': 'Gukurikirana ubuzima n\'aho iherereye mu gihe nyacyo',
     'farmer.lastUpdated': 'Byavuguruwe bwa nyuma',
-    'farmer.exportReport': 'Kohereza Raporo',
+    'farmer.exportReport': 'Raporo',
     'farmer.refresh': 'Kuvugurura',
     'farmer.dataSourceConfig': 'Gushyiraho Inkomoko y\'Amakuru',
-    'farmer.channelId': 'ID y\'Umuyoboro',
+    'farmer.channelId': 'ID y\'umuyoboro',
     'farmer.apiKey': 'Urufunguzo rwa API',
     'farmer.resultsCount': 'Umubare w\'Ibisubizo',
     'farmer.fetch': 'Gukuramo',
@@ -1659,7 +1666,7 @@ const translations = {
     'farmer.elevated': 'Byiyongereye',
     'farmer.high': 'Byinshi',
     'farmer.consultationDetails': 'Amakuru ya randevu',
-    'farmer.backToAllConsultations': 'Subira ku Nama Zose',
+    'farmer.backToAllConsultations': 'Subira kuri randevu zose',
     'farmer.consultationFor': 'Randevu y\'inkingo',
     'farmer.acceptedWithFeedback': 'Yemewe hamwe n\'igitekerezo',
     'farmer.rejectedWithFeedback': 'Yanze hamwe n\'igitekerezo',
@@ -1695,6 +1702,13 @@ const translations = {
     'farmer.exportAsCSV': 'Kurura CSV',
     'farmer.exportAsExcel': 'Kurura Excel',
     'farmer.selectDistrictFirst': 'Banza uhitemo akarere',
+    'farmer.selectDoctor': 'Hitamo muganga',
+    'farmer.consultationType': 'Ubwoko bwa Randevu',
+    'farmer.virtual': 'Ikoreshwa rya Televiziyo',
+    'farmer.inPerson': 'Imbonankubone',
+
+    // Generated Reports
+    'farmer.genName': 'Izina ry\'umworozi',
 
     // Edit Animal
     'farmer.editAnimal': 'Hindura umwirondoro w\'itungo',
