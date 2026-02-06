@@ -384,8 +384,8 @@ export default function PetTrackingPage() {
 
       // Contact info
       const contactInfo = `Contact Vettrack Support`
-      const emailInfo = `Email: ntdm2050@gmail.com`
-      const phoneInfo = `Phone:+250 78 051 9960 `
+      const emailInfo = `Email: info@vettrack.rw`
+      const phoneInfo = `Phone:+250 78 072 1800 `
 
       const baseY = pageHeight - 22;
       const lineHeight = 5;
