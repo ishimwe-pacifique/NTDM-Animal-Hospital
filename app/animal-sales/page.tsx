@@ -271,7 +271,7 @@ export default function AnimalSalesPage() {
               <div className="relative h-48">
                 <Link href={`/animal-sales/${animal.id}`}>
                   <Image
-                    src={animal.image}
+                    src={animal.image || '/placeholder.jpg'}
                     alt={animal.name}
                     fill
                     className="object-cover cursor-pointer hover:scale-105 transition-transform"
@@ -295,7 +295,7 @@ export default function AnimalSalesPage() {
                 <CardTitle className="flex justify-between items-start">
                   <span>{animal.name}</span>
                   <span className="text-primary font-bold">
-                    RWF {animal.price.toLocaleString()}
+                    RWF {(animal.price || 0).toLocaleString()}
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -339,13 +339,20 @@ export default function AnimalSalesPage() {
                     </Button>
                   </Link>
                   <div className="flex gap-2">
-                    {animal.sellerPhone && (
+                    {animal.sellerPhone ? (
                       <Button className="flex-1" asChild>
                         <a href={`tel:${animal.sellerPhone}`}>
                           <Phone className="h-4 w-4 mr-2" />
                           Call
                         </a>
                       </Button>
+                    ) : (
+                      <Link href={`/animal-sales/${animal.id}`} className="flex-1">
+                        <Button className="w-full">
+                          <Phone className="h-4 w-4 mr-2" />
+                          {t('common.orderNow')}
+                        </Button>
+                      </Link>
                     )}
                     {animal.sellerEmail && (
                       <Button variant="outline" className="flex-1" asChild>
