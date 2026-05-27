@@ -270,6 +270,11 @@ const translations = {
     'auth.orContinueWith': 'OR CONTINUE WITH',
     'auth.phoneNumber': 'Phone Number',
 
+    // Account Suspension
+    'user.accountSuspendedTitle': 'Account Suspended',
+    'user.accountSuspendedDesc': 'Your account has been suspended. Please contact the administrator for assistance.',
+
+
     // Farmer Dashboard
     'farmer.dashboard': 'Farmer Dashboard',
     'farmer.welcomeBack': 'Welcome back',
@@ -1517,6 +1522,10 @@ const translations = {
     'auth.district': 'Akarere',
     'auth.orContinueWith': 'Komeza na',
     'auth.phoneNumber': 'Nimero ya Telefoni',
+
+    // Account Suspenssion
+    'user.accountSuspendedTitle': 'Konti Yahagaritswe',
+    'user.accountSuspendedDesc': 'Konti yawe yahagaritswe. Nyamuneka vugana n\'ushinzwe sisitemu kugira ngo ubone ubufasha.',
 
     // Farmer Dashboard
     'farmer.dashboard': 'Ikibaho cy\'Umworozi',

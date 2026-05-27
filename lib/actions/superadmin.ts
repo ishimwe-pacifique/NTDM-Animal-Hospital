@@ -1468,6 +1468,8 @@ export async function createSystemNotification(data: {
       ...data,
       priority: data.priority || "normal",
       read: false,
+      deletedBy: [],
+      expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
       createdAt: new Date()
     }
 
@@ -1555,6 +1557,8 @@ export async function sendBulkNotification(templateId: string, targetUsers: stri
       type: template.type,
       priority: template.priority,
       read: false,
+      deletedBy: [],
+      expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
       createdAt: new Date()
     }))
 
