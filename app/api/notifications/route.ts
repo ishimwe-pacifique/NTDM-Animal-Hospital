@@ -50,7 +50,6 @@ export async function GET(request: NextRequest) {
     const orConditions: any[] = [
       { targetRole: userRole },
       { targetRole: "all" },
-      { type: "system" }
     ]
     if (userObjectId) orConditions.push({ userId: userObjectId })
 
