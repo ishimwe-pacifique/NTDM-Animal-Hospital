@@ -194,7 +194,7 @@ export default function VeterinaryNotificationsPage() {
             {notifications.some(n => !n.read && !n._id.startsWith('announcement-')) && (
               <Button onClick={markAllAsRead} variant="outline" size="sm">
                 <Check className="h-4 w-4 mr-2" />
-                {t('vet.markAllRead') || 'Mark All Read'}
+                {t('vet.markAllRead')}
               </Button>
             )}
           </div>
