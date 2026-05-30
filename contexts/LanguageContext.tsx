@@ -598,6 +598,8 @@ const translations = {
     'vet.searchPatients': 'Search patients, appointments...',
     'vet.notifications': 'Notifications',
     'vet.manageAppointments': 'Manage your consultation requests and appointments',
+    'superadmin.scheduledFor': 'Scheduled for',
+    'superadmin.recipients': 'Recipients',
 
     // Veterinary profile
     'vet.manageProfile': 'Manage your veterinary profile',

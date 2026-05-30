@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { createNotificationTemplate, sendBulkNotification, scheduleNotification, deleteNotificationTemplate } from "@/lib/actions/superadmin"
-import { Plus, Send, Clock, FileText, Users, Calendar, Trash2, RotateCcw, Eye } from "lucide-react"
+import { Plus, Send, Clock, FileText, Users, Calendar, Trash2, RotateCcw, Eye, Search } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
@@ -44,6 +44,9 @@ export default function NotificationsPageClient({
   const [sentLoading, setSentLoading] = useState(false)
   const [permanentDeleteId, setPermanentDeleteId] = useState<string | null>(null)
   const [restoreId, setRestoreId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState<"delete" | "restore" | null>(null)
+  const [userSearch, setUserSearch] = useState("")
 
   const [templateForm, setTemplateForm] = useState({
     name: "",
@@ -159,8 +162,14 @@ export default function NotificationsPageClient({
     )
   }
 
+  const filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+    u.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+    u.role.toLowerCase().includes(userSearch.toLowerCase())
+  )
+
   const selectAllUsers = () => {
-    setSelectedUsers(users.map(u => u._id))
+    setSelectedUsers(filteredUsers.map(u => u._id))
   }
 
   const clearSelection = () => {
@@ -232,6 +241,56 @@ export default function NotificationsPageClient({
       toast({ title: "Error", description: "Failed to restore", variant: "destructive" })
     } finally {
       setRestoreId(null)
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === sentNotifications.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(sentNotifications.map(n => n._id)))
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all([...selectedIds].map(id =>
+        fetch(`/api/notifications?id=${id}&permanent=true`, { method: 'DELETE' })
+      ))
+      setSentNotifications(prev => prev.filter(n => !selectedIds.has(n._id)))
+      toast({ title: "Deleted", description: `${selectedIds.size} notification${selectedIds.size > 1 ? 's' : ''} permanently deleted` })
+      setSelectedIds(new Set())
+    } catch {
+      toast({ title: "Error", description: "Bulk delete failed", variant: "destructive" })
+    } finally {
+      setBulkAction(null)
+    }
+  }
+
+  const handleBulkRestore = async () => {
+    try {
+      await Promise.all([...selectedIds].map(id =>
+        fetch('/api/notifications', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        })
+      ))
+      await fetchSentNotifications()
+      toast({ title: "Restored", description: `${selectedIds.size} notification${selectedIds.size > 1 ? 's' : ''} restored` })
+      setSelectedIds(new Set())
+    } catch {
+      toast({ title: "Error", description: "Bulk restore failed", variant: "destructive" })
+    } finally {
+      setBulkAction(null)
     }
   }
 
@@ -371,10 +430,51 @@ export default function NotificationsPageClient({
             </Card>
           ) : (
             <Card>
+              {/* Bulk action toolbar */}
+              {selectedIds.size > 0 && (
+                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-b border-emerald-100 rounded-t-lg">
+                  <span className="text-sm font-medium text-emerald-700">{selectedIds.size} selected</span>
+                  <div className="flex gap-2 ml-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
+                      onClick={() => setBulkAction('restore')}
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Restore Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1 text-red-600 border-red-300 hover:bg-red-50"
+                      onClick={() => setBulkAction('delete')}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-gray-500"
+                      onClick={() => setSelectedIds(new Set())}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              )}
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox
+                          checked={selectedIds.size === sentNotifications.length && sentNotifications.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                          aria-label="Select all"
+                        />
+                      </TableHead>
                       <TableHead>Title</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead>Priority</TableHead>
@@ -389,8 +489,16 @@ export default function NotificationsPageClient({
                       const now = Date.now()
                       const isDeleted = n.deletedBy?.length > 0
                       const isExpired = n.expiresAt ? new Date(n.expiresAt).getTime() < now : false
+                      const isSelected = selectedIds.has(n._id)
                       return (
-                        <TableRow key={n._id} className={isDeleted ? 'bg-red-50/40' : isExpired ? 'bg-amber-50/40' : ''}>
+                        <TableRow key={n._id} className={isSelected ? 'bg-emerald-50/60' : isDeleted ? 'bg-red-50/40' : isExpired ? 'bg-amber-50/40' : ''}>
+                          <TableCell>
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelect(n._id)}
+                              aria-label="Select row"
+                            />
+                          </TableCell>
                           <TableCell>
                             <p className="font-medium text-sm">{n.title}</p>
                             <p className="text-xs text-gray-500 truncate max-w-[180px]">{n.message}</p>
@@ -430,6 +538,31 @@ export default function NotificationsPageClient({
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Bulk Action Confirmation Dialog */}
+      <Dialog open={!!bulkAction} onOpenChange={open => !open && setBulkAction(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {bulkAction === 'restore' ? 'Restore Selected Notifications' : 'Delete Selected Notifications'}
+            </DialogTitle>
+            <DialogDescription>
+              {bulkAction === 'restore'
+                ? `This will restore ${selectedIds.size} notification${selectedIds.size > 1 ? 's' : ''} and reset their expiry to 48 hours from now.`
+                : `This will permanently delete ${selectedIds.size} notification${selectedIds.size > 1 ? 's' : ''}. This cannot be undone.`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setBulkAction(null)}>Cancel</Button>
+            {bulkAction === 'restore' ? (
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleBulkRestore}>Restore</Button>
+            ) : (
+              <Button variant="destructive" onClick={handleBulkDelete}>Delete Permanently</Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Permanent Delete Dialog */}
       <Dialog open={!!permanentDeleteId} onOpenChange={open => !open && setPermanentDeleteId(null)}>
@@ -598,8 +731,19 @@ export default function NotificationsPageClient({
                   </Button>
                 </div>
               </div>
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search by name, email or role..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
               <div className="max-h-60 overflow-y-auto border rounded-lg p-3 space-y-2">
-                {users.map((user) => (
+                {filteredUsers.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">No users match your search.</p>
+                ) : filteredUsers.map((user) => (
                   <div key={user._id} className="flex items-center space-x-2">
                     <Checkbox
                       id={user._id}
