@@ -11,13 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Trash2, Plus, Pencil, BarChart3, History, Weight } from "lucide-react"
+import { Trash2, Plus, Pencil, BarChart3, History, Weight, ChevronDown } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 interface Animal { _id: string; name: string; type: string }
 interface WasteRecord {
   _id: string; animalId: string | null; animalName: string | null
-  wasteType: string; quantity: number; unit: string
+  wasteType: string | string[]; quantity: number; unit: string
   disposalMethod: string | null; date: string; notes: string | null
 }
 
@@ -48,13 +48,14 @@ export default function WasteManagementPage() {
 
   // Form
   const [animalId, setAnimalId] = useState("")
-  const [wasteType, setWasteType] = useState("")
+  const [wasteType, setWasteType] = useState<string[]>([])
   const [quantity, setQuantity] = useState("")
   const [unit, setUnit] = useState("")
   const [disposalMethod, setDisposalMethod] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [wasteTypeOpen, setWasteTypeOpen] = useState(false)
 
   // Filter
   const [filterType, setFilterType] = useState("")
@@ -81,14 +82,17 @@ export default function WasteManagementPage() {
 
   const filteredRecords = useMemo(() => {
     let data = [...records]
-    if (filterType) data = data.filter(r => r.wasteType === filterType)
+    if (filterType) data = data.filter(r => {
+      const types = Array.isArray(r.wasteType) ? r.wasteType : [r.wasteType]
+      return types.includes(filterType)
+    })
     if (filterMonth) data = data.filter(r => r.date.startsWith(filterMonth))
     return data
   }, [records, filterType, filterMonth])
 
   const validate = () => {
     const e: Record<string, string> = {}
-    if (!wasteType) e.wasteType = "Select a waste type"
+    if (!wasteType.length) e.wasteType = "Select at least one waste type"
     if (!quantity || Number(quantity) <= 0) e.quantity = "Enter a valid quantity"
     if (!unit) e.unit = "Select a unit"
     if (!date) e.date = "Select a date"
@@ -97,7 +101,7 @@ export default function WasteManagementPage() {
   }
 
   const resetForm = () => {
-    setAnimalId(""); setWasteType(""); setQuantity(""); setUnit("")
+    setAnimalId(""); setWasteType([]); setQuantity(""); setUnit("")
     setDisposalMethod(""); setDate(today); setNotes("")
     setErrors({}); setEditRecord(null)
   }
@@ -108,7 +112,7 @@ export default function WasteManagementPage() {
     const animal = animals.find(a => a._id === animalId)
     const body = {
       farmerId: user._id.toString(), animalId: animalId || null,
-      animalName: animal?.name || null, wasteType, quantity, unit,
+      animalName: animal?.name || null, wasteType: wasteType.join(", "), quantity, unit,
       disposalMethod: disposalMethod || null, date, notes,
     }
 
@@ -126,7 +130,7 @@ export default function WasteManagementPage() {
   const handleEdit = (r: WasteRecord) => {
     setEditRecord(r)
     setAnimalId(r.animalId || "")
-    setWasteType(r.wasteType)
+    setWasteType(Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim()))
     setQuantity(String(r.quantity))
     setUnit(r.unit)
     setDisposalMethod(r.disposalMethod || "")
@@ -143,7 +147,10 @@ export default function WasteManagementPage() {
   // Summary stats
   const totalByType = useMemo(() => {
     const map: Record<string, number> = {}
-    filteredRecords.forEach(r => { map[r.wasteType] = (map[r.wasteType] || 0) + r.quantity })
+    filteredRecords.forEach(r => {
+      const types = Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim())
+      types.forEach(t => { map[t] = (map[t] || 0) + r.quantity })
+    })
     return Object.entries(map).map(([type, quantity]) => ({ type, quantity }))
   }, [filteredRecords])
 
@@ -232,14 +239,36 @@ export default function WasteManagementPage() {
                 {/* Waste Type */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Waste Type *</label>
-                  <Select value={wasteType} onValueChange={setWasteType}>
-                    <SelectTrigger className={errors.wasteType ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Select waste type..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {WASTE_TYPES.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <button
+                    type="button"
+                    onClick={() => setWasteTypeOpen(o => !o)}
+                    className={`w-full flex items-center justify-between border rounded-md px-3 py-2 bg-white text-sm text-left${errors.wasteType ? " border-red-500" : " border-input"}`}
+                  >
+                    <span className="flex flex-wrap gap-1 flex-1 min-w-0">
+                      {wasteType.length === 0
+                        ? <span className="text-gray-400">Select waste type(s)...</span>
+                        : wasteType.map(t => (
+                            <span key={t} className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs border ${WASTE_COLORS[t] || WASTE_COLORS.Other}`}>{t}</span>
+                          ))
+                      }
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-gray-400 ml-2 shrink-0 transition-transform${wasteTypeOpen ? " rotate-180" : ""}`} />
+                  </button>
+                  {wasteTypeOpen && (
+                    <div className="border border-input rounded-md bg-white shadow-sm p-2 space-y-1">
+                      {WASTE_TYPES.map(w => (
+                        <label key={w} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded px-2 py-1">
+                          <input
+                            type="checkbox"
+                            checked={wasteType.includes(w)}
+                            onChange={() => setWasteType(prev => prev.includes(w) ? prev.filter(t => t !== w) : [...prev, w])}
+                            className="accent-emerald-600 h-4 w-4"
+                          />
+                          <span className="text-sm">{w}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                   {errors.wasteType && <p className="text-xs text-red-500">{errors.wasteType}</p>}
                 </div>
 
@@ -346,9 +375,11 @@ export default function WasteManagementPage() {
                       <TableRow key={r._id}>
                         <TableCell className="text-sm">{r.date}</TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={WASTE_COLORS[r.wasteType] || WASTE_COLORS.Other}>
-                            {r.wasteType}
-                          </Badge>
+                          <div className="flex flex-wrap gap-1">
+                            {(Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim())).map(t => (
+                              <Badge key={t} variant="outline" className={WASTE_COLORS[t] || WASTE_COLORS.Other}>{t}</Badge>
+                            ))}
+                          </div>
                         </TableCell>
                         <TableCell className="text-sm">{r.animalName || <span className="text-gray-400">General</span>}</TableCell>
                         <TableCell className="font-semibold text-emerald-700">{r.quantity} {r.unit}</TableCell>
@@ -426,7 +457,10 @@ export default function WasteManagementPage() {
                             <Badge variant="outline" className={WASTE_COLORS[row.type] || WASTE_COLORS.Other}>{row.type}</Badge>
                           </TableCell>
                           <TableCell className="font-semibold text-emerald-700">{row.quantity.toFixed(1)}</TableCell>
-                          <TableCell>{filteredRecords.filter(r => r.wasteType === row.type).length}</TableCell>
+                          <TableCell>{filteredRecords.filter(r => {
+                              const types = Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim())
+                              return types.includes(row.type)
+                            }).length}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
