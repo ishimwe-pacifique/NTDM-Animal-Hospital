@@ -22,6 +22,8 @@ type Animal = {
   phoneNumber: string;
   price: number;
   status: string;
+  acquisitionType?: string;
+  earTagId?: string;
 }
 
 interface EditAnimalFormProps {
@@ -75,7 +77,9 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
     ownerName: animal.ownerName,
     phoneNumber: animal.phoneNumber,
     price: animal.price.toString(),
-    status: animal.status || "Healthy"
+    status: animal.status || "Healthy",
+    acquisitionType: animal.acquisitionType || "",
+    earTagId: animal.earTagId || "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +227,30 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
                 placeholder="Enter price"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="earTagId">{t('animal.earTagId')}</Label>
+              <Input
+                id="earTagId"
+                name="earTagId"
+                value={formData.earTagId}
+                onChange={handleChange}
+                placeholder="Enter ear tag ID"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="acquisitionType">{t('farmer.acquisitionType')}</Label>
+              <Select value={formData.acquisitionType} onValueChange={(value) => handleSelectChange("acquisitionType", value)} required>
+                <SelectTrigger id="acquisitionType">
+                  <SelectValue placeholder={t('farmer.selectAcquisitionType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bought">{t('farmer.bought')}</SelectItem>
+                  <SelectItem value="born">{t('farmer.born')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

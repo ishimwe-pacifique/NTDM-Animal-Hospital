@@ -25,6 +25,8 @@ export async function registerAnimal(formData: FormData, ownerId: string) {
       ownerName: ownerName, // Use user's name from DB if available
       phoneNumber: formData.get("phoneNumber"),
       price: Number(formData.get("price")),
+      acquisitionType: formData.get("acquisitionType"),
+      earTagId: formData.get("earTagId") || null,
       createdAt: new Date(),
       ownerId, // Associate this animal with its owner
       status: "Healthy", // Default status
@@ -96,6 +98,8 @@ export async function updateAnimal(id: string, formData: FormData) {
       ownerName: formData.get("ownerName"),
       phoneNumber: formData.get("phoneNumber"),
       price: Number(formData.get("price")),
+      acquisitionType: formData.get("acquisitionType") || originalAnimal.acquisitionType || null,
+      earTagId: formData.get("earTagId") || originalAnimal.earTagId || null,
       status: formData.get("status") || originalAnimal.status || "Healthy",
       updatedAt: new Date(),
       ownerId: ownerId,
@@ -323,6 +327,8 @@ export async function getAnimals(ownerId?: string) {
       ownerName: animal.ownerName,
       phoneNumber: animal.phoneNumber,
       price: animal.price,
+      acquisitionType: animal.acquisitionType || null,
+      earTagId: animal.earTagId || null,
       ownerId: animal.ownerId || null,
       status: animal.status || "Healthy",
       createdAt: animal.createdAt.toISOString()

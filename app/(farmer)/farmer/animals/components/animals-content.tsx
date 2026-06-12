@@ -53,6 +53,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                   <TableHead>{t('farmer.name')}</TableHead>
                   <TableHead>{t('farmer.type')}</TableHead>
                   <TableHead>{t('farmer.breed')}</TableHead>
+                  <TableHead>{t('farmer.acquisitionType')}</TableHead>
                   <TableHead>{t('farmer.location')}</TableHead>
                   <TableHead>{t('farmer.status')}</TableHead>
                   <TableHead>{t('farmer.price')}</TableHead>
@@ -65,6 +66,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                     <TableCell className="font-medium">{animal.name}</TableCell>
                     <TableCell>{animal.type}</TableCell>
                     <TableCell>{animal.breed}</TableCell>
+                    <TableCell>{animal.acquisitionType}</TableCell>
                     <TableCell>{animal.district}, {animal.sector}</TableCell>
                     <TableCell>
                       <Badge
