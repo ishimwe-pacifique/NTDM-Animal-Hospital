@@ -13,7 +13,7 @@ import {
   Milk
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Activity, Trash2 } from "lucide-react";
+import { Activity, Trash2, ShieldAlert } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function FarmerSidebar() {
@@ -49,6 +49,7 @@ export default function FarmerSidebar() {
     { href: "/farmer/consultations", label: t('farmer.consultations'), icon: <Stethoscope className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/tracking", label: t('farmer.tracking'), icon: <Activity className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/waste", label: "Waste Management", icon: <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" /> },
+    { href: "/farmer/diseases", label: "Disease Management", icon: <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/messages", label: t('farmer.messages'), icon: <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" /> },
   ];
 
