@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { getCurrentUser } from "@/lib/actions/auth"
-import { getAnimals } from "@/lib/actions"
+import { getAnimals, getDoctorsList } from "@/lib/actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ import { ShieldAlert, Plus, Pencil, Trash2, BarChart3, History, Activity, CheckC
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
 
 interface Animal { _id: string; name: string; type: string }
+interface Doctor { _id: string; name: string; specialization: string }
 interface DiseaseRecord {
   _id: string; animalId: string; animalName: string | null
   diseaseName: string; symptoms: string | null; treatment: string | null
@@ -52,6 +53,7 @@ const today = new Date().toISOString().split("T")[0]
 export default function DiseaseManagementPage() {
   const [user, setUser] = useState<any>(null)
   const [animals, setAnimals] = useState<Animal[]>([])
+  const [doctors, setDoctors] = useState<Doctor[]>([])
   const [records, setRecords] = useState<DiseaseRecord[]>([])
   const [doses, setDoses] = useState<TreatmentDose[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,8 +99,12 @@ export default function DiseaseManagementPage() {
       const userData = await getCurrentUser()
       if (!userData) return
       setUser(userData)
-      const animalsData = await getAnimals(userData._id.toString())
+      const [animalsData, doctorsData] = await Promise.all([
+        getAnimals(userData._id.toString()),
+        getDoctorsList(),
+      ])
       setAnimals(animalsData)
+      setDoctors(doctorsData)
       await Promise.all([
         fetchRecords(userData._id.toString()),
         fetchDoses(userData._id.toString()),
@@ -436,7 +442,19 @@ export default function DiseaseManagementPage() {
 
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Veterinarian <span className="text-gray-400 text-xs">optional</span></label>
-                  <Input placeholder="Vet name..." value={veterinarianName} onChange={e => setVeterinarianName(e.target.value)} />
+                  <Select value={veterinarianName || "none"} onValueChange={v => setVeterinarianName(v === "none" ? "" : v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select veterinarian..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— Not assigned —</SelectItem>
+                      {doctors.map(d => (
+                        <SelectItem key={d._id} value={d.name}>
+                          {d.name}{d.specialization ? ` — ${d.specialization}` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-1 md:col-span-2">
