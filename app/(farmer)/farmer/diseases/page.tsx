@@ -393,7 +393,7 @@ export default function DiseaseManagementPage() {
       doc.setFillColor(239, 68, 68); doc.rect(15, y - 6, 180, 8, 'F')
       doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold')
       doc.text('Animal', 18, y); doc.text('Insurance ID', 45, y); doc.text('Disease', 82, y)
-      doc.text('Status', 118, y); doc.text('Diagnosed', 138, y); doc.text('Vet', 165, y)
+      doc.text('Status', 108, y); doc.text('Vet', 138, y); doc.text('Diagnosed', 165, y)
       doc.setFont('helvetica', 'normal')
       exportRecs.forEach((r, i) => {
         y += 9
@@ -403,9 +403,9 @@ export default function DiseaseManagementPage() {
         doc.text(r.animalName || '—', 18, y)
         doc.text(getAnimalInsuranceId(r.animalId), 45, y)
         doc.text(r.diseaseName, 82, y)
-        doc.text(r.status, 118, y)
-        doc.text(r.diagnosedDate, 138, y)
-        doc.text(r.veterinarianName || '—', 165, y)
+        doc.text(r.status, 108, y)
+        doc.text(r.veterinarianName || '—', 138, y)
+        doc.text(r.diagnosedDate, 165, y)
       })
 
       // ── Daily Cost section ──
