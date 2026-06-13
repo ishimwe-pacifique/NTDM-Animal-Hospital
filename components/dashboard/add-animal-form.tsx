@@ -65,6 +65,7 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
     price: "",
     acquisitionType: "",
     earTagId: "",
+    insuranceId: "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +253,17 @@ export default function AddAnimalForm({ userId }: AddAnimalFormProps) {
                 value={formData.earTagId}
                 onChange={handleChange}
                 placeholder="Enter ear tag ID"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="insuranceId">{t('farmer.insuranceId')} <span className="text-gray-400 text-xs font-normal">(optional)</span></Label>
+              <Input
+                id="insuranceId"
+                name="insuranceId"
+                value={formData.insuranceId}
+                onChange={handleChange}
+                placeholder="Enter insurance ID"
               />
             </div>
 

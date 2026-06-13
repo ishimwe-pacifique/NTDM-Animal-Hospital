@@ -16,7 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-interface Animal { _id: string; name: string; type: string }
+interface Animal { _id: string; name: string; type: string; insuranceId?: string | null }
 interface MilkRecord {
   _id: string; cowId: string; cowName: string; liters: number
   pricePerLiter: number | null; totalAmount: number | null
@@ -41,6 +41,7 @@ export default function MilkProductionPage() {
   const [liters, setLiters] = useState("")
   const [pricePerLiter, setPricePerLiter] = useState("")
   const [totalAmount, setTotalAmount] = useState("")
+  const [insuranceId, setInsuranceId] = useState("")
   const [session, setSession] = useState("")
   const [date, setDate] = useState(today)
   const [time, setTime] = useState("")
@@ -94,6 +95,12 @@ export default function MilkProductionPage() {
     }
   }, [liters, pricePerLiter])
 
+  // Auto-detect insurance ID from selected animal
+  useEffect(() => {
+    const cow = animals.find(a => a._id === cowId)
+    setInsuranceId(cow?.insuranceId || "")
+  }, [cowId, animals])
+
   const validate = () => {
     const e: Record<string, string> = {}
     if (!cowId) e.cowId = "Please select a cow"
@@ -106,6 +113,7 @@ export default function MilkProductionPage() {
 
   const resetForm = () => {
     setCowId(""); setLiters(""); setPricePerLiter(""); setTotalAmount("")
+    setInsuranceId("")
     setSession(""); setDate(today); setTime(""); setNotes("")
     setErrors({}); setEditRecord(null)
   }
@@ -131,6 +139,8 @@ export default function MilkProductionPage() {
     setEditRecord(r); setCowId(r.cowId); setLiters(String(r.liters))
     setPricePerLiter(r.pricePerLiter ? String(r.pricePerLiter) : "")
     setTotalAmount(r.totalAmount ? String(r.totalAmount) : "")
+    const cow = animals.find(a => a._id === r.cowId)
+    setInsuranceId(cow?.insuranceId || "")
     setSession(r.session); setDate(r.date); setTime(r.time || ""); setNotes(r.notes || "")
   }
 
@@ -159,6 +169,9 @@ export default function MilkProductionPage() {
     if (exportType === "monthly") data = data.filter(r => r.date.startsWith(exportMonth))
     return data.sort((a, b) => a.date.localeCompare(b.date))
   }
+
+  const getAnimalInsuranceId = (cowId: string) =>
+    animals.find(a => a._id === cowId)?.insuranceId || '—'
 
   const exportToPDF = async () => {
     setExporting(true)
@@ -223,11 +236,12 @@ export default function MilkProductionPage() {
       doc.setFontSize(8)
       doc.setFont('helvetica', 'bold')
       doc.text('Date', 18, y)
-      doc.text('Animal', 48, y)
-      doc.text('Session', 88, y)
-      doc.text('Liters', 118, y)
-      doc.text('Price/L', 138, y)
-      doc.text('Total (RWF)', 158, y)
+      doc.text('Animal', 45, y)
+      doc.text('Insurance ID', 80, y)
+      doc.text('Session', 118, y)
+      doc.text('Liters', 142, y)
+      doc.text('Price/L', 158, y)
+      doc.text('Total (RWF)', 173, y)
 
       // Table rows
       doc.setFont('helvetica', 'normal')
@@ -240,13 +254,14 @@ export default function MilkProductionPage() {
         }
         doc.setTextColor(55, 65, 81)
         doc.text(r.date, 18, y)
-        doc.text(r.cowName || '-', 48, y)
-        doc.text(r.session, 88, y)
+        doc.text(r.cowName || '-', 45, y)
+        doc.text(getAnimalInsuranceId(r.cowId), 80, y)
+        doc.text(r.session, 118, y)
         doc.setTextColor(22, 163, 74)
-        doc.text(`${r.liters}L`, 118, y)
+        doc.text(`${r.liters}L`, 142, y)
         doc.setTextColor(55, 65, 81)
-        doc.text(r.pricePerLiter ? String(r.pricePerLiter) : '-', 138, y)
-        doc.text(r.totalAmount ? r.totalAmount.toLocaleString() : '-', 158, y)
+        doc.text(r.pricePerLiter ? String(r.pricePerLiter) : '-', 158, y)
+        doc.text(r.totalAmount ? r.totalAmount.toLocaleString() : '-', 173, y)
       })
 
       // Footer
@@ -266,7 +281,39 @@ export default function MilkProductionPage() {
     }
   }
 
-  // Reports calculations — based on filteredRecords so charts/cards reflect active filters
+  const exportToExcel = async () => {
+    setExporting(true)
+    try {
+      const XLSX = await import('xlsx')
+      const exportRecords = getExportRecords()
+      const cowName = exportCow === "all" ? "All Animals" : animals.find(a => a._id === exportCow)?.name || "Unknown"
+
+      const data = exportRecords.map(r => ({
+        Date: r.date,
+        Time: r.time || '—',
+        Animal: r.cowName || '—',
+        'Insurance ID': getAnimalInsuranceId(r.cowId),
+        Session: r.session,
+        'Liters': r.liters,
+        'Price per Liter (RWF)': r.pricePerLiter ?? '—',
+        'Total Amount (RWF)': r.totalAmount ?? '—',
+        Notes: r.notes || '—',
+      }))
+
+      const ws = XLSX.utils.json_to_sheet(data)
+      ws['!cols'] = [14, 10, 18, 20, 12, 10, 22, 22, 30].map(w => ({ wch: w }))
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Milk Production')
+      XLSX.writeFile(wb, `milk-report-${cowName.replace(/\s+/g, '-')}-${exportType}-${today}.xlsx`)
+      setExportOpen(false)
+    } catch (err) {
+      console.error('Excel export failed:', err)
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  // Reports calculations
   const totalLiters = useMemo(() => filteredRecords.reduce((s, r) => s + r.liters, 0), [filteredRecords])
   const totalRevenue = useMemo(() => filteredRecords.reduce((s, r) => s + (r.totalAmount || 0), 0), [filteredRecords])
   const avgPerDay = useMemo(() => {
@@ -421,6 +468,16 @@ export default function MilkProductionPage() {
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Total Amount (RWF) <span className="text-gray-400 text-xs">auto-calculated</span></label>
                   <Input type="number" min="0" placeholder="Auto-calculated" value={totalAmount} onChange={e => setTotalAmount(e.target.value)} className="bg-emerald-50" />
+                </div>
+
+                {/* Insurance ID */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Insurance ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={insuranceId || (cowId ? "No insurance registered" : "Select a cow first")}
+                    className={`${insuranceId ? "bg-blue-50 text-blue-700 font-medium" : "bg-gray-50 text-gray-400 italic"}`}
+                  />
                 </div>
 
                 {/* Date */}
@@ -730,14 +787,22 @@ export default function MilkProductionPage() {
               })()}
             </div>
 
-            <div className="flex gap-3 pt-1">
-              <Button variant="outline" onClick={() => setExportOpen(false)} className="flex-1 rounded-xl">Cancel</Button>
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <Button variant="outline" onClick={() => setExportOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button
+                onClick={exportToExcel}
+                disabled={exporting || getExportRecords().length === 0}
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? 'Exporting...' : 'Excel'}
+              </Button>
               <Button
                 onClick={exportToPDF}
                 disabled={exporting || getExportRecords().length === 0}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
+                className="col-span-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
               >
-                <Download className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
                 {exporting ? "Exporting..." : "Export PDF"}
               </Button>
             </div>

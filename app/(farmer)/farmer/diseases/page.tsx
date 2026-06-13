@@ -15,7 +15,7 @@ import { ShieldAlert, Plus, Pencil, Trash2, BarChart3, History, Activity, CheckC
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
 
-interface Animal { _id: string; name: string; type: string }
+interface Animal { _id: string; name: string; type: string; insuranceId?: string | null }
 interface Doctor { _id: string; name: string; specialization: string }
 interface DiseaseRecord {
   _id: string; animalId: string; animalName: string | null
@@ -74,6 +74,7 @@ export default function DiseaseManagementPage() {
   const [veterinarianName, setVeterinarianName] = useState("")
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [insuranceId, setInsuranceId] = useState("")
 
   // Dose form
   const [doseRecordId, setDoseRecordId] = useState("")
@@ -127,6 +128,15 @@ export default function DiseaseManagementPage() {
     setDoses(Array.isArray(data) ? data : [])
   }
 
+  // Auto-detect insurance ID from selected animal
+  useEffect(() => {
+    const animal = animals.find(a => a._id === animalId)
+    setInsuranceId(animal?.insuranceId || "")
+  }, [animalId, animals])
+
+  const getAnimalInsuranceId = (id: string) =>
+    animals.find(a => a._id === id)?.insuranceId || '—'
+
   const filteredRecords = useMemo(() => {
     let data = [...records]
     if (filterStatus) data = data.filter(r => r.status === filterStatus)
@@ -179,6 +189,7 @@ export default function DiseaseManagementPage() {
     setAnimalId(""); setDiseaseName(""); setCustomDisease(""); setSymptoms("")
     setTreatment(""); setDiagnosedDate(today); setResolvedDate("")
     setStatus("Active"); setVeterinarianName(""); setNotes("")
+    setInsuranceId("")
     setErrors({}); setEditRecord(null)
   }
 
@@ -237,6 +248,7 @@ export default function DiseaseManagementPage() {
   const handleEdit = (r: DiseaseRecord) => {
     setEditRecord(r)
     setAnimalId(r.animalId)
+    setInsuranceId(animals.find(a => a._id === r.animalId)?.insuranceId || "")
     const isCommon = COMMON_DISEASES.includes(r.diseaseName)
     setDiseaseName(isCommon ? r.diseaseName : "Other")
     setCustomDisease(isCommon ? "" : r.diseaseName)
@@ -380,8 +392,8 @@ export default function DiseaseManagementPage() {
       let y = 118
       doc.setFillColor(239, 68, 68); doc.rect(15, y - 6, 180, 8, 'F')
       doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold')
-      doc.text('Animal', 18, y); doc.text('Disease', 48, y); doc.text('Status', 88, y)
-      doc.text('Diagnosed', 112, y); doc.text('Resolved', 140, y); doc.text('Veterinarian', 165, y)
+      doc.text('Animal', 18, y); doc.text('Insurance ID', 45, y); doc.text('Disease', 82, y)
+      doc.text('Status', 118, y); doc.text('Diagnosed', 138, y); doc.text('Vet', 165, y)
       doc.setFont('helvetica', 'normal')
       exportRecs.forEach((r, i) => {
         y += 9
@@ -389,10 +401,10 @@ export default function DiseaseManagementPage() {
         if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, 'F') }
         doc.setTextColor(55, 65, 81)
         doc.text(r.animalName || '—', 18, y)
-        doc.text(r.diseaseName, 48, y)
-        doc.text(r.status, 88, y)
-        doc.text(r.diagnosedDate, 112, y)
-        doc.text(r.resolvedDate || '—', 140, y)
+        doc.text(getAnimalInsuranceId(r.animalId), 45, y)
+        doc.text(r.diseaseName, 82, y)
+        doc.text(r.status, 118, y)
+        doc.text(r.diagnosedDate, 138, y)
         doc.text(r.veterinarianName || '—', 165, y)
       })
 
@@ -592,6 +604,15 @@ export default function DiseaseManagementPage() {
                     </SelectContent>
                   </Select>
                   {errors.animalId && <p className="text-xs text-red-500">{errors.animalId}</p>}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Insurance ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={insuranceId || (animalId ? "No insurance registered" : "Select an animal first")}
+                    className={insuranceId ? "bg-blue-50 text-blue-700 font-medium" : "bg-gray-50 text-gray-400 italic"}
+                  />
                 </div>
 
                 <div className="space-y-1">

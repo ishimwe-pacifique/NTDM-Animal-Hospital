@@ -24,6 +24,7 @@ type Animal = {
   status: string;
   acquisitionType?: string;
   earTagId?: string;
+  insuranceId?: string;
 }
 
 interface EditAnimalFormProps {
@@ -80,6 +81,7 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
     status: animal.status || "Healthy",
     acquisitionType: animal.acquisitionType || "",
     earTagId: animal.earTagId || "",
+    insuranceId: animal.insuranceId || "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,6 +239,17 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
                 value={formData.earTagId}
                 onChange={handleChange}
                 placeholder="Enter ear tag ID"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="insuranceId">{t('farmer.insuranceId')} <span className="text-gray-400 text-xs font-normal">(optional)</span></Label>
+              <Input
+                id="insuranceId"
+                name="insuranceId"
+                value={formData.insuranceId}
+                onChange={handleChange}
+                placeholder="Enter insurance ID"
               />
             </div>
 
