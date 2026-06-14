@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Milk, Plus, Pencil, Trash2, BarChart3, History, TrendingUp, DollarSign, Droplets, Download, FileText } from "lucide-react"
+import { Milk, Plus, Pencil, Trash2, BarChart3, History, TrendingUp, DollarSign, Droplets, Download, FileText, Eye } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -38,6 +38,7 @@ export default function MilkProductionPage() {
   const [saving, setSaving] = useState(false)
   const [editRecord, setEditRecord] = useState<MilkRecord | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [detailRecord, setDetailRecord] = useState<MilkRecord | null>(null)
 
   // Form state
   const [cowId, setCowId] = useState("")
@@ -768,6 +769,9 @@ export default function MilkProductionPage() {
                           <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "—"}</TableCell>
                           <TableCell>
                             <div className="flex gap-1">
+                              <Button size="sm" variant="ghost" onClick={() => setDetailRecord(r)} className="h-8 w-8 p-0 hover:bg-sky-50">
+                                <Eye className="h-3.5 w-3.5 text-sky-600" />
+                              </Button>
                               <Button size="sm" variant="ghost" onClick={() => handleEdit(r)} className="h-8 w-8 p-0 hover:bg-emerald-50">
                                 <Pencil className="h-3.5 w-3.5 text-emerald-600" />
                               </Button>
@@ -1034,6 +1038,116 @@ export default function MilkProductionPage() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
+      <Dialog open={!!detailRecord} onOpenChange={open => !open && setDetailRecord(null)}>
+        <DialogContent className="max-w-2xl p-6 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <Eye className="h-5 w-5 text-sky-600" />
+              Milk Record Details
+            </DialogTitle>
+          </DialogHeader>
+
+          {detailRecord && (() => {
+            const sold =
+              detailRecord.soldLiters ??
+              Math.max(0, detailRecord.liters - (detailRecord.homeConsumption || 0))
+
+            const animal = animals.find(a => a._id === detailRecord.cowId)
+
+            const Card = ({ title, children }: any) => (
+              <div className="border rounded-xl p-4 bg-gray-50/40">
+                <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                  {title}
+                </h4>
+                <div className="space-y-2">{children}</div>
+              </div>
+            )
+
+            const Row = ({ label, value }: any) => (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">{label}</span>
+                <span className="text-gray-800 font-medium text-right">{value}</span>
+              </div>
+            )
+
+            return (
+              <div className="space-y-4 pt-2 max-h-[70vh] overflow-y-auto pr-2">
+
+                {/* ANIMAL */}
+                <Card title="Animal Information">
+                  <Row value={detailRecord.cowName} label="Name" />
+                  <Row
+                    label="Ear Tag ID"
+                    value={animal?.earTagId || <span className="text-gray-400">Not registered</span>}
+                  />
+                  <Row
+                    label="Insurance ID"
+                    value={animal?.insuranceId || <span className="text-gray-400">Not registered</span>}
+                  />
+                </Card>
+
+                {/* PRODUCTION */}
+                <Card title="Milk Production">
+                  <Row label="Date" value={detailRecord.date} />
+                  <Row label="Session" value={detailRecord.session} />
+                  <Row label="Total Milk" value={`${detailRecord.liters} L`} />
+                  <Row
+                    label="Home Consumption"
+                    value={
+                      detailRecord.homeConsumption
+                        ? `${detailRecord.homeConsumption} L`
+                        : <span className="text-gray-400">—</span>
+                    }
+                  />
+                  <Row label="Sold Milk" value={`${sold.toFixed(1)} L`} />
+                </Card>
+
+                {/* FINANCIAL */}
+                <Card title="Financial Summary">
+                  <Row
+                    label="Price per Liter"
+                    value={
+                      detailRecord.pricePerLiter
+                        ? `RWF ${detailRecord.pricePerLiter.toLocaleString()}`
+                        : <span className="text-gray-400">—</span>
+                    }
+                  />
+                  <Row
+                    label="Total Revenue"
+                    value={
+                      detailRecord.totalAmount
+                        ? `RWF ${detailRecord.totalAmount.toLocaleString()}`
+                        : <span className="text-gray-400">—</span>
+                    }
+                  />
+                </Card>
+
+                {/* FEED & NOTES */}
+                <Card title="Feed & Notes">
+                  <Row
+                    label="Water Intake"
+                    value={
+                      detailRecord.waterLiters
+                        ? `${detailRecord.waterLiters} L`
+                        : <span className="text-gray-400">—</span>
+                    }
+                  />
+                  <Row label="Food Type" value={detailRecord.foodType || <span className="text-gray-400">—</span>} />
+                  <div className="pt-2">
+                    <div className="text-xs text-gray-500 mb-1">Notes</div>
+                    <div className="text-sm text-gray-800">
+                      {detailRecord.notes || <span className="text-gray-400">—</span>}
+                    </div>
+                  </div>
+                </Card>
+
+              </div>
+            )
+          })()}
         </DialogContent>
       </Dialog>
 
