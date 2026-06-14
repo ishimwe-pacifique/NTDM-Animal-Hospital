@@ -16,9 +16,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-interface Animal { _id: string; name: string; type: string; insuranceId?: string | null }
+interface Animal { _id: string; name: string; type: string; insuranceId?: string; gender?: string | null }
 interface MilkRecord {
   _id: string; cowId: string; cowName: string; liters: number
+  homeConsumption: number | null; soldLiters: number | null
   pricePerLiter: number | null; totalAmount: number | null
   session: string; date: string; time: string | null; notes: string | null
 }
@@ -30,6 +31,7 @@ export default function MilkProductionPage() {
   const { t } = useLanguage()
   const [user, setUser] = useState<any>(null)
   const [animals, setAnimals] = useState<Animal[]>([])
+  const femaleAnimals = animals.filter(a => !a.gender || a.gender === "female")
   const [records, setRecords] = useState<MilkRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -39,12 +41,15 @@ export default function MilkProductionPage() {
   // Form state
   const [cowId, setCowId] = useState("")
   const [liters, setLiters] = useState("")
+  const [homeConsumption, setHomeConsumption] = useState("")
   const [pricePerLiter, setPricePerLiter] = useState("")
   const [totalAmount, setTotalAmount] = useState("")
   const [insuranceId, setInsuranceId] = useState("")
   const [session, setSession] = useState("")
   const [date, setDate] = useState(today)
   const [time, setTime] = useState("")
+  const [waterLiters, setWaterLiters] = useState("")
+  const [foodType, setFoodType] = useState("")
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -88,12 +93,15 @@ export default function MilkProductionPage() {
     return filtered
   }, [records, filterCow, filterSession, filterStart, filterEnd, filterMonth])
 
-  // Auto-calculate total amount
+  // Auto-calculate: soldLiters = liters - homeConsumption, totalAmount = soldLiters * pricePerLiter
   useEffect(() => {
-    if (liters && pricePerLiter) {
-      setTotalAmount((Number(liters) * Number(pricePerLiter)).toFixed(2))
+    const total = Number(liters) || 0
+    const consumed = Number(homeConsumption) || 0
+    const sold = Math.max(0, total - consumed)
+    if (pricePerLiter) {
+      setTotalAmount((sold * Number(pricePerLiter)).toFixed(2))
     }
-  }, [liters, pricePerLiter])
+  }, [liters, homeConsumption, pricePerLiter])
 
   // Auto-detect insurance ID from selected animal
   useEffect(() => {
@@ -112,9 +120,9 @@ export default function MilkProductionPage() {
   }
 
   const resetForm = () => {
-    setCowId(""); setLiters(""); setPricePerLiter(""); setTotalAmount("")
+    setCowId(""); setLiters(""); setHomeConsumption(""); setPricePerLiter(""); setTotalAmount("")
     setInsuranceId("")
-    setSession(""); setDate(today); setTime(""); setNotes("")
+    setSession(""); setDate(today); setTime(""); setWaterLiters(""); setFoodType(""); setNotes("")
     setErrors({}); setEditRecord(null)
   }
 
@@ -122,10 +130,11 @@ export default function MilkProductionPage() {
     if (!validate()) return
     setSaving(true)
     const cow = animals.find(a => a._id === cowId)
-    const body = { farmerId: user._id.toString(), cowId, cowName: cow?.name, liters, pricePerLiter, totalAmount, session, date, time, notes }
+    const soldLiters = Math.max(0, Number(liters) - Number(homeConsumption || 0))
+    const body = { farmerId: user._id.toString(), cowId, cowName: cow?.name, liters, homeConsumption, soldLiters, pricePerLiter, totalAmount, session, date, time, waterLiters, foodType, notes }
 
     if (editRecord) {
-      await fetch("/api/milk", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editRecord._id, liters, pricePerLiter, totalAmount, session, date, time, notes }) })
+      await fetch("/api/milk", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editRecord._id, liters, homeConsumption, soldLiters, pricePerLiter, totalAmount, session, date, time, waterLiters, foodType, notes }) })
     } else {
       await fetch("/api/milk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
     }
@@ -137,11 +146,15 @@ export default function MilkProductionPage() {
 
   const handleEdit = (r: MilkRecord) => {
     setEditRecord(r); setCowId(r.cowId); setLiters(String(r.liters))
+    setHomeConsumption(r.homeConsumption != null ? String(r.homeConsumption) : "")
     setPricePerLiter(r.pricePerLiter ? String(r.pricePerLiter) : "")
     setTotalAmount(r.totalAmount ? String(r.totalAmount) : "")
     const cow = animals.find(a => a._id === r.cowId)
     setInsuranceId(cow?.insuranceId || "")
-    setSession(r.session); setDate(r.date); setTime(r.time || ""); setNotes(r.notes || "")
+    setSession(r.session); setDate(r.date); setTime(r.time || "")
+    setWaterLiters((r as any).waterLiters ? String((r as any).waterLiters) : "")
+    setFoodType((r as any).foodType || "")
+    setNotes(r.notes || "")
   }
 
   const handleDelete = async (id: string) => {
@@ -315,6 +328,8 @@ export default function MilkProductionPage() {
 
   // Reports calculations
   const totalLiters = useMemo(() => filteredRecords.reduce((s, r) => s + r.liters, 0), [filteredRecords])
+  const totalConsumed = useMemo(() => filteredRecords.reduce((s, r) => s + (r.homeConsumption || 0), 0), [filteredRecords])
+  const totalSold = useMemo(() => filteredRecords.reduce((s, r) => s + (r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))), 0), [filteredRecords])
   const totalRevenue = useMemo(() => filteredRecords.reduce((s, r) => s + (r.totalAmount || 0), 0), [filteredRecords])
   const avgPerDay = useMemo(() => {
     const days = new Set(filteredRecords.map(r => r.date)).size
@@ -328,10 +343,12 @@ export default function MilkProductionPage() {
   }, [filteredRecords])
 
   const cowData = useMemo(() => {
-    const map: Record<string, { name: string; liters: number; revenue: number }> = {}
+    const map: Record<string, { name: string; liters: number; consumed: number; sold: number; revenue: number }> = {}
     filteredRecords.forEach(r => {
-      if (!map[r.cowId]) map[r.cowId] = { name: r.cowName, liters: 0, revenue: 0 }
+      if (!map[r.cowId]) map[r.cowId] = { name: r.cowName, liters: 0, consumed: 0, sold: 0, revenue: 0 }
       map[r.cowId].liters += r.liters
+      map[r.cowId].consumed += r.homeConsumption || 0
+      map[r.cowId].sold += r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))
       map[r.cowId].revenue += r.totalAmount || 0
     })
     return Object.values(map)
@@ -370,37 +387,38 @@ export default function MilkProductionPage() {
         <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-emerald-100 uppercase font-medium">Total Liters</p>
+              <p className="text-xs text-emerald-100 uppercase font-medium">Total Produced</p>
               <p className="text-2xl font-bold">{totalLiters.toFixed(1)}L</p>
             </div>
             <Droplets className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-orange-100 uppercase font-medium">Home Consumed</p>
+              <p className="text-2xl font-bold">{totalConsumed.toFixed(1)}L</p>
+            </div>
+            <Milk className="h-8 w-8 text-white/40" />
+          </CardContent>
+        </Card>
         <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-blue-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-sky-100 uppercase font-medium">Total Revenue</p>
-              <p className="text-2xl font-bold">RWF {totalRevenue.toLocaleString()}</p>
+              <p className="text-xs text-sky-100 uppercase font-medium">Sold</p>
+              <p className="text-xl font-bold">{totalSold.toFixed(1)}L</p>
+              <p className="text-xs text-sky-100">RWF {totalRevenue.toLocaleString()}</p>
             </div>
             <DollarSign className="h-8 w-8 text-white/40" />
-          </CardContent>
-        </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-500 to-orange-500 text-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs text-amber-100 uppercase font-medium">Avg/Day</p>
-              <p className="text-2xl font-bold">{avgPerDay}L</p>
-            </div>
-            <TrendingUp className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
         <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-purple-100 uppercase font-medium">Records</p>
-              <p className="text-2xl font-bold">{records.length}</p>
+              <p className="text-xs text-purple-100 uppercase font-medium">Avg/Day</p>
+              <p className="text-2xl font-bold">{avgPerDay}L</p>
             </div>
-            <BarChart3 className="h-8 w-8 text-white/40" />
+            <TrendingUp className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
       </div>
@@ -431,7 +449,7 @@ export default function MilkProductionPage() {
                       <SelectValue placeholder="Select cow..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {animals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
+                      {femaleAnimals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
                     </SelectContent>
                   </Select>
                   {errors.cowId && <p className="text-xs text-red-500">{errors.cowId}</p>}
@@ -456,6 +474,15 @@ export default function MilkProductionPage() {
                   <label className="text-sm font-medium text-gray-700">Milk Quantity (Liters) *</label>
                   <Input type="number" min="0" step="0.1" placeholder="e.g. 12.5" value={liters} onChange={e => setLiters(e.target.value)} className={errors.liters ? "border-red-500" : ""} />
                   {errors.liters && <p className="text-xs text-red-500">{errors.liters}</p>}
+                </div>
+
+                {/* Home Consumption */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Home Consumption (Liters) <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input type="number" min="0" step="0.1" placeholder="e.g. 2" value={homeConsumption} onChange={e => setHomeConsumption(e.target.value)} />
+                  {liters && homeConsumption && (
+                    <p className="text-xs text-sky-600">Sold: {Math.max(0, Number(liters) - Number(homeConsumption)).toFixed(1)}L</p>
+                  )}
                 </div>
 
                 {/* Price per liter */}
@@ -493,6 +520,18 @@ export default function MilkProductionPage() {
                   <Input type="time" value={time} onChange={e => setTime(e.target.value)} />
                 </div>
 
+                {/* Water Intake */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Water Intake (Liters) <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input type="number" min="0" step="0.5" placeholder="e.g. 40" value={waterLiters} onChange={e => setWaterLiters(e.target.value)} />
+                </div>
+
+                {/* Food Type */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Food Type <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input placeholder="e.g. Hay, Silage, Grass, Concentrate" value={foodType} onChange={e => setFoodType(e.target.value)} />
+                </div>
+
                 {/* Notes */}
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-medium text-gray-700">Notes <span className="text-gray-400 text-xs">optional</span></label>
@@ -528,7 +567,7 @@ export default function MilkProductionPage() {
                   <SelectTrigger><SelectValue placeholder="All Cows" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Cows</SelectItem>
-                    {animals.map(a => <SelectItem key={a._id} value={a._id}>{a.name}</SelectItem>)}
+                    {femaleAnimals.map(a => <SelectItem key={a._id} value={a._id}>{a.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={filterSession || "all"} onValueChange={v => setFilterSession(v === "all" ? "" : v)}>
@@ -555,17 +594,21 @@ export default function MilkProductionPage() {
                       <TableHead>Date</TableHead>
                       <TableHead>Cow</TableHead>
                       <TableHead>Session</TableHead>
-                      <TableHead>Liters</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Consumed</TableHead>
+                      <TableHead>Sold</TableHead>
                       <TableHead>Price/L</TableHead>
-                      <TableHead>Total (RWF)</TableHead>
+                      <TableHead>Revenue (RWF)</TableHead>
                       <TableHead>Notes</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredRecords.length === 0 ? (
-                      <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
-                    ) : filteredRecords.map(r => (
+                      <TableRow><TableCell colSpan={10} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
+                    ) : filteredRecords.map(r => {
+                      const sold = r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))
+                      return (
                       <TableRow key={r._id}>
                         <TableCell className="text-sm">{r.date}{r.time ? ` ${r.time}` : ""}</TableCell>
                         <TableCell className="font-medium">{r.cowName}</TableCell>
@@ -575,9 +618,11 @@ export default function MilkProductionPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="font-semibold text-emerald-700">{r.liters}L</TableCell>
-                        <TableCell>{r.pricePerLiter ? `${r.pricePerLiter}` : "-"}</TableCell>
-                        <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "-"}</TableCell>
-                        <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "-"}</TableCell>
+                        <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption}L` : "—"}</TableCell>
+                        <TableCell className="text-sky-700 font-medium">{sold > 0 ? `${sold.toFixed(1)}L` : "—"}</TableCell>
+                        <TableCell>{r.pricePerLiter ? `${r.pricePerLiter}` : "—"}</TableCell>
+                        <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "—"}</TableCell>
+                        <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "—"}</TableCell>
                         <TableCell>
                           <div className="flex gap-1">
                             <Button size="sm" variant="ghost" onClick={() => handleEdit(r)} className="h-8 w-8 p-0 hover:bg-emerald-50">
@@ -589,7 +634,8 @@ export default function MilkProductionPage() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -624,8 +670,10 @@ export default function MilkProductionPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Cow</TableHead>
-                        <TableHead>Total Liters</TableHead>
-                        <TableHead>Total Revenue (RWF)</TableHead>
+                        <TableHead>Total (L)</TableHead>
+                        <TableHead>Consumed (L)</TableHead>
+                        <TableHead>Sold (L)</TableHead>
+                        <TableHead>Revenue (RWF)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -634,8 +682,10 @@ export default function MilkProductionPage() {
                       ) : cowData.map((c, i) => (
                         <TableRow key={i}>
                           <TableCell className="font-medium">{c.name}</TableCell>
-                          <TableCell className="text-emerald-700 font-semibold">{c.liters.toFixed(1)}L</TableCell>
-                          <TableCell>{c.revenue > 0 ? c.revenue.toLocaleString() : "-"}</TableCell>
+                          <TableCell className="text-emerald-700 font-semibold">{c.liters.toFixed(1)}</TableCell>
+                          <TableCell className="text-orange-600">{c.consumed > 0 ? c.consumed.toFixed(1) : "—"}</TableCell>
+                          <TableCell className="text-sky-700 font-semibold">{c.sold > 0 ? c.sold.toFixed(1) : "—"}</TableCell>
+                          <TableCell>{c.revenue > 0 ? c.revenue.toLocaleString() : "—"}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -739,7 +789,7 @@ export default function MilkProductionPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Animals</SelectItem>
-                  {animals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
+                  {femaleAnimals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Syringe, Plus, Pencil, Trash2, History, ChevronDown, Baby, FlaskConical } from "lucide-react"
 
-interface Animal { _id: string; name: string; type: string; gender?: string | null }
+interface Animal { _id: string; name: string; type: string; gender?: string | null; insuranceId?: string | null }
 interface Vet { _id: string; name: string; specialization: string }
 interface InseminationRecord {
   _id: string
@@ -55,6 +55,7 @@ export default function InseminationPage() {
   const [expectedBirthDate, setExpectedBirthDate] = useState("")
   const [vetName, setVetName] = useState("")
   const [vetOrigin, setVetOrigin] = useState("")
+  const [insuranceId, setInsuranceId] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -78,6 +79,7 @@ export default function InseminationPage() {
   const handleAnimalChange = (val: string) => {
     setAnimalId(val === "none" ? "" : val)
     const selectedAnimal = animals.find(a => a._id === val)
+    setInsuranceId(selectedAnimal?.insuranceId || "")
     if (selectedAnimal?.type?.toLowerCase() === "cow" && date) {
       setExpectedBirthDate(calcExpectedBirth(date))
     }
@@ -131,7 +133,7 @@ export default function InseminationPage() {
   }
 
   const resetForm = () => {
-    setAnimalId(""); setSemenTypes([]); setSemenPrice(""); setVetPrice("")
+    setAnimalId(""); setInsuranceId(""); setSemenTypes([]); setSemenPrice(""); setVetPrice("")
     setInjectionTime(""); setExpectedBirthDate(""); setVetName(""); setVetOrigin("")
     setDate(today); setNotes(""); setErrors({}); setEditRecord(null)
     setSemenTypeOpen(false)
@@ -163,6 +165,7 @@ export default function InseminationPage() {
   const handleEdit = (r: InseminationRecord) => {
     setEditRecord(r)
     setAnimalId(r.animalId || "")
+    setInsuranceId(animals.find(a => a._id === r.animalId)?.insuranceId || "")
     setSemenTypes(r.semenTypes || [])
     setSemenPrice(r.semenPrice != null ? String(r.semenPrice) : "")
     setVetPrice(r.vetPrice != null ? String(r.vetPrice) : "")
@@ -268,6 +271,16 @@ export default function InseminationPage() {
                       {femaleAnimals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Insurance ID */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Insurance ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={insuranceId || (animalId ? "No insurance registered" : "Select an animal first")}
+                    className={`${insuranceId ? "bg-blue-50 text-blue-700 font-medium" : "bg-gray-50 text-gray-400 italic"}`}
+                  />
                 </div>
 
                 {/* Semen Types — collapsible multi-select */}

@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { farmerId, animalId, animalName, wasteType, quantity, unit, disposalMethod, date, notes } = body
+    const { farmerId, animalId, animalName, wasteType, quantity, unit, homeConsumption, soldQuantity, pricePerUnit, totalAmount, disposalMethod, date, notes } = body
 
     if (!farmerId || !wasteType || !quantity || !date)
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -44,6 +44,10 @@ export async function POST(req: NextRequest) {
     const record = {
       farmerId, animalId: animalId || null, animalName: animalName || null,
       wasteType, quantity: Number(quantity), unit,
+      homeConsumption: homeConsumption != null ? Number(homeConsumption) : null,
+      soldQuantity: soldQuantity != null ? Number(soldQuantity) : null,
+      pricePerUnit: pricePerUnit ? Number(pricePerUnit) : null,
+      totalAmount: totalAmount ? Number(totalAmount) : null,
       disposalMethod: disposalMethod || null,
       date, notes: notes || null,
       createdAt: new Date(),
@@ -59,7 +63,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
-    const { id, animalId, animalName, wasteType, quantity, unit, disposalMethod, date, notes } = body
+    const { id, animalId, animalName, wasteType, quantity, unit, homeConsumption, soldQuantity, pricePerUnit, totalAmount, disposalMethod, date, notes } = body
     if (!id) return NextResponse.json({ error: "Record ID required" }, { status: 400 })
 
     const client = await clientPromise
@@ -67,7 +71,12 @@ export async function PUT(req: NextRequest) {
 
     await db.collection("waste_records").updateOne(
       { _id: new ObjectId(id) },
-      { $set: { animalId, animalName, wasteType, quantity: Number(quantity), unit, disposalMethod, date, notes, updatedAt: new Date() } }
+      { $set: { animalId, animalName, wasteType, quantity: Number(quantity), unit,
+        homeConsumption: homeConsumption != null ? Number(homeConsumption) : null,
+        soldQuantity: soldQuantity != null ? Number(soldQuantity) : null,
+        pricePerUnit: pricePerUnit ? Number(pricePerUnit) : null,
+        totalAmount: totalAmount ? Number(totalAmount) : null,
+        disposalMethod, date, notes, updatedAt: new Date() } }
     )
     return NextResponse.json({ success: true })
   } catch {

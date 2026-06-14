@@ -19,6 +19,8 @@ interface Animal { _id: string; name: string; type: string; insuranceId?: string
 interface WasteRecord {
   _id: string; animalId: string | null; animalName: string | null
   wasteType: string | string[]; quantity: number; unit: string
+  homeConsumption: number | null; soldQuantity: number | null
+  pricePerUnit: number | null; totalAmount: number | null
   disposalMethod: string | null; date: string; notes: string | null
 }
 
@@ -53,6 +55,9 @@ export default function WasteManagementPage() {
   const [quantity, setQuantity] = useState("")
   const [unit, setUnit] = useState("")
   const [disposalMethod, setDisposalMethod] = useState("")
+  const [homeConsumption, setHomeConsumption] = useState("")
+  const [pricePerUnit, setPricePerUnit] = useState("")
+  const [totalAmount, setTotalAmount] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -102,9 +107,19 @@ export default function WasteManagementPage() {
     return Object.keys(e).length === 0
   }
 
+  // Auto-calculate: soldQuantity = quantity - homeConsumption, totalAmount = soldQuantity * pricePerUnit
+  useEffect(() => {
+    const total = Number(quantity) || 0
+    const consumed = Number(homeConsumption) || 0
+    const sold = Math.max(0, total - consumed)
+    if (pricePerUnit) setTotalAmount((sold * Number(pricePerUnit)).toFixed(2))
+    else setTotalAmount("")
+  }, [quantity, homeConsumption, pricePerUnit])
+
   const resetForm = () => {
     setAnimalId(""); setWasteType([]); setQuantity(""); setUnit("")
-    setDisposalMethod(""); setDate(today); setNotes("")
+    setDisposalMethod(""); setHomeConsumption(""); setPricePerUnit(""); setTotalAmount("")
+    setDate(today); setNotes("")
     setInsuranceId("")
     setErrors({}); setEditRecord(null)
   }
@@ -113,9 +128,13 @@ export default function WasteManagementPage() {
     if (!validate()) return
     setSaving(true)
     const animal = animals.find(a => a._id === animalId)
+    const soldQuantity = Math.max(0, Number(quantity) - Number(homeConsumption || 0))
     const body = {
       farmerId: user._id.toString(), animalId: animalId || null,
       animalName: animal?.name || null, wasteType: wasteType.join(", "), quantity, unit,
+      homeConsumption: homeConsumption ? Number(homeConsumption) : null,
+      soldQuantity, pricePerUnit: pricePerUnit ? Number(pricePerUnit) : null,
+      totalAmount: totalAmount ? Number(totalAmount) : null,
       disposalMethod: disposalMethod || null, date, notes,
     }
 
@@ -137,6 +156,9 @@ export default function WasteManagementPage() {
     setWasteType(Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim()))
     setQuantity(String(r.quantity))
     setUnit(r.unit)
+    setHomeConsumption(r.homeConsumption != null ? String(r.homeConsumption) : "")
+    setPricePerUnit(r.pricePerUnit ? String(r.pricePerUnit) : "")
+    setTotalAmount(r.totalAmount ? String(r.totalAmount) : "")
     setDisposalMethod(r.disposalMethod || "")
     setDate(r.date)
     setNotes(r.notes || "")
@@ -159,6 +181,9 @@ export default function WasteManagementPage() {
   }, [filteredRecords])
 
   const totalQuantity = useMemo(() => filteredRecords.reduce((s, r) => s + r.quantity, 0), [filteredRecords])
+  const totalConsumed = useMemo(() => filteredRecords.reduce((s, r) => s + (r.homeConsumption || 0), 0), [filteredRecords])
+  const totalSold = useMemo(() => filteredRecords.reduce((s, r) => s + (r.soldQuantity ?? Math.max(0, r.quantity - (r.homeConsumption || 0))), 0), [filteredRecords])
+  const totalRevenue = useMemo(() => filteredRecords.reduce((s, r) => s + (r.totalAmount || 0), 0), [filteredRecords])
 
   // Auto-detect insurance ID from selected animal
   useEffect(() => {
@@ -301,26 +326,36 @@ export default function WasteManagementPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-emerald-100 uppercase font-medium">Total Records</p>
-              <p className="text-2xl font-bold">{records.length}</p>
-            </div>
-            <BarChart3 className="h-8 w-8 text-white/40" />
-          </CardContent>
-        </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-500 to-orange-500 text-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs text-amber-100 uppercase font-medium">Total Quantity</p>
+              <p className="text-xs text-emerald-100 uppercase font-medium">Total Quantity</p>
               <p className="text-2xl font-bold">{totalQuantity.toFixed(1)}</p>
             </div>
             <Weight className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-indigo-600 text-white col-span-2 lg:col-span-1">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-orange-100 uppercase font-medium">Home Used</p>
+              <p className="text-2xl font-bold">{totalConsumed.toFixed(1)}</p>
+            </div>
+            <Trash2 className="h-8 w-8 text-white/40" />
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-blue-600 text-white">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-sky-100 uppercase font-medium">Sold</p>
+              <p className="text-xl font-bold">{totalSold.toFixed(1)}</p>
+              <p className="text-xs text-sky-100">RWF {totalRevenue.toLocaleString()}</p>
+            </div>
+            <BarChart3 className="h-8 w-8 text-white/40" />
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-purple-100 uppercase font-medium">Waste Types</p>
@@ -428,6 +463,27 @@ export default function WasteManagementPage() {
                   {errors.unit && <p className="text-xs text-red-500">{errors.unit}</p>}
                 </div>
 
+                {/* Home Consumption */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Home Use <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input type="number" min="0" step="0.1" placeholder="e.g. 10" value={homeConsumption} onChange={e => setHomeConsumption(e.target.value)} />
+                  {quantity && homeConsumption && (
+                    <p className="text-xs text-sky-600">Sold: {Math.max(0, Number(quantity) - Number(homeConsumption)).toFixed(1)}</p>
+                  )}
+                </div>
+
+                {/* Price per unit */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Price per Unit (RWF) <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input type="number" min="0" placeholder="e.g. 200" value={pricePerUnit} onChange={e => setPricePerUnit(e.target.value)} />
+                </div>
+
+                {/* Total amount */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Total Amount (RWF) <span className="text-gray-400 text-xs">auto-calculated</span></label>
+                  <Input type="number" min="0" placeholder="Auto-calculated" value={totalAmount} onChange={e => setTotalAmount(e.target.value)} className="bg-emerald-50" />
+                </div>
+
                 {/* Disposal Method */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Disposal Method <span className="text-gray-400 text-xs">optional</span></label>
@@ -498,6 +554,10 @@ export default function WasteManagementPage() {
                       <TableHead>Waste Type</TableHead>
                       <TableHead>Animal</TableHead>
                       <TableHead>Quantity</TableHead>
+                      <TableHead>Home Use</TableHead>
+                      <TableHead>Sold</TableHead>
+                      <TableHead>Price/Unit</TableHead>
+                      <TableHead>Revenue (RWF)</TableHead>
                       <TableHead>Disposal</TableHead>
                       <TableHead>Notes</TableHead>
                       <TableHead>Actions</TableHead>
@@ -505,7 +565,7 @@ export default function WasteManagementPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredRecords.length === 0 ? (
-                      <TableRow><TableCell colSpan={7} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={11} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
                     ) : filteredRecords.map(r => (
                       <TableRow key={r._id}>
                         <TableCell className="text-sm">{r.date}</TableCell>
@@ -517,7 +577,12 @@ export default function WasteManagementPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">{r.animalName || <span className="text-gray-400">General</span>}</TableCell>
+
                         <TableCell className="font-semibold text-emerald-700">{r.quantity} {r.unit}</TableCell>
+                        <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption} ${r.unit}` : "—"}</TableCell>
+                        <TableCell className="text-sky-700 font-medium">{(() => { const s = r.soldQuantity ?? Math.max(0, r.quantity - (r.homeConsumption || 0)); return s > 0 ? `${s.toFixed(1)} ${r.unit}` : "—" })()}</TableCell>
+                        <TableCell>{r.pricePerUnit ? r.pricePerUnit : "—"}</TableCell>
+                        <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "—"}</TableCell>
                         <TableCell className="text-sm">{r.disposalMethod || <span className="text-gray-400">—</span>}</TableCell>
                         <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "—"}</TableCell>
                         <TableCell>
