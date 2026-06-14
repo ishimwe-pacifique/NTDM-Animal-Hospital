@@ -733,8 +733,8 @@ export default function MilkProductionPage() {
                       <TableHead>Cow</TableHead>
                       <TableHead>Session</TableHead>
                       <TableHead>Total</TableHead>
-                      <TableHead>Consumed</TableHead>
-                      <TableHead>Consumed Value (RWF)</TableHead>
+                      <TableHead>Home Use</TableHead>
+                      <TableHead>Home Use Value (RWF)</TableHead>
                       <TableHead>Sold</TableHead>
                       <TableHead>Price/L</TableHead>
                       <TableHead>Revenue (RWF)</TableHead>
