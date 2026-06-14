@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Syringe, Plus, Pencil, Trash2, History, ChevronDown, Baby, FlaskConical } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Syringe, Plus, Pencil, Trash2, History, ChevronDown, Baby, FlaskConical, BarChart3, Download, FileText } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 interface Animal { _id: string; name: string; type: string; gender?: string | null; insuranceId?: string | null }
 interface Vet { _id: string; name: string; specialization: string }
@@ -24,6 +26,7 @@ interface InseminationRecord {
   vetPrice: number | null
   injectionTime: string | null
   expectedBirthDate: string | null
+  deliveredBabies: number | null
   vetName: string | null
   vetOrigin: string | null
   date: string
@@ -38,12 +41,14 @@ export default function InseminationPage() {
   const [user, setUser] = useState<any>(null)
   const [animals, setAnimals] = useState<Animal[]>([])
   const [vets, setVets] = useState<Vet[]>([])
-  const femaleAnimals = animals.filter(a => !a.gender || a.gender === "female")
+  // include females + animals with undefined/null gender (exclude confirmed males)
+  const femaleAnimals = animals.filter(a => a.gender !== "male")
   const [records, setRecords] = useState<InseminationRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editRecord, setEditRecord] = useState<InseminationRecord | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [genderAlertAnimal, setGenderAlertAnimal] = useState<Animal | null>(null)
   const [semenTypeOpen, setSemenTypeOpen] = useState(false)
 
   // Form fields
@@ -53,6 +58,7 @@ export default function InseminationPage() {
   const [vetPrice, setVetPrice] = useState("")
   const [injectionTime, setInjectionTime] = useState("")
   const [expectedBirthDate, setExpectedBirthDate] = useState("")
+  const [deliveredBabies, setDeliveredBabies] = useState("")
   const [vetName, setVetName] = useState("")
   const [vetOrigin, setVetOrigin] = useState("")
   const [insuranceId, setInsuranceId] = useState("")
@@ -60,7 +66,21 @@ export default function InseminationPage() {
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Auto-calculate expected birth date (+283 days) when insemination date changes for cows
+  // Pregnant animal IDs — those with a future expectedBirthDate and no deliveredBabies yet
+  const pregnantAnimalIds = useMemo(() => {
+    const now = today
+    return new Set(
+      records
+        .filter(r => r.animalId && r.expectedBirthDate && r.expectedBirthDate >= now && !r.deliveredBabies)
+        .map(r => r.animalId as string)
+    )
+  }, [records])
+
+  const availableAnimals = useMemo(
+    () => femaleAnimals.filter(a => !pregnantAnimalIds.has(a._id) || a._id === animalId),
+    [femaleAnimals, pregnantAnimalIds, animalId]
+  )
+
   const calcExpectedBirth = (insemDate: string) => {
     if (!insemDate) return ""
     const d = new Date(insemDate)
@@ -77,7 +97,7 @@ export default function InseminationPage() {
   }
 
   const handleAnimalChange = (val: string) => {
-    setAnimalId(val === "none" ? "" : val)
+    setAnimalId(val)
     const selectedAnimal = animals.find(a => a._id === val)
     setInsuranceId(selectedAnimal?.insuranceId || "")
     if (selectedAnimal?.type?.toLowerCase() === "cow" && date) {
@@ -85,7 +105,6 @@ export default function InseminationPage() {
     }
   }
 
-  // Days counter for expected birth date
   const birthCountdown = useMemo(() => {
     if (!expectedBirthDate) return null
     const diff = Math.ceil((new Date(expectedBirthDate).getTime() - new Date().setHours(0,0,0,0)) / (1000 * 60 * 60 * 24))
@@ -126,6 +145,7 @@ export default function InseminationPage() {
 
   const validate = () => {
     const e: Record<string, string> = {}
+    if (!animalId) e.animalId = "Select an animal"
     if (!semenTypes.length) e.semenTypes = "Select at least one semen type"
     if (!date) e.date = "Select a date"
     setErrors(e)
@@ -134,13 +154,19 @@ export default function InseminationPage() {
 
   const resetForm = () => {
     setAnimalId(""); setInsuranceId(""); setSemenTypes([]); setSemenPrice(""); setVetPrice("")
-    setInjectionTime(""); setExpectedBirthDate(""); setVetName(""); setVetOrigin("")
+    setInjectionTime(""); setExpectedBirthDate(""); setDeliveredBabies(""); setVetName(""); setVetOrigin("")
     setDate(today); setNotes(""); setErrors({}); setEditRecord(null)
     setSemenTypeOpen(false)
   }
 
   const handleSubmit = async () => {
     if (!validate()) return
+    // Block save if selected animal has no gender defined
+    const selectedAnimal = animals.find(a => a._id === animalId)
+    if (selectedAnimal && !selectedAnimal.gender) {
+      setGenderAlertAnimal(selectedAnimal)
+      return
+    }
     setSaving(true)
     const animal = animals.find(a => a._id === animalId)
     const body = {
@@ -148,7 +174,8 @@ export default function InseminationPage() {
       animalId: animalId || null,
       animalName: animal?.name || null,
       semenTypes, semenPrice, vetPrice, injectionTime,
-      expectedBirthDate, vetName, vetOrigin, date, notes,
+      expectedBirthDate, deliveredBabies: deliveredBabies ? Number(deliveredBabies) : null,
+      vetName, vetOrigin, date, notes,
     }
 
     if (editRecord) {
@@ -171,6 +198,7 @@ export default function InseminationPage() {
     setVetPrice(r.vetPrice != null ? String(r.vetPrice) : "")
     setInjectionTime(r.injectionTime || "")
     setExpectedBirthDate(r.expectedBirthDate || "")
+    setDeliveredBabies(r.deliveredBabies != null ? String(r.deliveredBabies) : "")
     setVetName(r.vetName || "")
     setVetOrigin(r.vetOrigin || "")
     setDate(r.date)
@@ -193,6 +221,175 @@ export default function InseminationPage() {
     [records]
   )
 
+  const totalBabies = useMemo(() =>
+    records.reduce((s, r) => s + (r.deliveredBabies || 0), 0),
+    [records]
+  )
+
+  // Per-cow summary for reports
+  const cowSummary = useMemo(() => {
+    const map: Record<string, { name: string; inseminations: number; babies: number; totalCost: number; lastDate: string }> = {}
+    records.forEach(r => {
+      const key = r.animalId || "general"
+      if (!map[key]) map[key] = { name: r.animalName || "General", inseminations: 0, babies: 0, totalCost: 0, lastDate: "" }
+      map[key].inseminations += 1
+      map[key].babies += r.deliveredBabies || 0
+      map[key].totalCost += (r.semenPrice || 0) + (r.vetPrice || 0)
+      if (!map[key].lastDate || r.date > map[key].lastDate) map[key].lastDate = r.date
+    })
+    return Object.values(map).sort((a, b) => b.inseminations - a.inseminations)
+  }, [records])
+
+  const getAnimalInsuranceId = (id: string | null) =>
+    animals.find(a => a._id === id)?.insuranceId || "—"
+
+  // Export
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exporting, setExporting] = useState(false)
+
+  const exportToPDF = async () => {
+    setExporting(true)
+    try {
+      const jsPDF = (await import("jspdf")).default
+      const doc = new jsPDF()
+
+      // Header
+      doc.setFillColor(22, 163, 74)
+      doc.rect(0, 0, 210, 38, "F")
+      try {
+        const logoImg = new Image(); logoImg.crossOrigin = "anonymous"; logoImg.src = "/logo/NTDM.png"
+        await new Promise((res, rej) => { logoImg.onload = res; logoImg.onerror = rej })
+        doc.addImage(logoImg, "PNG", 15, 7, 22, 22)
+      } catch {}
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(16); doc.setFont("helvetica", "bold")
+      doc.text("Insemination Report", 45, 18)
+      doc.setFontSize(10); doc.setFont("helvetica", "normal")
+      doc.text("NTDM Animal Hospital", 45, 27)
+
+      // Meta
+      doc.setTextColor(55, 65, 81); doc.setFontSize(10)
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 50)
+      doc.text(`Generated by: ${user?.name || "Unknown"}`, 15, 58)
+
+      // Summary box
+      doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240)
+      doc.rect(15, 66, 180, 28, "FD")
+      doc.setTextColor(22, 163, 74); doc.setFontSize(11); doc.setFont("helvetica", "bold")
+      doc.text("Summary", 20, 77)
+      doc.setTextColor(55, 65, 81); doc.setFont("helvetica", "normal"); doc.setFontSize(10)
+      doc.text(`Total Records: ${records.length}`, 20, 87)
+      doc.text(`Total Babies Delivered: ${totalBabies}`, 80, 87)
+      doc.text(`Total Cost: RWF ${totalCost.toLocaleString()}`, 145, 87)
+
+      // Per-cow summary table
+      let y = 106
+      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, "F")
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold")
+      doc.text("Animal", 18, y); doc.text("Insurance ID", 55, y); doc.text("Inseminations", 98, y)
+      doc.text("Babies Born", 135, y); doc.text("Total Cost (RWF)", 163, y)
+      doc.setFont("helvetica", "normal")
+      cowSummary.forEach((c, i) => {
+        y += 9
+        if (y > 270) { doc.addPage(); y = 20 }
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, "F") }
+        const insId = animals.find(a => a.name === c.name)?.insuranceId || "—"
+        doc.setTextColor(55, 65, 81)
+        doc.text(c.name, 18, y)
+        doc.text(insId, 55, y)
+        doc.text(String(c.inseminations), 108, y)
+        doc.setTextColor(22, 163, 74)
+        doc.text(String(c.babies), 140, y)
+        doc.setTextColor(55, 65, 81)
+        doc.text(c.totalCost > 0 ? c.totalCost.toLocaleString() : "—", 163, y)
+      })
+
+      // Detailed records section
+      y += 16
+      if (y > 240) { doc.addPage(); y = 20 }
+      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, "F")
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold")
+      doc.text("Date", 18, y); doc.text("Animal", 40, y); doc.text("Semen", 72, y)
+      doc.text("Semen Price", 100, y); doc.text("Vet Price", 130, y)
+      doc.text("Expected Birth", 153, y); doc.text("Babies", 186, y)
+      doc.setFont("helvetica", "normal")
+      records.forEach((r, i) => {
+        y += 9
+        if (y > 270) { doc.addPage(); y = 20 }
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, "F") }
+        doc.setTextColor(55, 65, 81)
+        doc.text(r.date, 18, y)
+        doc.text(r.animalName || "General", 40, y)
+        doc.text((r.semenTypes || []).join(", ").slice(0, 18), 72, y)
+        doc.text(r.semenPrice != null ? String(r.semenPrice) : "—", 100, y)
+        doc.text(r.vetPrice != null ? String(r.vetPrice) : "—", 130, y)
+        doc.text(r.expectedBirthDate || "—", 153, y)
+        doc.setTextColor(22, 163, 74)
+        doc.text(r.deliveredBabies != null ? String(r.deliveredBabies) : "—", 190, y)
+      })
+
+      // Footer
+      const pageH = doc.internal.pageSize.height
+      doc.setFillColor(248, 250, 252); doc.rect(0, pageH - 18, 210, 18, "F")
+      doc.setTextColor(107, 114, 128); doc.setFontSize(7)
+      doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"} | ${today}`, 15, pageH - 7)
+
+      doc.save(`insemination-report-${today}.pdf`)
+      setExportOpen(false)
+    } catch (err) {
+      console.error("PDF export failed:", err)
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const exportToExcel = async () => {
+    setExporting(true)
+    try {
+      const XLSX = await import("xlsx")
+      const wb = XLSX.utils.book_new()
+
+      // Sheet 1 — Per-cow summary with babies counter
+      const summaryData = cowSummary.map(c => ({
+        Animal: c.name,
+        "Insurance ID": animals.find(a => a.name === c.name)?.insuranceId || "—",
+        "Total Inseminations": c.inseminations,
+        "Babies Born": c.babies,
+        "Total Cost (RWF)": c.totalCost,
+        "Last Insemination": c.lastDate,
+      }))
+      const ws1 = XLSX.utils.json_to_sheet(summaryData)
+      ws1["!cols"] = [20, 22, 22, 14, 20, 20].map(w => ({ wch: w }))
+      XLSX.utils.book_append_sheet(wb, ws1, "Per-Cow Summary")
+
+      // Sheet 2 — All records
+      const recordsData = records.map(r => ({
+        Date: r.date,
+        Animal: r.animalName || "General",
+        "Insurance ID": getAnimalInsuranceId(r.animalId),
+        "Semen Types": (r.semenTypes || []).join(", "),
+        "Semen Price (RWF)": r.semenPrice ?? "—",
+        "Vet Price (RWF)": r.vetPrice ?? "—",
+        "Injection Time": r.injectionTime || "—",
+        "Expected Birth Date": r.expectedBirthDate || "—",
+        "Babies Delivered": r.deliveredBabies ?? "—",
+        Vet: r.vetName || "—",
+        Organization: r.vetOrigin || "—",
+        Notes: r.notes || "—",
+      }))
+      const ws2 = XLSX.utils.json_to_sheet(recordsData)
+      ws2["!cols"] = [14, 18, 22, 22, 18, 16, 16, 20, 18, 20, 22, 30].map(w => ({ wch: w }))
+      XLSX.utils.book_append_sheet(wb, ws2, "All Records")
+
+      XLSX.writeFile(wb, `insemination-report-${today}.xlsx`)
+      setExportOpen(false)
+    } catch (err) {
+      console.error("Excel export failed:", err)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
@@ -213,7 +410,7 @@ export default function InseminationPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
@@ -226,13 +423,13 @@ export default function InseminationPage() {
         <Card className="border-0 shadow-md bg-gradient-to-br from-amber-500 to-orange-500 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-amber-100 uppercase font-medium">Total Cost</p>
-              <p className="text-2xl font-bold">{totalCost.toFixed(0)}</p>
+              <p className="text-xs text-amber-100 uppercase font-medium">Total Cost (RWF)</p>
+              <p className="text-2xl font-bold">{totalCost.toLocaleString()}</p>
             </div>
             <FlaskConical className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-indigo-600 text-white col-span-2 lg:col-span-1">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-purple-100 uppercase font-medium">Expected Births</p>
@@ -241,12 +438,22 @@ export default function InseminationPage() {
             <Baby className="h-8 w-8 text-white/40" />
           </CardContent>
         </Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-blue-600 text-white">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-sky-100 uppercase font-medium">Babies Born</p>
+              <p className="text-2xl font-bold">{totalBabies}</p>
+            </div>
+            <Baby className="h-8 w-8 text-white/40" />
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="record">
-        <TabsList className="grid grid-cols-2 w-full max-w-xs">
+        <TabsList className="grid grid-cols-3 w-full max-w-md">
           <TabsTrigger value="record" className="flex items-center gap-1"><Plus className="h-4 w-4" /> Record</TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-1"><History className="h-4 w-4" /> History</TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-1"><BarChart3 className="h-4 w-4" /> Reports</TabsTrigger>
         </TabsList>
 
         {/* RECORD TAB */}
@@ -261,16 +468,27 @@ export default function InseminationPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                {/* Animal */}
+                {/* Animal — only non-pregnant females */}
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700">Animal <span className="text-gray-400 text-xs">optional</span></label>
-                  <Select value={animalId || "none"} onValueChange={handleAnimalChange}>
-                    <SelectTrigger><SelectValue placeholder="Select animal..." /></SelectTrigger>
+                  <label className="text-sm font-medium text-gray-700">Animal *</label>
+                  <Select value={animalId} onValueChange={handleAnimalChange} disabled={availableAnimals.length === 0}>
+                    <SelectTrigger className={errors.animalId ? "border-red-500" : ""}>
+                      <SelectValue placeholder={availableAnimals.length === 0 ? "No animals available" : "Select animal..."} />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">All / General</SelectItem>
-                      {femaleAnimals.map(a => <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>)}
+                      {availableAnimals.map(a => (
+                        <SelectItem key={a._id} value={a._id}>{a.name} ({a.type})</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {availableAnimals.length === 0
+                    ? <p className="text-xs text-red-500">All female animals are currently pregnant</p>
+                    : pregnantAnimalIds.size > 0 && <p className="text-xs text-amber-600">{pregnantAnimalIds.size} animal(s) hidden — currently pregnant</p>
+                  }
+                  {animalId && !animals.find(a => a._id === animalId)?.gender && (
+                    <p className="text-xs text-amber-600">Gender not defined — you will be prompted to fix this before saving</p>
+                  )}
+                  {errors.animalId && <p className="text-xs text-red-500">{errors.animalId}</p>}
                 </div>
 
                 {/* Insurance ID */}
@@ -283,7 +501,7 @@ export default function InseminationPage() {
                   />
                 </div>
 
-                {/* Semen Types — collapsible multi-select */}
+                {/* Semen Types */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Types of Semen *</label>
                   <button
@@ -369,6 +587,12 @@ export default function InseminationPage() {
                   })()}
                 </div>
 
+                {/* Babies Delivered */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Babies Delivered <span className="text-gray-400 text-xs">optional</span></label>
+                  <Input type="number" min="0" placeholder="e.g. 1" value={deliveredBabies} onChange={e => setDeliveredBabies(e.target.value)} />
+                </div>
+
                 {/* Vet Name */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Name of the Vet <span className="text-gray-400 text-xs">optional</span></label>
@@ -428,7 +652,6 @@ export default function InseminationPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Filters */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl">
                 <Select value={filterAnimal || "all"} onValueChange={v => setFilterAnimal(v === "all" ? "" : v)}>
                   <SelectTrigger><SelectValue placeholder="All Animals" /></SelectTrigger>
@@ -455,6 +678,7 @@ export default function InseminationPage() {
                       <TableHead>Vet Price</TableHead>
                       <TableHead>Injection Time</TableHead>
                       <TableHead>Expected Birth</TableHead>
+                      <TableHead>Babies</TableHead>
                       <TableHead>Vet</TableHead>
                       <TableHead>Organization</TableHead>
                       <TableHead>Actions</TableHead>
@@ -462,7 +686,7 @@ export default function InseminationPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredRecords.length === 0 ? (
-                      <TableRow><TableCell colSpan={10} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={11} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
                     ) : filteredRecords.map(r => (
                       <TableRow key={r._id}>
                         <TableCell className="text-sm">{r.date}</TableCell>
@@ -482,6 +706,9 @@ export default function InseminationPage() {
                             ? <span className={new Date(r.expectedBirthDate) >= new Date() ? "text-emerald-600 font-medium" : "text-gray-500"}>{r.expectedBirthDate}</span>
                             : <span className="text-gray-400">—</span>
                           }
+                        </TableCell>
+                        <TableCell className="text-center font-semibold text-sky-700">
+                          {r.deliveredBabies != null ? r.deliveredBabies : <span className="text-gray-400">—</span>}
                         </TableCell>
                         <TableCell className="text-sm">{r.vetName || <span className="text-gray-400">—</span>}</TableCell>
                         <TableCell className="text-sm">{r.vetOrigin || <span className="text-gray-400">—</span>}</TableCell>
@@ -503,7 +730,166 @@ export default function InseminationPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* REPORTS TAB */}
+        <TabsContent value="reports">
+          <div className="space-y-6">
+            {/* Export button */}
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setExportOpen(true)}
+                className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export Report
+              </Button>
+            </div>
+
+            {/* Per-cow summary table */}
+            <Card className="border-0 shadow-xl bg-white/90">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                  Summary per Animal
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Animal</TableHead>
+                        <TableHead>Inseminations</TableHead>
+                        <TableHead>Babies Born</TableHead>
+                        <TableHead>Total Cost (RWF)</TableHead>
+                        <TableHead>Last Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cowSummary.length === 0 ? (
+                        <TableRow><TableCell colSpan={5} className="text-center py-6 text-gray-400">No data</TableCell></TableRow>
+                      ) : cowSummary.map((c, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-medium">{c.name}</TableCell>
+                          <TableCell className="text-emerald-700 font-semibold">{c.inseminations}</TableCell>
+                          <TableCell className="text-sky-700 font-semibold">{c.babies > 0 ? c.babies : "—"}</TableCell>
+                          <TableCell>{c.totalCost > 0 ? c.totalCost.toLocaleString() : "—"}</TableCell>
+                          <TableCell className="text-sm text-gray-500">{c.lastDate}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Babies per cow bar chart */}
+            {cowSummary.some(c => c.babies > 0) && (
+              <Card className="border-0 shadow-xl bg-white/90">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                    Babies Born per Animal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={cowSummary.filter(c => c.babies > 0)}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                      <Tooltip formatter={(v: any) => [v, "Babies Born"]} />
+                      <Bar dataKey="babies" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Inseminations per cow bar chart */}
+            {cowSummary.length > 0 && (
+              <Card className="border-0 shadow-xl bg-white/90">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                    Inseminations per Animal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={cowSummary}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                      <Tooltip formatter={(v: any) => [v, "Inseminations"]} />
+                      <Bar dataKey="inseminations" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
+
+      {/* Export Dialog */}
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-emerald-600" />
+              Export Insemination Report
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+              <div className="text-sm space-y-1">
+                <p className="font-medium text-emerald-700">Preview</p>
+                <p className="text-gray-600">
+                  {records.length} records &bull; {totalBabies} babies born &bull; {cowSummary.length} animal(s)
+                </p>
+                <p className="text-gray-600">Total cost: <strong className="text-emerald-700">RWF {totalCost.toLocaleString()}</strong></p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <Button variant="outline" onClick={() => setExportOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button
+                onClick={exportToExcel}
+                disabled={exporting || records.length === 0}
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? "Exporting..." : "Excel"}
+              </Button>
+              <Button
+                onClick={exportToPDF}
+                disabled={exporting || records.length === 0}
+                className="col-span-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                {exporting ? "Exporting..." : "Export PDF"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Gender Alert Dialog */}
+      <AlertDialog open={!!genderAlertAnimal} onOpenChange={open => !open && setGenderAlertAnimal(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Gender Not Defined</AlertDialogTitle>
+            <AlertDialogDescription>
+              The animal <strong>{genderAlertAnimal?.name}</strong> does not have a gender defined. Please go to the Animals page and set its gender to <strong>Female</strong> before recording an insemination.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setGenderAlertAnimal(null)}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>
