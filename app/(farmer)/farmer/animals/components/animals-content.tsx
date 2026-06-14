@@ -61,6 +61,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                   <TableHead>{t('farmer.type')}</TableHead>
                   <TableHead>{t('farmer.breed')}</TableHead>
                   <TableHead>{t('farmer.insuranceId')}</TableHead>
+                  <TableHead>{t('animal.earTagId')}</TableHead>
                   <TableHead>{t('farmer.acquisitionType')}</TableHead>
                   <TableHead>{t('farmer.location')}</TableHead>
                   <TableHead>{t('farmer.status')}</TableHead>
@@ -76,6 +77,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                     <TableCell>{animal.type}</TableCell>
                     <TableCell>{animal.breed}</TableCell>
                     <TableCell>{animal.insuranceId}</TableCell>
+                    <TableCell>{animal.earTagId}</TableCell>
                     <TableCell>{animal.acquisitionType}</TableCell>
                     <TableCell>{animal.district}, {animal.sector}</TableCell>
                     <TableCell>

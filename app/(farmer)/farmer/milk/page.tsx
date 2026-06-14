@@ -276,8 +276,8 @@ export default function MilkProductionPage() {
         doc.text("Insurance", cols.insurance.x, y)
         doc.text("Session", cols.session.x, y)
         doc.text("Liters", cols.liters.x, y)
-        doc.text("Consumed", cols.consumed.x, y)
-        doc.text("Cons.Val", cols.consumedVal.x, y)
+        doc.text("Home use", cols.consumed.x, y)
+        doc.text("Home.Val", cols.consumedVal.x, y)
         doc.text("Total (RWF)", cols.total.x, y)
         doc.setFont("helvetica", "normal")
       }

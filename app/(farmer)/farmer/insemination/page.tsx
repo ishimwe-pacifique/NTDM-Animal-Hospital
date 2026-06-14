@@ -33,7 +33,7 @@ interface InseminationRecord {
   notes: string | null
 }
 
-const SEMEN_TYPES = ["Bovine", "Ovine", "Caprine", "Porcine", "Equine", "Other"]
+const SEMEN_TYPES = ["Sexed Freisian", "Sexed Jersey", "Ordinary Freisian", "Ordinary Jersey", "Fleckv", "Girolando"]
 
 const today = new Date().toISOString().split("T")[0]
 
