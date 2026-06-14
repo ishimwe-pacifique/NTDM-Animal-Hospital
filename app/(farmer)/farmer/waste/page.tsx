@@ -212,7 +212,7 @@ export default function WasteManagementPage() {
         const logoImg = new Image(); logoImg.crossOrigin = 'anonymous'; logoImg.src = '/logo/NTDM.png'
         await new Promise((res, rej) => { logoImg.onload = res; logoImg.onerror = rej })
         doc.addImage(logoImg, 'PNG', 15, 7, 22, 22)
-      } catch {}
+      } catch { }
       doc.setTextColor(255, 255, 255)
       doc.setFontSize(16); doc.setFont('helvetica', 'bold')
       doc.text('Waste Management Report', 45, 18)
@@ -235,40 +235,201 @@ export default function WasteManagementPage() {
       doc.text(`Waste Types: ${totalByType.length}`, 145, 84)
 
       // Table header
+      // Table header
       let y = 100
-      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, 'F')
-      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold')
-      doc.text('Date', 18, y)
-      doc.text('Animal', 40, y)
-      doc.text('Insurance ID', 72, y)
-      doc.text('Waste Type', 110, y)
-      doc.text('Qty', 148, y)
-      doc.text('Unit', 160, y)
-      doc.text('Disposal', 173, y)
+
+      const columns = {
+        date: { x: 18, width: 25 },
+        animal: { x: 45, width: 35 },
+        wasteType: { x: 82, width: 45 },
+        qty: { x: 130, width: 12 },
+        unit: { x: 145, width: 12 },
+        disposal: { x: 160, width: 30 }
+      }
+
+      // Draw header
+      doc.setFillColor(22, 163, 74)
+      doc.rect(15, y - 6, 180, 8, 'F')
+
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+
+      doc.text('Date', columns.date.x, y)
+      doc.text('Animal', columns.animal.x, y)
+      doc.text('Waste Type', columns.wasteType.x, y)
+      doc.text('Qty', columns.qty.x, y)
+      doc.text('Unit', columns.unit.x, y)
+      doc.text('Disposal', columns.disposal.x, y)
 
       doc.setFont('helvetica', 'normal')
+
+      y += 8
+
       filteredRecords.forEach((r, i) => {
-        y += 9
-        if (y > 275) { doc.addPage(); y = 20 }
-        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, 'F') }
-        const types = Array.isArray(r.wasteType) ? r.wasteType.join(', ') : r.wasteType
+        const wasteText = Array.isArray(r.wasteType)
+          ? r.wasteType.join(', ')
+          : r.wasteType || ''
+
+        const disposalText = r.disposalMethod || '—'
+
+        const wasteLines = doc.splitTextToSize(
+          wasteText,
+          columns.wasteType.width
+        )
+
+        const disposalLines = doc.splitTextToSize(
+          disposalText,
+          columns.disposal.width
+        )
+
+        const animalLines = doc.splitTextToSize(
+          r.animalName || 'General',
+          columns.animal.width
+        )
+
+        const rowHeight =
+          Math.max(
+            wasteLines.length,
+            disposalLines.length,
+            animalLines.length,
+            1
+          ) * 5 + 4
+
+        // New page if needed
+        if (y + rowHeight > 270) {
+          doc.addPage()
+
+          y = 20
+
+          // Redraw header on new page
+          doc.setFillColor(22, 163, 74)
+          doc.rect(15, y - 6, 180, 8, 'F')
+
+          doc.setTextColor(255, 255, 255)
+          doc.setFontSize(8)
+          doc.setFont('helvetica', 'bold')
+
+          doc.text('Date', columns.date.x, y)
+          doc.text('Animal', columns.animal.x, y)
+          doc.text('Waste Type', columns.wasteType.x, y)
+          doc.text('Qty', columns.qty.x, y)
+          doc.text('Unit', columns.unit.x, y)
+          doc.text('Disposal', columns.disposal.x, y)
+
+          doc.setFont('helvetica', 'normal')
+
+          y += 8
+        }
+
+        // Alternate row background
+        if (i % 2 === 0) {
+          doc.setFillColor(248, 250, 252)
+          doc.rect(15, y - 4, 180, rowHeight, 'F')
+        }
+
+        // Row border
+        doc.setDrawColor(226, 232, 240)
+        doc.rect(15, y - 4, 180, rowHeight)
+
+        // Vertical separators
+        doc.line(43, y - 4, 43, y - 4 + rowHeight)
+        doc.line(80, y - 4, 80, y - 4 + rowHeight)
+        doc.line(128, y - 4, 128, y - 4 + rowHeight)
+        doc.line(143, y - 4, 143, y - 4 + rowHeight)
+        doc.line(158, y - 4, 158, y - 4 + rowHeight)
+
+        // Date
         doc.setTextColor(55, 65, 81)
-        doc.text(r.date, 18, y)
-        doc.text(r.animalName || 'General', 40, y)
-        doc.text(getAnimalInsuranceId(r.animalId), 72, y)
-        doc.text(types.length > 20 ? types.slice(0, 18) + '…' : types, 110, y)
+        const formattedDate = new Date(r.date).toLocaleDateString()
+
+        doc.text(
+          formattedDate,
+          columns.date.x,
+          y
+        )
+
+        // Animal
+        doc.text(
+          animalLines,
+          columns.animal.x,
+          y
+        )
+
+        // Waste Type
+        doc.text(
+          wasteLines,
+          columns.wasteType.x,
+          y
+        )
+
+        // Quantity
         doc.setTextColor(22, 163, 74)
-        doc.text(String(r.quantity), 148, y)
+        doc.text(
+          String(r.quantity ?? 0),
+          columns.qty.x,
+          y
+        )
+
+        // Unit
         doc.setTextColor(55, 65, 81)
-        doc.text(r.unit, 160, y)
-        doc.text(r.disposalMethod || '—', 173, y)
+        doc.text(
+          r.unit || '—',
+          columns.unit.x,
+          y
+        )
+
+        // Disposal
+        doc.text(
+          disposalLines,
+          columns.disposal.x,
+          y
+        )
+
+        y += rowHeight
       })
 
       // Footer
-      const pageH = doc.internal.pageSize.height
-      doc.setFillColor(248, 250, 252); doc.rect(0, pageH - 18, 210, 18, 'F')
-      doc.setTextColor(107, 114, 128); doc.setFontSize(7)
-      doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || 'Unknown'} | ${today}`, 15, pageH - 7)
+      const totalPages = doc.getNumberOfPages()
+
+      for (let page = 1; page <= totalPages; page++) {
+        doc.setPage(page)
+
+        const pageWidth = doc.internal.pageSize.getWidth()
+        const pageHeight = doc.internal.pageSize.getHeight()
+
+        // Footer background
+        doc.setFillColor(248, 250, 252)
+        doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
+
+        // Top border line
+        doc.setDrawColor(226, 232, 240)
+        doc.line(
+          0,
+          pageHeight - 18,
+          pageWidth,
+          pageHeight - 18
+        )
+
+        doc.setFontSize(7)
+        doc.setTextColor(107, 114, 128)
+
+        // Left side
+        doc.text(
+          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
+          }`,
+          15,
+          pageHeight - 7
+        )
+
+        // Right side page number
+        doc.text(
+          `Page ${page} of ${totalPages}`,
+          pageWidth - 15,
+          pageHeight - 7,
+          { align: "right" }
+        )
+      }
 
       doc.save(`waste-report-${today}.pdf`)
       setExportOpen(false)
@@ -286,7 +447,7 @@ export default function WasteManagementPage() {
       const data = filteredRecords.map(r => ({
         Date: r.date,
         Animal: r.animalName || 'General',
-        'Insurance ID': getAnimalInsuranceId(r.animalId),
+        // 'Insurance ID': getAnimalInsuranceId(r.animalId),
         'Waste Type': Array.isArray(r.wasteType) ? r.wasteType.join(', ') : r.wasteType,
         Quantity: r.quantity,
         Unit: r.unit,
@@ -418,8 +579,8 @@ export default function WasteManagementPage() {
                       {wasteType.length === 0
                         ? <span className="text-gray-400">Select waste type(s)...</span>
                         : wasteType.map(t => (
-                            <span key={t} className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs border ${WASTE_COLORS[t] || WASTE_COLORS.Other}`}>{t}</span>
-                          ))
+                          <span key={t} className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs border ${WASTE_COLORS[t] || WASTE_COLORS.Other}`}>{t}</span>
+                        ))
                       }
                     </span>
                     <ChevronDown className={`h-4 w-4 text-gray-400 ml-2 shrink-0 transition-transform${wasteTypeOpen ? " rotate-180" : ""}`} />
@@ -607,6 +768,16 @@ export default function WasteManagementPage() {
         {/* REPORTS TAB */}
         <TabsContent value="reports">
           <div className="space-y-6">
+            {/* Export button */}
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setExportOpen(true)}
+                className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export Report
+              </Button>
+            </div>
             <Card className="border-0 shadow-xl bg-white/90">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -658,9 +829,9 @@ export default function WasteManagementPage() {
                           </TableCell>
                           <TableCell className="font-semibold text-emerald-700">{row.quantity.toFixed(1)}</TableCell>
                           <TableCell>{filteredRecords.filter(r => {
-                              const types = Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim())
-                              return types.includes(row.type)
-                            }).length}</TableCell>
+                            const types = Array.isArray(r.wasteType) ? r.wasteType : r.wasteType.split(", ").map(s => s.trim())
+                            return types.includes(row.type)
+                          }).length}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -671,6 +842,48 @@ export default function WasteManagementPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Export Dialog */}
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-emerald-600" />
+              Export Waste Management Report
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+              <div className="text-sm space-y-1">
+                <p className="font-medium text-emerald-700">Preview</p>
+                <p className="text-gray-600">
+                  {filteredRecords.length} record{filteredRecords.length !== 1 ? "s" : ""} &bull; {totalQuantity.toFixed(1)} total quantity &bull; {totalByType.length} waste type{totalByType.length !== 1 ? "s" : ""}
+                </p>
+                <p className="text-gray-600">Revenue: <strong className="text-emerald-700">RWF {totalRevenue.toLocaleString()}</strong></p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <Button variant="outline" onClick={() => setExportOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button
+                onClick={exportToExcel}
+                disabled={exporting || filteredRecords.length === 0}
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? "Exporting..." : "Excel"}
+              </Button>
+              <Button
+                onClick={exportToPDF}
+                disabled={exporting || filteredRecords.length === 0}
+                className="col-span-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                {exporting ? "Exporting..." : "Export PDF"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>

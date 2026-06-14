@@ -15,7 +15,7 @@ import { ShieldAlert, Plus, Pencil, Trash2, BarChart3, History, Activity, CheckC
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
 
-interface Animal { _id: string; name: string; type: string; insuranceId?: string | null }
+interface Animal { _id: string; name: string; type: string; insuranceId?: string | null; earTagId?: string | null }
 interface Doctor { _id: string; name: string; specialization: string }
 interface DiseaseRecord {
   _id: string; animalId: string; animalName: string | null
@@ -75,6 +75,7 @@ export default function DiseaseManagementPage() {
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [insuranceId, setInsuranceId] = useState("")
+  const [earTagId, setEarTagId] = useState("")
 
   // Dose form
   const [doseRecordId, setDoseRecordId] = useState("")
@@ -132,10 +133,14 @@ export default function DiseaseManagementPage() {
   useEffect(() => {
     const animal = animals.find(a => a._id === animalId)
     setInsuranceId(animal?.insuranceId || "")
+    setEarTagId(animal?.earTagId || "")
   }, [animalId, animals])
 
   const getAnimalInsuranceId = (id: string) =>
     animals.find(a => a._id === id)?.insuranceId || '—'
+
+  const getAnimalEarTagId = (id: string) =>
+    animals.find(a => a._id === id)?.earTagId || '—'
 
   const filteredRecords = useMemo(() => {
     let data = [...records]
@@ -152,9 +157,9 @@ export default function DiseaseManagementPage() {
 
   // Cost per animal (total across all doses per animal)
   const costPerAnimal = useMemo(() => {
-    const map: Record<string, { animalName: string; medicineCost: number; vetCost: number; total: number; doses: number }> = {}
+    const map: Record<string, { animalId: string; animalName: string; medicineCost: number; vetCost: number; total: number; doses: number }> = {}
     doses.forEach(d => {
-      if (!map[d.animalId]) map[d.animalId] = { animalName: d.animalName || d.animalId, medicineCost: 0, vetCost: 0, total: 0, doses: 0 }
+      if (!map[d.animalId]) map[d.animalId] = { animalId: d.animalId, animalName: d.animalName || d.animalId, medicineCost: 0, vetCost: 0, total: 0, doses: 0 }
       map[d.animalId].medicineCost += d.medicineCost
       map[d.animalId].vetCost += d.vetCost
       map[d.animalId].total += d.totalCost
@@ -189,7 +194,7 @@ export default function DiseaseManagementPage() {
     setAnimalId(""); setDiseaseName(""); setCustomDisease(""); setSymptoms("")
     setTreatment(""); setDiagnosedDate(today); setResolvedDate("")
     setStatus("Active"); setVeterinarianName(""); setNotes("")
-    setInsuranceId("")
+    setInsuranceId(""); setEarTagId("")
     setErrors({}); setEditRecord(null)
   }
 
@@ -249,6 +254,7 @@ export default function DiseaseManagementPage() {
     setEditRecord(r)
     setAnimalId(r.animalId)
     setInsuranceId(animals.find(a => a._id === r.animalId)?.insuranceId || "")
+    setEarTagId(animals.find(a => a._id === r.animalId)?.earTagId || "")
     const isCommon = COMMON_DISEASES.includes(r.diseaseName)
     setDiseaseName(isCommon ? r.diseaseName : "Other")
     setCustomDisease(isCommon ? "" : r.diseaseName)
@@ -364,7 +370,7 @@ export default function DiseaseManagementPage() {
         const logoImg = new Image(); logoImg.crossOrigin = 'anonymous'; logoImg.src = '/logo/NTDM.png'
         await new Promise((res, rej) => { logoImg.onload = res; logoImg.onerror = rej })
         doc.addImage(logoImg, 'PNG', 15, 7, 22, 22)
-      } catch {}
+      } catch { }
       doc.setTextColor(255, 255, 255)
       doc.setFontSize(16); doc.setFont('helvetica', 'bold')
       doc.text('Disease Management Report', 45, 18)
@@ -390,55 +396,137 @@ export default function DiseaseManagementPage() {
 
       // ── Disease Cases section ──
       let y = 118
-      doc.setFillColor(239, 68, 68); doc.rect(15, y - 6, 180, 8, 'F')
-      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold')
-      doc.text('Animal', 18, y); doc.text('Insurance ID', 45, y); doc.text('Disease', 82, y)
-      doc.text('Status', 108, y); doc.text('Vet', 138, y); doc.text('Diagnosed', 165, y)
-      doc.setFont('helvetica', 'normal')
-      exportRecs.forEach((r, i) => {
-        y += 9
-        if (y > 270) { doc.addPage(); y = 20 }
-        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, 'F') }
-        doc.setTextColor(55, 65, 81)
-        doc.text(r.animalName || '—', 18, y)
-        doc.text(getAnimalInsuranceId(r.animalId), 45, y)
-        doc.text(r.diseaseName, 82, y)
-        doc.text(r.status, 108, y)
-        doc.text(r.veterinarianName || '—', 138, y)
-        doc.text(r.diagnosedDate, 165, y)
-      })
 
-      // ── Daily Cost section ──
-      y += 16
-      if (y > 240) { doc.addPage(); y = 20 }
-      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, 'F')
-      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold')
-      doc.text('Date', 18, y); doc.text('Morning Doses', 48, y); doc.text('Morning Cost', 88, y)
-      doc.text('Evening Doses', 120, y); doc.text('Evening Cost', 153, y); doc.text('Cumulative', 175, y)
-      doc.setFont('helvetica', 'normal')
-      daily.forEach((row, i) => {
-        y += 9
-        if (y > 270) { doc.addPage(); y = 20 }
-        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, 'F') }
-        const mDoses = row.morning.reduce((s, d) => s + d.doseCount, 0)
-        const mCost = row.morning.reduce((s, d) => s + d.totalCost, 0)
-        const eDoses = row.evening.reduce((s, d) => s + d.doseCount, 0)
-        const eCost = row.evening.reduce((s, d) => s + d.totalCost, 0)
+      const caseCols = {
+        animal: { x: 18, width: 22 },
+        earTag: { x: 42, width: 22 },
+        insurance: { x: 65, width: 30 },
+        disease: { x: 98, width: 24 },
+        status: { x: 124, width: 20 },
+        vet: { x: 148, width: 20 },
+        date: { x: 170, width: 20 }
+      }
+
+      const drawCaseHeader = () => {
+        doc.setFillColor(239, 68, 68)
+        doc.rect(15, y - 6, 180, 8, 'F')
+
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+
+        doc.text('Animal', caseCols.animal.x, y)
+        doc.text('Ear Tag', caseCols.earTag.x, y)
+        doc.text('Insurance ID', caseCols.insurance.x, y)
+        doc.text('Disease', caseCols.disease.x, y)
+        doc.text('Status', caseCols.status.x, y)
+        doc.text('Vet', caseCols.vet.x, y)
+        doc.text('Diagnosed', caseCols.date.x, y)
+
+        doc.setFont('helvetica', 'normal')
+      }
+
+      drawCaseHeader()
+      y += 8
+
+      exportRecs.forEach((r, i) => {
+        const animalText = r.animalName || '—'
+        const earTagText = getAnimalEarTagId(r.animalId) || '—'
+        const insuranceText = getAnimalInsuranceId(r.animalId) || '—'
+        const diseaseText = r.diseaseName || '—'
+        const statusText = r.status || '—'
+        const vetText = r.veterinarianName || '—'
+
+        const animalLines = doc.splitTextToSize(animalText, caseCols.animal.width)
+        const earTagLines = doc.splitTextToSize(earTagText, caseCols.earTag.width)
+        const insuranceLines = doc.splitTextToSize(insuranceText, caseCols.insurance.width)
+        const diseaseLines = doc.splitTextToSize(diseaseText, caseCols.disease.width)
+        const statusLines = doc.splitTextToSize(statusText, caseCols.status.width)
+        const vetLines = doc.splitTextToSize(vetText, caseCols.vet.width)
+
+        const rowHeight =
+          Math.max(
+            animalLines.length,
+            earTagLines.length,
+            insuranceLines.length,
+            diseaseLines.length,
+            statusLines.length,
+            vetLines.length,
+            1
+          ) * 5 + 4
+
+        // Page break
+        if (y + rowHeight > 270) {
+          doc.addPage()
+          y = 20
+          drawCaseHeader()
+          y += 8
+        }
+
+        // Row background
+        if (i % 2 === 0) {
+          doc.setFillColor(248, 250, 252)
+          doc.rect(15, y - 4, 180, rowHeight, 'F')
+        }
+
+        doc.setDrawColor(226, 232, 240)
+        doc.rect(15, y - 4, 180, rowHeight)
+
         doc.setTextColor(55, 65, 81)
-        doc.text(row.date, 18, y)
-        doc.text(mDoses > 0 ? String(mDoses) : '—', 55, y)
-        doc.text(mCost > 0 ? `RWF ${mCost.toLocaleString()}` : '—', 88, y)
-        doc.text(eDoses > 0 ? String(eDoses) : '—', 128, y)
-        doc.text(eCost > 0 ? `RWF ${eCost.toLocaleString()}` : '—', 153, y)
-        doc.setTextColor(22, 163, 74)
-        doc.text(`RWF ${row.runningTotal.toLocaleString()}`, 172, y)
+
+        doc.text(animalLines, caseCols.animal.x, y)
+        doc.text(earTagLines, caseCols.earTag.x, y)
+        doc.text(insuranceLines, caseCols.insurance.x, y)
+        doc.text(diseaseLines, caseCols.disease.x, y)
+        doc.text(statusLines, caseCols.status.x, y)
+        doc.text(vetLines, caseCols.vet.x, y)
+
+        doc.text(r.diagnosedDate || '—', caseCols.date.x, y)
+
+        y += rowHeight
       })
 
       // Footer
-      const pageH = doc.internal.pageSize.height
-      doc.setFillColor(248, 250, 252); doc.rect(0, pageH - 18, 210, 18, 'F')
-      doc.setTextColor(107, 114, 128); doc.setFontSize(7)
-      doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || 'Unknown'} | ${new Date().toLocaleDateString()}`, 15, pageH - 7)
+      const totalPages = doc.getNumberOfPages()
+
+      for (let page = 1; page <= totalPages; page++) {
+        doc.setPage(page)
+
+        const pageWidth = doc.internal.pageSize.getWidth()
+        const pageHeight = doc.internal.pageSize.getHeight()
+
+        // Footer background
+        doc.setFillColor(248, 250, 252)
+        doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
+
+        // Top border line
+        doc.setDrawColor(226, 232, 240)
+        doc.line(
+          0,
+          pageHeight - 18,
+          pageWidth,
+          pageHeight - 18
+        )
+
+        doc.setFontSize(7)
+        doc.setTextColor(107, 114, 128)
+
+        // Left side
+        doc.text(
+          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
+          }`,
+          15,
+          pageHeight - 7
+        )
+
+        // Right side page number
+        doc.text(
+          `Page ${page} of ${totalPages}`,
+          pageWidth - 15,
+          pageHeight - 7,
+          { align: "right" }
+        )
+      }
 
       doc.save(`disease-report-${caseLabel.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${today}.pdf`)
       setExportOpen(false)
@@ -461,6 +549,8 @@ export default function DiseaseManagementPage() {
       // Sheet 1 — Disease Cases
       const casesData = exportRecs.map(r => ({
         Animal: r.animalName || '—',
+        'Ear Tag ID': getAnimalEarTagId(r.animalId),
+        'Insurance ID': getAnimalInsuranceId(r.animalId),
         Disease: r.diseaseName,
         Status: r.status,
         'Diagnosed Date': r.diagnosedDate,
@@ -471,7 +561,7 @@ export default function DiseaseManagementPage() {
         Notes: r.notes || '—',
       }))
       const ws1 = XLSX.utils.json_to_sheet(casesData)
-      ws1['!cols'] = [18, 28, 16, 16, 16, 20, 30, 30, 30].map(w => ({ wch: w }))
+      ws1['!cols'] = [18, 18, 20, 28, 16, 16, 16, 20, 30, 30, 30].map(w => ({ wch: w }))
       XLSX.utils.book_append_sheet(wb, ws1, 'Disease Cases')
 
       // Sheet 2 — Daily Cost Breakdown
@@ -497,13 +587,15 @@ export default function DiseaseManagementPage() {
       // Sheet 3 — Cost per Animal
       const animalData = costPerAnimal.map(row => ({
         Animal: row.animalName,
+        'Ear Tag ID': getAnimalEarTagId(row.animalId || ''),
+        'Insurance ID': getAnimalInsuranceId(row.animalId || ''),
         'Total Doses': row.doses,
         'Medicine Cost (RWF)': row.medicineCost,
         'Vet Cost (RWF)': row.vetCost,
         'Total Cost (RWF)': row.total,
       }))
       const ws3 = XLSX.utils.json_to_sheet(animalData)
-      ws3['!cols'] = [20, 14, 22, 18, 20].map(w => ({ wch: w }))
+      ws3['!cols'] = [20, 18, 20, 14, 22, 18, 20].map(w => ({ wch: w }))
       XLSX.utils.book_append_sheet(wb, ws3, 'Cost per Animal')
 
       XLSX.writeFile(wb, `disease-report-${caseLabel.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${today}.xlsx`)
@@ -612,6 +704,15 @@ export default function DiseaseManagementPage() {
                     readOnly
                     value={insuranceId || (animalId ? "No insurance registered" : "Select an animal first")}
                     className={insuranceId ? "bg-blue-50 text-blue-700 font-medium" : "bg-gray-50 text-gray-400 italic"}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Ear Tag ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={earTagId || (animalId ? "No ear tag registered" : "Select an animal first")}
+                    className={earTagId ? "bg-amber-50 text-amber-700 font-medium" : "bg-gray-50 text-gray-400 italic"}
                   />
                 </div>
 

@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Syringe, Plus, Pencil, Trash2, History, ChevronDown, Baby, FlaskConical, BarChart3, Download, FileText } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
-interface Animal { _id: string; name: string; type: string; gender?: string | null; insuranceId?: string | null }
+interface Animal { _id: string; name: string; type: string; gender?: string | null; insuranceId?: string | null; earTagId?: string | null }
 interface Vet { _id: string; name: string; specialization: string }
 interface InseminationRecord {
   _id: string
@@ -36,6 +36,50 @@ interface InseminationRecord {
 const SEMEN_TYPES = ["Bovine", "Ovine", "Caprine", "Porcine", "Equine", "Other"]
 
 const today = new Date().toISOString().split("T")[0]
+
+function BirthCountdown({ targetDate }: { targetDate: string }) {
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  const target = new Date(targetDate).setHours(0, 0, 0, 0)
+  const diff = target - now
+
+  if (diff <= 0) {
+    const overMs = Math.abs(diff)
+    const overDays = Math.floor(overMs / (1000 * 60 * 60 * 24))
+    const overHrs = Math.floor((overMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const overMins = Math.floor((overMs % (1000 * 60 * 60)) / (1000 * 60))
+    const overSecs = Math.floor((overMs % (1000 * 60)) / 1000)
+    return (
+      <div className="text-center">
+        <span className="text-xs text-red-600 font-semibold block">{targetDate}</span>
+        <span className="text-xs text-red-500 font-mono">
+          {overDays}d {overHrs}h {overSecs}s overdue
+        </span>
+      </div>
+    )
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hrs = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const secs = Math.floor((diff % (1000 * 60)) / 1000)
+
+  const urgency = days <= 7 ? "text-amber-600" : "text-emerald-600"
+
+  return (
+    <div className="text-center">
+      {/* <span className="text-xs text-gray-500 block">{targetDate}</span> */}
+      <span className={`text-xs font-mono font-semibold ${urgency}`}>
+        {days}d {hrs}h {mins}m {secs}s
+      </span>
+    </div>
+  )
+}
 
 export default function InseminationPage() {
   const [user, setUser] = useState<any>(null)
@@ -62,6 +106,7 @@ export default function InseminationPage() {
   const [vetName, setVetName] = useState("")
   const [vetOrigin, setVetOrigin] = useState("")
   const [insuranceId, setInsuranceId] = useState("")
+  const [earTagId, setEarTagId] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -100,6 +145,7 @@ export default function InseminationPage() {
     setAnimalId(val)
     const selectedAnimal = animals.find(a => a._id === val)
     setInsuranceId(selectedAnimal?.insuranceId || "")
+    setEarTagId(selectedAnimal?.earTagId || "")
     if (selectedAnimal?.type?.toLowerCase() === "cow" && date) {
       setExpectedBirthDate(calcExpectedBirth(date))
     }
@@ -107,7 +153,7 @@ export default function InseminationPage() {
 
   const birthCountdown = useMemo(() => {
     if (!expectedBirthDate) return null
-    const diff = Math.ceil((new Date(expectedBirthDate).getTime() - new Date().setHours(0,0,0,0)) / (1000 * 60 * 60 * 24))
+    const diff = Math.ceil((new Date(expectedBirthDate).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24))
     return diff
   }, [expectedBirthDate])
 
@@ -153,7 +199,7 @@ export default function InseminationPage() {
   }
 
   const resetForm = () => {
-    setAnimalId(""); setInsuranceId(""); setSemenTypes([]); setSemenPrice(""); setVetPrice("")
+    setAnimalId(""); setInsuranceId(""); setEarTagId(""); setSemenTypes([]); setSemenPrice(""); setVetPrice("")
     setInjectionTime(""); setExpectedBirthDate(""); setDeliveredBabies(""); setVetName(""); setVetOrigin("")
     setDate(today); setNotes(""); setErrors({}); setEditRecord(null)
     setSemenTypeOpen(false)
@@ -193,6 +239,7 @@ export default function InseminationPage() {
     setEditRecord(r)
     setAnimalId(r.animalId || "")
     setInsuranceId(animals.find(a => a._id === r.animalId)?.insuranceId || "")
+    setEarTagId(animals.find(a => a._id === r.animalId)?.earTagId || "")
     setSemenTypes(r.semenTypes || [])
     setSemenPrice(r.semenPrice != null ? String(r.semenPrice) : "")
     setVetPrice(r.vetPrice != null ? String(r.vetPrice) : "")
@@ -260,7 +307,7 @@ export default function InseminationPage() {
         const logoImg = new Image(); logoImg.crossOrigin = "anonymous"; logoImg.src = "/logo/NTDM.png"
         await new Promise((res, rej) => { logoImg.onload = res; logoImg.onerror = rej })
         doc.addImage(logoImg, "PNG", 15, 7, 22, 22)
-      } catch {}
+      } catch { }
       doc.setTextColor(255, 255, 255)
       doc.setFontSize(16); doc.setFont("helvetica", "bold")
       doc.text("Insemination Report", 45, 18)
@@ -284,55 +331,292 @@ export default function InseminationPage() {
 
       // Per-cow summary table
       let y = 106
-      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, "F")
-      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold")
-      doc.text("Animal", 18, y); doc.text("Insurance ID", 55, y); doc.text("Inseminations", 98, y)
-      doc.text("Babies Born", 135, y); doc.text("Total Cost (RWF)", 163, y)
+
+      const summaryCols = {
+        animal: { x: 18, width: 25 },
+        insurance: { x: 45, width: 30 },
+        earTag: { x: 80, width: 25 },
+        inseminations: { x: 112, width: 20 },
+        babies: { x: 145, width: 20 },
+        cost: { x: 170, width: 20 }
+      }
+
+      doc.setFillColor(22, 163, 74)
+      doc.rect(15, y - 6, 180, 8, "F")
+
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(8)
+      doc.setFont("helvetica", "bold")
+
+      doc.text("Animal", summaryCols.animal.x, y)
+      doc.text("Insurance ID", summaryCols.insurance.x, y)
+      doc.text("Ear Tag ID", summaryCols.earTag.x, y)
+      doc.text("Inseminations", summaryCols.inseminations.x, y)
+      doc.text("Babies", summaryCols.babies.x, y)
+      doc.text("Cost", summaryCols.cost.x, y)
+
       doc.setFont("helvetica", "normal")
+
+      y += 8
+
       cowSummary.forEach((c, i) => {
-        y += 9
-        if (y > 270) { doc.addPage(); y = 20 }
-        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, "F") }
-        const insId = animals.find(a => a.name === c.name)?.insuranceId || "—"
+        const animal = animals.find(a => a.name === c.name)
+
+        const animalLines = doc.splitTextToSize(
+          c.name || "—",
+          summaryCols.animal.width
+        )
+
+        const insuranceLines = doc.splitTextToSize(
+          animal?.insuranceId || "—",
+          summaryCols.insurance.width
+        )
+
+        const earTagLines = doc.splitTextToSize(
+          animal?.earTagId || "—",
+          summaryCols.earTag.width
+        )
+
+        const rowHeight =
+          Math.max(
+            animalLines.length,
+            insuranceLines.length,
+            earTagLines.length,
+            1
+          ) * 5 + 4
+
+        if (y + rowHeight > 270) {
+          doc.addPage()
+          y = 20
+        }
+
+        if (i % 2 === 0) {
+          doc.setFillColor(248, 250, 252)
+          doc.rect(15, y - 4, 180, rowHeight, "F")
+        }
+
+        doc.setDrawColor(226, 232, 240)
+        doc.rect(15, y - 4, 180, rowHeight)
+
         doc.setTextColor(55, 65, 81)
-        doc.text(c.name, 18, y)
-        doc.text(insId, 55, y)
-        doc.text(String(c.inseminations), 108, y)
+
+        doc.text(animalLines, summaryCols.animal.x, y)
+        doc.text(insuranceLines, summaryCols.insurance.x, y)
+        doc.text(earTagLines, summaryCols.earTag.x, y)
+
+        doc.text(
+          String(c.inseminations),
+          summaryCols.inseminations.x,
+          y
+        )
+
         doc.setTextColor(22, 163, 74)
-        doc.text(String(c.babies), 140, y)
+        doc.text(
+          String(c.babies),
+          summaryCols.babies.x,
+          y
+        )
+
         doc.setTextColor(55, 65, 81)
-        doc.text(c.totalCost > 0 ? c.totalCost.toLocaleString() : "—", 163, y)
+        doc.text(
+          c.totalCost > 0
+            ? c.totalCost.toLocaleString()
+            : "—",
+          summaryCols.cost.x,
+          y
+        )
+
+        y += rowHeight
       })
 
       // Detailed records section
       y += 16
-      if (y > 240) { doc.addPage(); y = 20 }
-      doc.setFillColor(22, 163, 74); doc.rect(15, y - 6, 180, 8, "F")
-      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold")
-      doc.text("Date", 18, y); doc.text("Animal", 40, y); doc.text("Semen", 72, y)
-      doc.text("Semen Price", 100, y); doc.text("Vet Price", 130, y)
-      doc.text("Expected Birth", 153, y); doc.text("Babies", 186, y)
+
+      if (y > 240) {
+        doc.addPage()
+        y = 20
+      }
+
+      const detailCols = {
+        date: { x: 18, width: 20 },
+        animal: { x: 40, width: 22 },
+        semen: { x: 64, width: 28 },
+        semenPrice: { x: 95, width: 18 },
+        vetPrice: { x: 118, width: 18 },
+        expectedBirth: { x: 140, width: 28 },
+        babies: { x: 175, width: 10 }
+      }
+
+      doc.setFillColor(22, 163, 74)
+      doc.rect(15, y - 6, 180, 8, "F")
+
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(8)
+      doc.setFont("helvetica", "bold")
+
+      doc.text("Date", detailCols.date.x, y)
+      doc.text("Animal", detailCols.animal.x, y)
+      doc.text("Semen Type", detailCols.semen.x, y)
+      doc.text("Semen Price", detailCols.semenPrice.x, y)
+      doc.text("Vet Price", detailCols.vetPrice.x, y)
+      doc.text("Expected Birth", detailCols.expectedBirth.x, y)
+      doc.text("Babies", detailCols.babies.x, y)
+
       doc.setFont("helvetica", "normal")
+
+      y += 8
+
       records.forEach((r, i) => {
-        y += 9
-        if (y > 270) { doc.addPage(); y = 20 }
-        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 5, 180, 8, "F") }
+        const semenText = Array.isArray(r.semenTypes)
+          ? r.semenTypes.join(", ")
+          : r.semenTypes || "—"
+
+        const semenLines = doc.splitTextToSize(
+          semenText,
+          detailCols.semen.width
+        )
+
+        const animalLines = doc.splitTextToSize(
+          r.animalName || "General",
+          detailCols.animal.width
+        )
+
+        const rowHeight =
+          Math.max(
+            semenLines.length,
+            animalLines.length,
+            1
+          ) * 5 + 4
+
+        if (y + rowHeight > 270) {
+          doc.addPage()
+
+          y = 20
+
+          doc.setFillColor(22, 163, 74)
+          doc.rect(15, y - 6, 180, 8, "F")
+
+          doc.setTextColor(255, 255, 255)
+          doc.setFontSize(8)
+          doc.setFont("helvetica", "bold")
+
+          doc.text("Date", detailCols.date.x, y)
+          doc.text("Animal", detailCols.animal.x, y)
+          doc.text("Semen Type", detailCols.semen.x, y)
+          doc.text("Semen Price", detailCols.semenPrice.x, y)
+          doc.text("Vet Price", detailCols.vetPrice.x, y)
+          doc.text("Expected Birth", detailCols.expectedBirth.x, y)
+          doc.text("Babies", detailCols.babies.x, y)
+
+          doc.setFont("helvetica", "normal")
+
+          y += 8
+        }
+
+        if (i % 2 === 0) {
+          doc.setFillColor(248, 250, 252)
+          doc.rect(15, y - 4, 180, rowHeight, "F")
+        }
+
+        doc.setDrawColor(226, 232, 240)
+        doc.rect(15, y - 4, 180, rowHeight)
+
         doc.setTextColor(55, 65, 81)
-        doc.text(r.date, 18, y)
-        doc.text(r.animalName || "General", 40, y)
-        doc.text((r.semenTypes || []).join(", ").slice(0, 18), 72, y)
-        doc.text(r.semenPrice != null ? String(r.semenPrice) : "—", 100, y)
-        doc.text(r.vetPrice != null ? String(r.vetPrice) : "—", 130, y)
-        doc.text(r.expectedBirthDate || "—", 153, y)
+
+        doc.text(
+          new Date(r.date).toLocaleDateString(),
+          detailCols.date.x,
+          y
+        )
+
+        doc.text(
+          animalLines,
+          detailCols.animal.x,
+          y
+        )
+
+        doc.text(
+          semenLines,
+          detailCols.semen.x,
+          y
+        )
+
+        doc.text(
+          r.semenPrice != null
+            ? r.semenPrice.toLocaleString()
+            : "—",
+          detailCols.semenPrice.x,
+          y
+        )
+
+        doc.text(
+          r.vetPrice != null
+            ? r.vetPrice.toLocaleString()
+            : "—",
+          detailCols.vetPrice.x,
+          y
+        )
+
+        doc.text(
+          r.expectedBirthDate || "—",
+          detailCols.expectedBirth.x,
+          y
+        )
+
         doc.setTextColor(22, 163, 74)
-        doc.text(r.deliveredBabies != null ? String(r.deliveredBabies) : "—", 190, y)
+
+        doc.text(
+          r.deliveredBabies != null
+            ? String(r.deliveredBabies)
+            : "—",
+          detailCols.babies.x,
+          y
+        )
+
+        y += rowHeight
       })
 
       // Footer
-      const pageH = doc.internal.pageSize.height
-      doc.setFillColor(248, 250, 252); doc.rect(0, pageH - 18, 210, 18, "F")
-      doc.setTextColor(107, 114, 128); doc.setFontSize(7)
-      doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"} | ${today}`, 15, pageH - 7)
+      const totalPages = doc.getNumberOfPages()
+
+      for (let page = 1; page <= totalPages; page++) {
+        doc.setPage(page)
+
+        const pageWidth = doc.internal.pageSize.getWidth()
+        const pageHeight = doc.internal.pageSize.getHeight()
+
+        // Footer background
+        doc.setFillColor(248, 250, 252)
+        doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
+
+        // Top border line
+        doc.setDrawColor(226, 232, 240)
+        doc.line(
+          0,
+          pageHeight - 18,
+          pageWidth,
+          pageHeight - 18
+        )
+
+        doc.setFontSize(7)
+        doc.setTextColor(107, 114, 128)
+
+        // Left side
+        doc.text(
+          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
+          }`,
+          15,
+          pageHeight - 7
+        )
+
+        // Right side page number
+        doc.text(
+          `Page ${page} of ${totalPages}`,
+          pageWidth - 15,
+          pageHeight - 7,
+          { align: "right" }
+        )
+      }
 
       doc.save(`insemination-report-${today}.pdf`)
       setExportOpen(false)
@@ -353,6 +637,7 @@ export default function InseminationPage() {
       const summaryData = cowSummary.map(c => ({
         Animal: c.name,
         "Insurance ID": animals.find(a => a.name === c.name)?.insuranceId || "—",
+        "Ear Tag ID": animals.find(a => a.name === c.name)?.earTagId || "—",
         "Total Inseminations": c.inseminations,
         "Babies Born": c.babies,
         "Total Cost (RWF)": c.totalCost,
@@ -367,6 +652,7 @@ export default function InseminationPage() {
         Date: r.date,
         Animal: r.animalName || "General",
         "Insurance ID": getAnimalInsuranceId(r.animalId),
+        "Ear Tag ID": animals.find(a => a._id === r.animalId)?.earTagId || "—",
         "Semen Types": (r.semenTypes || []).join(", "),
         "Semen Price (RWF)": r.semenPrice ?? "—",
         "Vet Price (RWF)": r.vetPrice ?? "—",
@@ -501,6 +787,16 @@ export default function InseminationPage() {
                   />
                 </div>
 
+                {/* Ear Tag ID */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Ear Tag ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={earTagId || (animalId ? "No ear tag registered" : "Select an animal first")}
+                    className={`${earTagId ? "bg-amber-50 text-amber-700 font-medium" : "bg-gray-50 text-gray-400 italic"}`}
+                  />
+                </div>
+
                 {/* Semen Types */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Types of Semen *</label>
@@ -513,8 +809,8 @@ export default function InseminationPage() {
                       {semenTypes.length === 0
                         ? <span className="text-gray-400">Select semen type(s)...</span>
                         : semenTypes.map(t => (
-                            <span key={t} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs border bg-emerald-50 text-emerald-700 border-emerald-200">{t}</span>
-                          ))
+                          <span key={t} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs border bg-emerald-50 text-emerald-700 border-emerald-200">{t}</span>
+                        ))
                       }
                     </span>
                     <ChevronDown className={`h-4 w-4 text-gray-400 ml-2 shrink-0 transition-transform${semenTypeOpen ? " rotate-180" : ""}`} />
@@ -567,13 +863,12 @@ export default function InseminationPage() {
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium text-gray-700">Expected Birth Date <span className="text-gray-400 text-xs">optional</span></label>
                     {birthCountdown !== null && (
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        birthCountdown > 0
-                          ? "bg-emerald-50 text-emerald-700"
-                          : birthCountdown === 0
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${birthCountdown > 0
+                        ? "bg-emerald-50 text-emerald-700"
+                        : birthCountdown === 0
                           ? "bg-amber-50 text-amber-700"
                           : "bg-red-50 text-red-600"
-                      }`}>
+                        }`}>
                         {birthCountdown > 0 ? `${birthCountdown}d remaining` : birthCountdown === 0 ? "Due today" : `${Math.abs(birthCountdown)}d overdue`}
                       </span>
                     )}
@@ -701,9 +996,11 @@ export default function InseminationPage() {
                         <TableCell className="text-sm">{r.semenPrice != null ? r.semenPrice : <span className="text-gray-400">—</span>}</TableCell>
                         <TableCell className="text-sm">{r.vetPrice != null ? r.vetPrice : <span className="text-gray-400">—</span>}</TableCell>
                         <TableCell className="text-sm">{r.injectionTime || <span className="text-gray-400">—</span>}</TableCell>
-                        <TableCell className="text-sm">
+                        <TableCell>
                           {r.expectedBirthDate
-                            ? <span className={new Date(r.expectedBirthDate) >= new Date() ? "text-emerald-600 font-medium" : "text-gray-500"}>{r.expectedBirthDate}</span>
+                            ? r.deliveredBabies != null
+                              ? <span className="text-xs text-gray-400">{r.expectedBirthDate}</span>
+                              : <BirthCountdown targetDate={r.expectedBirthDate} />
                             : <span className="text-gray-400">—</span>
                           }
                         </TableCell>

@@ -16,7 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-interface Animal { _id: string; name: string; type: string; insuranceId?: string; gender?: string | null }
+interface Animal { _id: string; name: string; type: string; insuranceId?: string; earTagId?: string | null; gender?: string | null }
 interface MilkRecord {
   _id: string; cowId: string; cowName: string; liters: number
   homeConsumption: number | null; soldLiters: number | null
@@ -45,6 +45,7 @@ export default function MilkProductionPage() {
   const [pricePerLiter, setPricePerLiter] = useState("")
   const [totalAmount, setTotalAmount] = useState("")
   const [insuranceId, setInsuranceId] = useState("")
+  const [earTagId, setEarTagId] = useState("")
   const [session, setSession] = useState("")
   const [date, setDate] = useState(today)
   const [time, setTime] = useState("")
@@ -107,6 +108,7 @@ export default function MilkProductionPage() {
   useEffect(() => {
     const cow = animals.find(a => a._id === cowId)
     setInsuranceId(cow?.insuranceId || "")
+    setEarTagId(cow?.earTagId || "")
   }, [cowId, animals])
 
   const validate = () => {
@@ -121,7 +123,7 @@ export default function MilkProductionPage() {
 
   const resetForm = () => {
     setCowId(""); setLiters(""); setHomeConsumption(""); setPricePerLiter(""); setTotalAmount("")
-    setInsuranceId("")
+    setInsuranceId(""); setEarTagId("")
     setSession(""); setDate(today); setTime(""); setWaterLiters(""); setFoodType(""); setNotes("")
     setErrors({}); setEditRecord(null)
   }
@@ -151,6 +153,7 @@ export default function MilkProductionPage() {
     setTotalAmount(r.totalAmount ? String(r.totalAmount) : "")
     const cow = animals.find(a => a._id === r.cowId)
     setInsuranceId(cow?.insuranceId || "")
+    setEarTagId(cow?.earTagId || "")
     setSession(r.session); setDate(r.date); setTime(r.time || "")
     setWaterLiters((r as any).waterLiters ? String((r as any).waterLiters) : "")
     setFoodType((r as any).foodType || "")
@@ -186,6 +189,9 @@ export default function MilkProductionPage() {
   const getAnimalInsuranceId = (cowId: string) =>
     animals.find(a => a._id === cowId)?.insuranceId || '—'
 
+  const getAnimalEarTagId = (cowId: string) =>
+    animals.find(a => a._id === cowId)?.earTagId || '—'
+
   const exportToPDF = async () => {
     setExporting(true)
     try {
@@ -208,7 +214,7 @@ export default function MilkProductionPage() {
         logoImg.src = '/logo/NTDM.png'
         await new Promise((resolve, reject) => { logoImg.onload = resolve; logoImg.onerror = reject })
         doc.addImage(logoImg, 'PNG', 15, 7, 22, 22)
-      } catch {}
+      } catch { }
 
       doc.setTextColor(255, 255, 255)
       doc.setFontSize(16)
@@ -243,47 +249,194 @@ export default function MilkProductionPage() {
 
       // Table header
       let y = 122
-      doc.setFillColor(22, 163, 74)
-      doc.rect(15, y - 6, 180, 8, 'F')
-      doc.setTextColor(255, 255, 255)
-      doc.setFontSize(8)
-      doc.setFont('helvetica', 'bold')
-      doc.text('Date', 18, y)
-      doc.text('Animal', 45, y)
-      doc.text('Insurance ID', 80, y)
-      doc.text('Session', 118, y)
-      doc.text('Liters', 142, y)
-      doc.text('Price/L', 158, y)
-      doc.text('Total (RWF)', 173, y)
 
-      // Table rows
-      doc.setFont('helvetica', 'normal')
+      const cols = {
+        date: { x: 18, width: 20 },
+        animal: { x: 40, width: 25 },
+        earTag: { x: 67, width: 22 },
+        insurance: { x: 92, width: 30 },
+        session: { x: 125, width: 18 },
+        liters: { x: 148, width: 12 },
+        total: { x: 163, width: 25 }
+      }
+
+      const drawTableHeader = () => {
+        doc.setFillColor(22, 163, 74)
+        doc.rect(15, y - 6, 180, 8, "F")
+
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(8)
+        doc.setFont("helvetica", "bold")
+
+        doc.text("Date", cols.date.x, y)
+        doc.text("Animal", cols.animal.x, y)
+        doc.text("Ear Tag", cols.earTag.x, y)
+        doc.text("Insurance ID", cols.insurance.x, y)
+        doc.text("Session", cols.session.x, y)
+        doc.text("Liters", cols.liters.x, y)
+        doc.text("Total (RWF)", cols.total.x, y)
+
+        doc.setFont("helvetica", "normal")
+      }
+
+      drawTableHeader()
+
+      y += 8
+
       exportRecords.forEach((r, i) => {
-        y += 9
-        if (y > 275) { doc.addPage(); y = 20 }
+        const animalLines = doc.splitTextToSize(
+          r.cowName || "-",
+          cols.animal.width
+        )
+
+        const earTagLines = doc.splitTextToSize(
+          getAnimalEarTagId(r.cowId) || "-",
+          cols.earTag.width
+        )
+
+        const insuranceLines = doc.splitTextToSize(
+          getAnimalInsuranceId(r.cowId) || "-",
+          cols.insurance.width
+        )
+
+        const rowHeight =
+          Math.max(
+            animalLines.length,
+            earTagLines.length,
+            insuranceLines.length,
+            1
+          ) * 5 + 4
+
+        // Page break
+        if (y + rowHeight > 270) {
+          doc.addPage()
+
+          y = 20
+
+          drawTableHeader()
+
+          y += 8
+        }
+
+        // Alternate row background
         if (i % 2 === 0) {
           doc.setFillColor(248, 250, 252)
-          doc.rect(15, y - 5, 180, 8, 'F')
+          doc.rect(15, y - 4, 180, rowHeight, "F")
         }
+
+        // Border
+        doc.setDrawColor(226, 232, 240)
+        doc.rect(15, y - 4, 180, rowHeight)
+
+        // Column separators
+        doc.line(38, y - 4, 38, y - 4 + rowHeight)
+        doc.line(65, y - 4, 65, y - 4 + rowHeight)
+        doc.line(90, y - 4, 90, y - 4 + rowHeight)
+        doc.line(123, y - 4, 123, y - 4 + rowHeight)
+        doc.line(145, y - 4, 145, y - 4 + rowHeight)
+        doc.line(160, y - 4, 160, y - 4 + rowHeight)
+
         doc.setTextColor(55, 65, 81)
-        doc.text(r.date, 18, y)
-        doc.text(r.cowName || '-', 45, y)
-        doc.text(getAnimalInsuranceId(r.cowId), 80, y)
-        doc.text(r.session, 118, y)
+
+        // Date
+        doc.text(
+          new Date(r.date).toLocaleDateString(),
+          cols.date.x,
+          y
+        )
+
+        // Animal
+        doc.text(
+          animalLines,
+          cols.animal.x,
+          y
+        )
+
+        // Ear Tag
+        doc.text(
+          earTagLines,
+          cols.earTag.x,
+          y
+        )
+
+        // Insurance
+        doc.text(
+          insuranceLines,
+          cols.insurance.x,
+          y
+        )
+
+        // Session
+        doc.text(
+          r.session || "-",
+          cols.session.x,
+          y
+        )
+
+        // Liters
         doc.setTextColor(22, 163, 74)
-        doc.text(`${r.liters}L`, 142, y)
+
+        doc.text(
+          `${Number(r.liters || 0).toFixed(1)}L`,
+          cols.liters.x,
+          y
+        )
+
+        // Revenue
         doc.setTextColor(55, 65, 81)
-        doc.text(r.pricePerLiter ? String(r.pricePerLiter) : '-', 158, y)
-        doc.text(r.totalAmount ? r.totalAmount.toLocaleString() : '-', 173, y)
+
+        doc.text(
+          r.totalAmount
+            ? r.totalAmount.toLocaleString()
+            : "-",
+          cols.total.x,
+          y
+        )
+
+        y += rowHeight
       })
 
       // Footer
-      const pageH = doc.internal.pageSize.height
-      doc.setFillColor(248, 250, 252)
-      doc.rect(0, pageH - 18, 210, 18, 'F')
-      doc.setTextColor(107, 114, 128)
-      doc.setFontSize(7)
-      doc.text(`NTDM Animal Hospital | www.vettrack.rw | Generated by: ${user?.name || 'Unknown'}`, 15, pageH - 7)
+      const totalPages = doc.getNumberOfPages()
+
+      for (let page = 1; page <= totalPages; page++) {
+        doc.setPage(page)
+
+        const pageWidth = doc.internal.pageSize.getWidth()
+        const pageHeight = doc.internal.pageSize.getHeight()
+
+        // Footer background
+        doc.setFillColor(248, 250, 252)
+        doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
+
+        // Top border line
+        doc.setDrawColor(226, 232, 240)
+        doc.line(
+          0,
+          pageHeight - 18,
+          pageWidth,
+          pageHeight - 18
+        )
+
+        doc.setFontSize(7)
+        doc.setTextColor(107, 114, 128)
+
+        // Left side
+        doc.text(
+          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
+          }`,
+          15,
+          pageHeight - 7
+        )
+
+        // Right side page number
+        doc.text(
+          `Page ${page} of ${totalPages}`,
+          pageWidth - 15,
+          pageHeight - 7,
+          { align: "right" }
+        )
+      }
 
       doc.save(`milk-report-${cowName.replace(/\s+/g, '-')}-${exportType}-${new Date().toISOString().split('T')[0]}.pdf`)
       setExportOpen(false)
@@ -305,6 +458,7 @@ export default function MilkProductionPage() {
         Date: r.date,
         Time: r.time || '—',
         Animal: r.cowName || '—',
+        'Ear Tag ID': getAnimalEarTagId(r.cowId),
         'Insurance ID': getAnimalInsuranceId(r.cowId),
         Session: r.session,
         'Liters': r.liters,
@@ -314,7 +468,7 @@ export default function MilkProductionPage() {
       }))
 
       const ws = XLSX.utils.json_to_sheet(data)
-      ws['!cols'] = [14, 10, 18, 20, 12, 10, 22, 22, 30].map(w => ({ wch: w }))
+      ws['!cols'] = [14, 10, 18, 18, 20, 12, 10, 22, 22, 30].map(w => ({ wch: w }))
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Milk Production')
       XLSX.writeFile(wb, `milk-report-${cowName.replace(/\s+/g, '-')}-${exportType}-${today}.xlsx`)
@@ -507,6 +661,16 @@ export default function MilkProductionPage() {
                   />
                 </div>
 
+                {/* Ear Tag ID */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Ear Tag ID <span className="text-gray-400 text-xs">auto-detected</span></label>
+                  <Input
+                    readOnly
+                    value={earTagId || (cowId ? "No ear tag registered" : "Select a cow first")}
+                    className={`${earTagId ? "bg-amber-50 text-amber-700 font-medium" : "bg-gray-50 text-gray-400 italic"}`}
+                  />
+                </div>
+
                 {/* Date */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Date *</label>
@@ -609,31 +773,31 @@ export default function MilkProductionPage() {
                     ) : filteredRecords.map(r => {
                       const sold = r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))
                       return (
-                      <TableRow key={r._id}>
-                        <TableCell className="text-sm">{r.date}{r.time ? ` ${r.time}` : ""}</TableCell>
-                        <TableCell className="font-medium">{r.cowName}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={r.session === "Morning" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-indigo-50 text-indigo-700 border-indigo-200"}>
-                            {r.session}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-semibold text-emerald-700">{r.liters}L</TableCell>
-                        <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption}L` : "—"}</TableCell>
-                        <TableCell className="text-sky-700 font-medium">{sold > 0 ? `${sold.toFixed(1)}L` : "—"}</TableCell>
-                        <TableCell>{r.pricePerLiter ? `${r.pricePerLiter}` : "—"}</TableCell>
-                        <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "—"}</TableCell>
-                        <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "—"}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => handleEdit(r)} className="h-8 w-8 p-0 hover:bg-emerald-50">
-                              <Pencil className="h-3.5 w-3.5 text-emerald-600" />
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setDeleteId(r._id)} className="h-8 w-8 p-0 hover:bg-red-50">
-                              <Trash2 className="h-3.5 w-3.5 text-red-500" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                        <TableRow key={r._id}>
+                          <TableCell className="text-sm">{r.date}{r.time ? ` ${r.time}` : ""}</TableCell>
+                          <TableCell className="font-medium">{r.cowName}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={r.session === "Morning" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-indigo-50 text-indigo-700 border-indigo-200"}>
+                              {r.session}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-semibold text-emerald-700">{r.liters}L</TableCell>
+                          <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption}L` : "—"}</TableCell>
+                          <TableCell className="text-sky-700 font-medium">{sold > 0 ? `${sold.toFixed(1)}L` : "—"}</TableCell>
+                          <TableCell>{r.pricePerLiter ? `${r.pricePerLiter}` : "—"}</TableCell>
+                          <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "—"}</TableCell>
+                          <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{r.notes || "—"}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="ghost" onClick={() => handleEdit(r)} className="h-8 w-8 p-0 hover:bg-emerald-50">
+                                <Pencil className="h-3.5 w-3.5 text-emerald-600" />
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => setDeleteId(r._id)} className="h-8 w-8 p-0 hover:bg-red-50">
+                                <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       )
                     })}
                   </TableBody>
