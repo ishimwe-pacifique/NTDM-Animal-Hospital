@@ -22,6 +22,7 @@ interface MilkRecord {
   homeConsumption: number | null; soldLiters: number | null
   pricePerLiter: number | null; totalAmount: number | null
   session: string; date: string; time: string | null; notes: string | null
+  waterLiters: number | null; foodType: string | null
 }
 
 const SESSIONS = ["Morning", "Evening"]
@@ -155,8 +156,8 @@ export default function MilkProductionPage() {
     setInsuranceId(cow?.insuranceId || "")
     setEarTagId(cow?.earTagId || "")
     setSession(r.session); setDate(r.date); setTime(r.time || "")
-    setWaterLiters((r as any).waterLiters ? String((r as any).waterLiters) : "")
-    setFoodType((r as any).foodType || "")
+    setWaterLiters(r.waterLiters ? String(r.waterLiters) : "")
+    setFoodType(r.foodType || "")
     setNotes(r.notes || "")
   }
 
@@ -467,15 +468,17 @@ export default function MilkProductionPage() {
   }, [filteredRecords])
 
   const cowData = useMemo(() => {
-    const map: Record<string, { name: string; liters: number; consumed: number; sold: number; revenue: number }> = {}
+    const map: Record<string, { name: string; liters: number; consumed: number; sold: number; revenue: number; water: number; foodTypes: Set<string> }> = {}
     filteredRecords.forEach(r => {
-      if (!map[r.cowId]) map[r.cowId] = { name: r.cowName, liters: 0, consumed: 0, sold: 0, revenue: 0 }
+      if (!map[r.cowId]) map[r.cowId] = { name: r.cowName, liters: 0, consumed: 0, sold: 0, revenue: 0, water: 0, foodTypes: new Set() }
       map[r.cowId].liters += r.liters
       map[r.cowId].consumed += r.homeConsumption || 0
       map[r.cowId].sold += r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))
       map[r.cowId].revenue += r.totalAmount || 0
+      map[r.cowId].water += r.waterLiters || 0
+      if (r.foodType) r.foodType.split(',').map(f => f.trim()).filter(Boolean).forEach(f => map[r.cowId].foodTypes.add(f))
     })
-    return Object.values(map)
+    return Object.values(map).map(c => ({ ...c, foodTypes: Array.from(c.foodTypes).join(', ') || '—' }))
   }, [filteredRecords])
 
   const monthlyData = useMemo(() => {
@@ -826,6 +829,40 @@ export default function MilkProductionPage() {
                           <TableCell className="text-orange-600">{c.consumed > 0 ? c.consumed.toFixed(1) : "—"}</TableCell>
                           <TableCell className="text-sky-700 font-semibold">{c.sold > 0 ? c.sold.toFixed(1) : "—"}</TableCell>
                           <TableCell>{c.revenue > 0 ? c.revenue.toLocaleString() : "—"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Water Intake & Food Type per Cow */}
+            <Card className="border-0 shadow-xl bg-white/90">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                  Water Intake &amp; Food Type per Cow
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cow</TableHead>
+                        <TableHead>Total Water Intake (L)</TableHead>
+                        <TableHead>Food Types Used</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cowData.length === 0 ? (
+                        <TableRow><TableCell colSpan={3} className="text-center py-6 text-gray-400">No data</TableCell></TableRow>
+                      ) : cowData.map((c, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-medium">{c.name}</TableCell>
+                          <TableCell className="text-sky-700 font-semibold">{c.water > 0 ? `${c.water.toFixed(1)} L` : <span className="text-gray-400">Not recorded</span>}</TableCell>
+                          <TableCell className="text-gray-700">{c.foodTypes !== '—' ? c.foodTypes : <span className="text-gray-400">Not recorded</span>}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
