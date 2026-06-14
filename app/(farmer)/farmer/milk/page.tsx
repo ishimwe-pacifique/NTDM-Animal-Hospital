@@ -251,31 +251,32 @@ export default function MilkProductionPage() {
       let y = 122
 
       const cols = {
-        date: { x: 18, width: 20 },
-        animal: { x: 40, width: 25 },
-        earTag: { x: 67, width: 22 },
-        insurance: { x: 92, width: 30 },
-        session: { x: 125, width: 18 },
-        liters: { x: 148, width: 12 },
-        total: { x: 163, width: 25 }
+        date: { x: 18, width: 18 },
+        animal: { x: 38, width: 22 },
+        earTag: { x: 62, width: 18 },
+        insurance: { x: 82, width: 22 },
+        session: { x: 106, width: 14 },
+        liters: { x: 122, width: 10 },
+        consumed: { x: 134, width: 14 },
+        consumedVal: { x: 150, width: 18 },
+        total: { x: 170, width: 22 }
       }
 
       const drawTableHeader = () => {
         doc.setFillColor(22, 163, 74)
         doc.rect(15, y - 6, 180, 8, "F")
-
         doc.setTextColor(255, 255, 255)
-        doc.setFontSize(8)
+        doc.setFontSize(7)
         doc.setFont("helvetica", "bold")
-
         doc.text("Date", cols.date.x, y)
         doc.text("Animal", cols.animal.x, y)
         doc.text("Ear Tag", cols.earTag.x, y)
-        doc.text("Insurance ID", cols.insurance.x, y)
+        doc.text("Insurance", cols.insurance.x, y)
         doc.text("Session", cols.session.x, y)
         doc.text("Liters", cols.liters.x, y)
+        doc.text("Consumed", cols.consumed.x, y)
+        doc.text("Cons.Val", cols.consumedVal.x, y)
         doc.text("Total (RWF)", cols.total.x, y)
-
         doc.setFont("helvetica", "normal")
       }
 
@@ -329,69 +330,33 @@ export default function MilkProductionPage() {
         doc.rect(15, y - 4, 180, rowHeight)
 
         // Column separators
-        doc.line(38, y - 4, 38, y - 4 + rowHeight)
-        doc.line(65, y - 4, 65, y - 4 + rowHeight)
-        doc.line(90, y - 4, 90, y - 4 + rowHeight)
-        doc.line(123, y - 4, 123, y - 4 + rowHeight)
-        doc.line(145, y - 4, 145, y - 4 + rowHeight)
-        doc.line(160, y - 4, 160, y - 4 + rowHeight)
+        doc.line(36, y - 4, 36, y - 4 + rowHeight)
+        doc.line(60, y - 4, 60, y - 4 + rowHeight)
+        doc.line(80, y - 4, 80, y - 4 + rowHeight)
+        doc.line(104, y - 4, 104, y - 4 + rowHeight)
+        doc.line(120, y - 4, 120, y - 4 + rowHeight)
+        doc.line(132, y - 4, 132, y - 4 + rowHeight)
+        doc.line(148, y - 4, 148, y - 4 + rowHeight)
+        doc.line(168, y - 4, 168, y - 4 + rowHeight)
 
         doc.setTextColor(55, 65, 81)
-
-        // Date
-        doc.text(
-          new Date(r.date).toLocaleDateString(),
-          cols.date.x,
-          y
-        )
-
-        // Animal
-        doc.text(
-          animalLines,
-          cols.animal.x,
-          y
-        )
-
-        // Ear Tag
-        doc.text(
-          earTagLines,
-          cols.earTag.x,
-          y
-        )
-
-        // Insurance
-        doc.text(
-          insuranceLines,
-          cols.insurance.x,
-          y
-        )
-
-        // Session
-        doc.text(
-          r.session || "-",
-          cols.session.x,
-          y
-        )
-
-        // Liters
+        doc.text(new Date(r.date).toLocaleDateString(), cols.date.x, y)
+        doc.text(animalLines, cols.animal.x, y)
+        doc.text(earTagLines, cols.earTag.x, y)
+        doc.text(insuranceLines, cols.insurance.x, y)
+        doc.text(r.session || "-", cols.session.x, y)
         doc.setTextColor(22, 163, 74)
-
+        doc.text(`${Number(r.liters || 0).toFixed(1)}L`, cols.liters.x, y)
+        doc.setTextColor(234, 88, 12)
+        doc.text(r.homeConsumption ? `${r.homeConsumption}L` : "-", cols.consumed.x, y)
         doc.text(
-          `${Number(r.liters || 0).toFixed(1)}L`,
-          cols.liters.x,
-          y
-        )
-
-        // Revenue
-        doc.setTextColor(55, 65, 81)
-
-        doc.text(
-          r.totalAmount
-            ? r.totalAmount.toLocaleString()
+          r.homeConsumption && r.pricePerLiter
+            ? (r.homeConsumption * r.pricePerLiter).toLocaleString()
             : "-",
-          cols.total.x,
-          y
+          cols.consumedVal.x, y
         )
+        doc.setTextColor(55, 65, 81)
+        doc.text(r.totalAmount ? r.totalAmount.toLocaleString() : "-", cols.total.x, y)
 
         y += rowHeight
       })
@@ -456,19 +421,24 @@ export default function MilkProductionPage() {
 
       const data = exportRecords.map(r => ({
         Date: r.date,
-        Time: r.time || '—',
-        Animal: r.cowName || '—',
+        Time: r.time || '-',
+        Animal: r.cowName || '-',
         'Ear Tag ID': getAnimalEarTagId(r.cowId),
         'Insurance ID': getAnimalInsuranceId(r.cowId),
         Session: r.session,
-        'Liters': r.liters,
-        'Price per Liter (RWF)': r.pricePerLiter ?? '—',
-        'Total Amount (RWF)': r.totalAmount ?? '—',
-        Notes: r.notes || '—',
+        'Total Liters': r.liters,
+        'Consumed (L)': r.homeConsumption ?? '-',
+        'Consumed Value (RWF)': r.homeConsumption && r.pricePerLiter
+          ? Number((r.homeConsumption * r.pricePerLiter).toFixed(2))
+          : '-',
+        'Sold (L)': r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0)),
+        'Price per Liter (RWF)': r.pricePerLiter ?? '-',
+        'Total Amount (RWF)': r.totalAmount ?? '-',
+        Notes: r.notes || '-',
       }))
 
       const ws = XLSX.utils.json_to_sheet(data)
-      ws['!cols'] = [14, 10, 18, 18, 20, 12, 10, 22, 22, 30].map(w => ({ wch: w }))
+      ws['!cols'] = [14, 10, 18, 18, 20, 12, 14, 14, 22, 12, 22, 22, 30].map(w => ({ wch: w }))
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Milk Production')
       XLSX.writeFile(wb, `milk-report-${cowName.replace(/\s+/g, '-')}-${exportType}-${today}.xlsx`)
@@ -760,6 +730,7 @@ export default function MilkProductionPage() {
                       <TableHead>Session</TableHead>
                       <TableHead>Total</TableHead>
                       <TableHead>Consumed</TableHead>
+                      <TableHead>Consumed Value (RWF)</TableHead>
                       <TableHead>Sold</TableHead>
                       <TableHead>Price/L</TableHead>
                       <TableHead>Revenue (RWF)</TableHead>
@@ -769,7 +740,7 @@ export default function MilkProductionPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredRecords.length === 0 ? (
-                      <TableRow><TableCell colSpan={10} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={11} className="text-center py-8 text-gray-400">No records found</TableCell></TableRow>
                     ) : filteredRecords.map(r => {
                       const sold = r.soldLiters ?? Math.max(0, r.liters - (r.homeConsumption || 0))
                       return (
@@ -783,6 +754,11 @@ export default function MilkProductionPage() {
                           </TableCell>
                           <TableCell className="font-semibold text-emerald-700">{r.liters}L</TableCell>
                           <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption}L` : "—"}</TableCell>
+                          <TableCell className="text-orange-700 font-medium">
+                            {r.homeConsumption && r.pricePerLiter
+                              ? `RWF ${(r.homeConsumption * r.pricePerLiter).toLocaleString()}`
+                              : "—"}
+                          </TableCell>
                           <TableCell className="text-sky-700 font-medium">{sold > 0 ? `${sold.toFixed(1)}L` : "—"}</TableCell>
                           <TableCell>{r.pricePerLiter ? `${r.pricePerLiter}` : "—"}</TableCell>
                           <TableCell>{r.totalAmount ? r.totalAmount.toLocaleString() : "—"}</TableCell>
