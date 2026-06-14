@@ -82,6 +82,7 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
     acquisitionType: animal.acquisitionType || "",
     earTagId: animal.earTagId || "",
     insuranceId: animal.insuranceId || "",
+    gender: (animal as any).gender || "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,6 +252,19 @@ export default function EditAnimalForm({ animal, userId }: EditAnimalFormProps) 
                 onChange={handleChange}
                 placeholder="Enter insurance ID"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender</Label>
+              <Select value={formData.gender} onValueChange={(value) => handleSelectChange("gender", value)} required>
+                <SelectTrigger id="gender">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="male">Male</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

@@ -104,6 +104,10 @@ export function AnimalDetailsClient({ animal, animalId }: AnimalDetailsClientPro
               <p>{t(`farmer.${animal.acquisitionType}`)}</p>
             </div>
             <div>
+              <h3 className="text-sm font-medium text-gray-500">{t('farmer.gender')}</h3>
+              <p>{t(`farmer.${animal.gender}`)}</p>
+            </div>
+            <div>
               <h3 className="text-sm font-medium text-gray-500">{t('farmer.insuranceId')}</h3>
               <p>{animal.insuranceId || t('farmer.notAvailable')}</p>
             </div>

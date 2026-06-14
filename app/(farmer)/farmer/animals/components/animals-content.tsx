@@ -64,6 +64,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                   <TableHead>{t('farmer.acquisitionType')}</TableHead>
                   <TableHead>{t('farmer.location')}</TableHead>
                   <TableHead>{t('farmer.status')}</TableHead>
+                  <TableHead>{t('farmer.gender')}</TableHead>
                   <TableHead>{t('farmer.price')}</TableHead>
                   <TableHead>{t('farmer.actions')}</TableHead>
                 </TableRow>
@@ -96,6 +97,7 @@ export default function AnimalsContent({ animals }: AnimalsContentProps) {
                               animal.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>{animal.gender ? t(`farmer.${animal.gender}`) : t('farmer.undefined')}</TableCell>
                     <TableCell>RWF {animal.price}</TableCell>
                     <TableCell>
                       <DropdownMenu>
