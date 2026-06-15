@@ -918,7 +918,7 @@ export default function InseminationPage() {
                       <TableHead>Semen Price</TableHead>
                       <TableHead>Vet Price</TableHead>
                       <TableHead>Injection Time</TableHead>
-                      <TableHead>Expected Birth</TableHead>
+                      <TableHead>Expected Birth In</TableHead>
                       <TableHead>Babies</TableHead>
                       <TableHead>Vet</TableHead>
                       <TableHead>Organization</TableHead>
