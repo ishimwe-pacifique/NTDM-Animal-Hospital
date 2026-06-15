@@ -714,7 +714,7 @@ export default function InseminationPage() {
                     </SelectContent>
                   </Select>
                   {availableAnimals.length === 0
-                  ? <p className="text-xs text-red-500">No Animals registered - please add animals first</p>
+                  ? <p className="text-xs text-red-500">Please register animals first</p>
                     // ? <p className="text-xs text-red-500">All female animals are currently pregnant</p>
                     : pregnantAnimalIds.size > 0 && <p className="text-xs text-amber-600">{pregnantAnimalIds.size} animal(s) hidden — currently pregnant</p>
                   }
