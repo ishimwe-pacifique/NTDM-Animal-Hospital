@@ -332,6 +332,10 @@ export default function InseminationPage() {
       // Per-cow summary table
       let y = 106
 
+      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81)
+      doc.text("Animal Details", 15, y - 4)
+      y += 6
+
       const summaryCols = {
         animal: { x: 18, width: 25 },
         insurance: { x: 45, width: 30 },
@@ -383,6 +387,10 @@ export default function InseminationPage() {
       y += 16
       if (y > 240) { doc.addPage(); y = 20 }
 
+      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81)
+      doc.text("Semen Details & Days to Birth", 15, y - 4)
+      y += 6
+
       // ── Column layout (narrowed to fit new "Days to Birth" column) ──
       const detailCols = {
         date: { x: 18, width: 18 },
@@ -392,7 +400,7 @@ export default function InseminationPage() {
         vetPrice: { x: 105, width: 15 },
         expectedBirth: { x: 122, width: 24 },
         babies: { x: 150, width: 10 },
-        daysToBirth: { x: 162, width: 33 }, // ← NEW
+        daysToBirth: { x: 162, width: 33 },
       }
 
       const drawDetailHeader = () => {
@@ -407,7 +415,7 @@ export default function InseminationPage() {
         doc.text("Vet Price", detailCols.vetPrice.x, y)
         doc.text("Exp. Birth", detailCols.expectedBirth.x, y)
         doc.text("Babies", detailCols.babies.x, y)
-        doc.text("Days to Birth", detailCols.daysToBirth.x, y) // ← NEW
+        doc.text("Days to Birth", detailCols.daysToBirth.x, y)
         doc.setFont("helvetica", "normal")
         y += 8
       }
@@ -472,6 +480,62 @@ export default function InseminationPage() {
         y += rowHeight
       })
 
+      // ── Third table: Vet & Injection Details ──────────────────────────
+      y += 16
+      if (y > 240) { doc.addPage(); y = 20 }
+
+      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81)
+      doc.text("Vet & Injection Details", 15, y - 4)
+      y += 6
+
+      const vetCols = {
+        animal: { x: 18, width: 30 },
+        vetName: { x: 50, width: 40 },
+        vetOrigin: { x: 92, width: 45 },
+        injection: { x: 139, width: 25 },
+        notes: { x: 166, width: 29 },
+      }
+
+      const drawVetHeader = () => {
+        doc.setFillColor(22, 163, 74)
+        doc.rect(15, y - 6, 180, 8, "F")
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(8); doc.setFont("helvetica", "bold")
+        doc.text("Animal", vetCols.animal.x, y)
+        doc.text("Vet Name", vetCols.vetName.x, y)
+        doc.text("Organization", vetCols.vetOrigin.x, y)
+        doc.text("Injection Time", vetCols.injection.x, y)
+        doc.text("Notes", vetCols.notes.x, y)
+        doc.setFont("helvetica", "normal")
+        y += 8
+      }
+
+      drawVetHeader()
+
+      records.forEach((r, i) => {
+        const animalLines = doc.splitTextToSize(r.animalName || "General", vetCols.animal.width)
+        const vetNameLines = doc.splitTextToSize(r.vetName || "—", vetCols.vetName.width)
+        const originLines = doc.splitTextToSize(r.vetOrigin || "—", vetCols.vetOrigin.width)
+        const notesLines = doc.splitTextToSize(r.notes || "—", vetCols.notes.width)
+        const rowHeight = Math.max(animalLines.length, vetNameLines.length, originLines.length, notesLines.length, 1) * 5 + 4
+
+        if (y + rowHeight > 270) {
+          doc.addPage(); y = 20
+          drawVetHeader()
+        }
+
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 4, 180, rowHeight, "F") }
+        doc.setDrawColor(226, 232, 240); doc.rect(15, y - 4, 180, rowHeight)
+        doc.setTextColor(55, 65, 81)
+        doc.text(animalLines, vetCols.animal.x, y)
+        doc.text(vetNameLines, vetCols.vetName.x, y)
+        doc.text(originLines, vetCols.vetOrigin.x, y)
+        doc.text(r.injectionTime || "—", vetCols.injection.x, y)
+        doc.text(notesLines, vetCols.notes.x, y)
+        y += rowHeight
+      })
+      // ──────────────────────────────────────────────────────────────────
+
       // Footer
       const totalPages = doc.getNumberOfPages()
       for (let page = 1; page <= totalPages; page++) {
@@ -535,6 +599,19 @@ export default function InseminationPage() {
       const ws2 = XLSX.utils.json_to_sheet(recordsData)
       ws2["!cols"] = [14, 18, 22, 22, 18, 16, 16, 20, 18, 20, 22, 30].map(w => ({ wch: w }))
       XLSX.utils.book_append_sheet(wb, ws2, "All Records")
+
+      // Sheet 3 — Vet & Injection Details
+      const vetData = records.map(r => ({
+        Date: r.date,
+        Animal: r.animalName || "General",
+        "Vet Name": r.vetName || "—",
+        "Organization": r.vetOrigin || "—",
+        "Injection Time": r.injectionTime || "—",
+        Notes: r.notes || "—",
+      }))
+      const ws3 = XLSX.utils.json_to_sheet(vetData)
+      ws3["!cols"] = [14, 22, 28, 32, 18, 40].map(w => ({ wch: w }))
+      XLSX.utils.book_append_sheet(wb, ws3, "Vet & Injection Details")
 
       XLSX.writeFile(wb, `insemination-report-${today}.xlsx`)
       setExportOpen(false)

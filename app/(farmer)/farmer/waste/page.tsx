@@ -202,12 +202,11 @@ export default function WasteManagementPage() {
     setExporting(true)
     try {
       const jsPDF = (await import('jspdf')).default
-      const doc = new jsPDF()
-      const totalQ = filteredRecords.reduce((s, r) => s + r.quantity, 0)
+      const doc = new jsPDF({ orientation: 'landscape' })
 
       // Header
       doc.setFillColor(22, 163, 74)
-      doc.rect(0, 0, 210, 38, 'F')
+      doc.rect(0, 0, 297, 38, 'F')
       try {
         const logoImg = new Image(); logoImg.crossOrigin = 'anonymous'; logoImg.src = '/logo/NTDM.png'
         await new Promise((res, rej) => { logoImg.onload = res; logoImg.onerror = rej })
@@ -226,209 +225,112 @@ export default function WasteManagementPage() {
 
       // Summary box
       doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240)
-      doc.rect(15, 66, 180, 22, 'FD')
+      doc.rect(15, 66, 267, 22, 'FD')
       doc.setTextColor(22, 163, 74); doc.setFontSize(11); doc.setFont('helvetica', 'bold')
       doc.text('Summary', 20, 76)
       doc.setTextColor(55, 65, 81); doc.setFont('helvetica', 'normal'); doc.setFontSize(10)
       doc.text(`Records: ${filteredRecords.length}`, 20, 84)
-      doc.text(`Total Quantity: ${totalQ.toFixed(1)}`, 80, 84)
-      doc.text(`Waste Types: ${totalByType.length}`, 145, 84)
+      doc.text(`Total Quantity: ${totalQuantity.toFixed(1)}`, 80, 84)
+      doc.text(`Total Sold: ${totalSold.toFixed(1)}`, 160, 84)
+      doc.text(`Revenue: RWF ${totalRevenue.toLocaleString()}`, 220, 84)
 
-      // Table header
-      // Table header
-      let y = 100
-
-      const columns = {
-        date: { x: 18, width: 25 },
-        animal: { x: 45, width: 35 },
-        wasteType: { x: 82, width: 45 },
-        qty: { x: 130, width: 12 },
-        unit: { x: 145, width: 12 },
-        disposal: { x: 160, width: 30 }
+      // ── Column layout (landscape = 297mm wide, margins 15 each → 267 usable) ──
+      const cols = {
+        date:     { x: 18,  width: 22 },
+        animal:   { x: 42,  width: 28 },
+        type:     { x: 72,  width: 38 },
+        qty:      { x: 112, width: 18 },
+        homeUse:  { x: 132, width: 18 },
+        sold:     { x: 152, width: 20 },
+        price:    { x: 174, width: 20 },
+        revenue:  { x: 196, width: 24 },
+        disposal: { x: 222, width: 28 },
+        notes:    { x: 252, width: 28 },
       }
 
-      // Draw header
-      doc.setFillColor(22, 163, 74)
-      doc.rect(15, y - 6, 180, 8, 'F')
+      let y = 100
 
-      doc.setTextColor(255, 255, 255)
-      doc.setFontSize(8)
-      doc.setFont('helvetica', 'bold')
+      const drawHeader = () => {
+        doc.setFillColor(22, 163, 74)
+        doc.rect(15, y - 6, 267, 8, 'F')
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'bold')
+        doc.text('Date',          cols.date.x,     y)
+        doc.text('Animal',        cols.animal.x,   y)
+        doc.text('Waste Type',    cols.type.x,     y)
+        doc.text('Qty & Unit',    cols.qty.x,      y)
+        doc.text('Home Use',      cols.homeUse.x,  y)
+        doc.text('Sold',          cols.sold.x,     y)
+        doc.text('Price/Unit',    cols.price.x,    y)
+        doc.text('Revenue (RWF)', cols.revenue.x,  y)
+        doc.text('Disposal',      cols.disposal.x, y)
+        doc.text('Notes',         cols.notes.x,    y)
+        doc.setFont('helvetica', 'normal')
+        y += 8
+      }
 
-      doc.text('Date', columns.date.x, y)
-      doc.text('Animal', columns.animal.x, y)
-      doc.text('Waste Type', columns.wasteType.x, y)
-      doc.text('Qty', columns.qty.x, y)
-      doc.text('Unit', columns.unit.x, y)
-      doc.text('Disposal', columns.disposal.x, y)
-
-      doc.setFont('helvetica', 'normal')
-
-      y += 8
+      drawHeader()
 
       filteredRecords.forEach((r, i) => {
-        const wasteText = Array.isArray(r.wasteType)
-          ? r.wasteType.join(', ')
-          : r.wasteType || ''
+        const wasteText = Array.isArray(r.wasteType) ? r.wasteType.join(', ') : r.wasteType || ''
+        const soldQty = r.soldQuantity ?? Math.max(0, r.quantity - (r.homeConsumption || 0))
 
-        const disposalText = r.disposalMethod || '—'
+        const typeLines     = doc.splitTextToSize(wasteText,               cols.type.width)
+        const animalLines   = doc.splitTextToSize(r.animalName || 'General', cols.animal.width)
+        const disposalLines = doc.splitTextToSize(r.disposalMethod || '—', cols.disposal.width)
+        const notesLines    = doc.splitTextToSize(r.notes || '—',          cols.notes.width)
 
-        const wasteLines = doc.splitTextToSize(
-          wasteText,
-          columns.wasteType.width
-        )
+        const rowHeight = Math.max(typeLines.length, animalLines.length, disposalLines.length, notesLines.length, 1) * 5 + 4
 
-        const disposalLines = doc.splitTextToSize(
-          disposalText,
-          columns.disposal.width
-        )
+        if (y + rowHeight > 190) { doc.addPage(); y = 20; drawHeader() }
 
-        const animalLines = doc.splitTextToSize(
-          r.animalName || 'General',
-          columns.animal.width
-        )
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 4, 267, rowHeight, 'F') }
+        doc.setDrawColor(226, 232, 240); doc.rect(15, y - 4, 267, rowHeight)
 
-        const rowHeight =
-          Math.max(
-            wasteLines.length,
-            disposalLines.length,
-            animalLines.length,
-            1
-          ) * 5 + 4
+        doc.setFontSize(7.5); doc.setTextColor(55, 65, 81)
+        doc.text(new Date(r.date).toLocaleDateString(), cols.date.x, y)
+        doc.text(animalLines,                            cols.animal.x,   y)
+        doc.text(typeLines,                              cols.type.x,     y)
 
-        // New page if needed
-        if (y + rowHeight > 270) {
-          doc.addPage()
-
-          y = 20
-
-          // Redraw header on new page
-          doc.setFillColor(22, 163, 74)
-          doc.rect(15, y - 6, 180, 8, 'F')
-
-          doc.setTextColor(255, 255, 255)
-          doc.setFontSize(8)
-          doc.setFont('helvetica', 'bold')
-
-          doc.text('Date', columns.date.x, y)
-          doc.text('Animal', columns.animal.x, y)
-          doc.text('Waste Type', columns.wasteType.x, y)
-          doc.text('Qty', columns.qty.x, y)
-          doc.text('Unit', columns.unit.x, y)
-          doc.text('Disposal', columns.disposal.x, y)
-
-          doc.setFont('helvetica', 'normal')
-
-          y += 8
-        }
-
-        // Alternate row background
-        if (i % 2 === 0) {
-          doc.setFillColor(248, 250, 252)
-          doc.rect(15, y - 4, 180, rowHeight, 'F')
-        }
-
-        // Row border
-        doc.setDrawColor(226, 232, 240)
-        doc.rect(15, y - 4, 180, rowHeight)
-
-        // Vertical separators
-        doc.line(43, y - 4, 43, y - 4 + rowHeight)
-        doc.line(80, y - 4, 80, y - 4 + rowHeight)
-        doc.line(128, y - 4, 128, y - 4 + rowHeight)
-        doc.line(143, y - 4, 143, y - 4 + rowHeight)
-        doc.line(158, y - 4, 158, y - 4 + rowHeight)
-
-        // Date
-        doc.setTextColor(55, 65, 81)
-        const formattedDate = new Date(r.date).toLocaleDateString()
-
-        doc.text(
-          formattedDate,
-          columns.date.x,
-          y
-        )
-
-        // Animal
-        doc.text(
-          animalLines,
-          columns.animal.x,
-          y
-        )
-
-        // Waste Type
-        doc.text(
-          wasteLines,
-          columns.wasteType.x,
-          y
-        )
-
-        // Quantity
+        // Quantity + unit
         doc.setTextColor(22, 163, 74)
-        doc.text(
-          String(r.quantity ?? 0),
-          columns.qty.x,
-          y
-        )
+        doc.text(`${r.quantity} ${r.unit}`,              cols.qty.x,      y)
 
-        // Unit
+        // Home use
+        doc.setTextColor(217, 119, 6)
+        doc.text(r.homeConsumption ? `${r.homeConsumption} ${r.unit}` : '—', cols.homeUse.x, y)
+
+        // Sold
+        doc.setTextColor(14, 165, 233)
+        doc.text(soldQty > 0 ? `${soldQty.toFixed(1)} ${r.unit}` : '—', cols.sold.x, y)
+
+        // Price per unit
         doc.setTextColor(55, 65, 81)
-        doc.text(
-          r.unit || '—',
-          columns.unit.x,
-          y
-        )
+        doc.text(r.pricePerUnit != null ? String(r.pricePerUnit) : '—', cols.price.x, y)
 
-        // Disposal
-        doc.text(
-          disposalLines,
-          columns.disposal.x,
-          y
-        )
+        // Revenue
+        doc.setTextColor(22, 163, 74)
+        doc.text(r.totalAmount ? r.totalAmount.toLocaleString() : '—', cols.revenue.x, y)
+
+        // Disposal & Notes
+        doc.setTextColor(55, 65, 81)
+        doc.text(disposalLines, cols.disposal.x, y)
+        doc.text(notesLines,    cols.notes.x,    y)
 
         y += rowHeight
       })
 
       // Footer
       const totalPages = doc.getNumberOfPages()
-
       for (let page = 1; page <= totalPages; page++) {
         doc.setPage(page)
-
-        const pageWidth = doc.internal.pageSize.getWidth()
-        const pageHeight = doc.internal.pageSize.getHeight()
-
-        // Footer background
-        doc.setFillColor(248, 250, 252)
-        doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
-
-        // Top border line
-        doc.setDrawColor(226, 232, 240)
-        doc.line(
-          0,
-          pageHeight - 18,
-          pageWidth,
-          pageHeight - 18
-        )
-
-        doc.setFontSize(7)
-        doc.setTextColor(107, 114, 128)
-
-        // Left side
-        doc.text(
-          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
-          }`,
-          15,
-          pageHeight - 7
-        )
-
-        // Right side page number
-        doc.text(
-          `Page ${page} of ${totalPages}`,
-          pageWidth - 15,
-          pageHeight - 7,
-          { align: "right" }
-        )
+        const pw = doc.internal.pageSize.getWidth()
+        const ph = doc.internal.pageSize.getHeight()
+        doc.setFillColor(248, 250, 252); doc.rect(0, ph - 18, pw, 18, 'F')
+        doc.setDrawColor(226, 232, 240); doc.line(0, ph - 18, pw, ph - 18)
+        doc.setFontSize(7); doc.setTextColor(107, 114, 128)
+        doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || 'Unknown'}`, 15, ph - 7)
+        doc.text(`Page ${page} of ${totalPages}`, pw - 15, ph - 7, { align: 'right' })
       }
 
       doc.save(`waste-report-${today}.pdf`)
@@ -444,18 +346,24 @@ export default function WasteManagementPage() {
     setExporting(true)
     try {
       const XLSX = await import('xlsx')
-      const data = filteredRecords.map(r => ({
-        Date: r.date,
-        Animal: r.animalName || 'General',
-        // 'Insurance ID': getAnimalInsuranceId(r.animalId),
-        'Waste Type': Array.isArray(r.wasteType) ? r.wasteType.join(', ') : r.wasteType,
-        Quantity: r.quantity,
-        Unit: r.unit,
-        'Disposal Method': r.disposalMethod || '—',
-        Notes: r.notes || '—',
-      }))
+      const data = filteredRecords.map(r => {
+        const soldQty = r.soldQuantity ?? Math.max(0, r.quantity - (r.homeConsumption || 0))
+        return {
+          Date: r.date,
+          Animal: r.animalName || 'General',
+          'Waste Type': Array.isArray(r.wasteType) ? r.wasteType.join(', ') : r.wasteType,
+          'Quantity': r.quantity,
+          'Unit': r.unit,
+          'Home Use': r.homeConsumption ?? '—',
+          'Sold Quantity': soldQty > 0 ? soldQty : '—',
+          'Price per Unit (RWF)': r.pricePerUnit ?? '—',
+          'Revenue (RWF)': r.totalAmount ?? '—',
+          'Disposal Method': r.disposalMethod || '—',
+          'Notes': r.notes || '—',
+        }
+      })
       const ws = XLSX.utils.json_to_sheet(data)
-      ws['!cols'] = [14, 18, 20, 24, 10, 10, 20, 30].map(w => ({ wch: w }))
+      ws['!cols'] = [14, 20, 24, 10, 10, 12, 16, 20, 16, 22, 30].map(w => ({ wch: w }))
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Waste Records')
       XLSX.writeFile(wb, `waste-report-${today}.xlsx`)
@@ -738,7 +646,6 @@ export default function WasteManagementPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">{r.animalName || <span className="text-gray-400">General</span>}</TableCell>
-
                         <TableCell className="font-semibold text-emerald-700">{r.quantity} {r.unit}</TableCell>
                         <TableCell className="text-orange-600">{r.homeConsumption ? `${r.homeConsumption} ${r.unit}` : "—"}</TableCell>
                         <TableCell className="text-sky-700 font-medium">{(() => { const s = r.soldQuantity ?? Math.max(0, r.quantity - (r.homeConsumption || 0)); return s > 0 ? `${s.toFixed(1)} ${r.unit}` : "—" })()}</TableCell>
@@ -905,3 +812,4 @@ export default function WasteManagementPage() {
     </div>
   )
 }
+
