@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { farmerId, animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate, status, notes, veterinarianName } = body
+    const { farmerId, animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate, status, notes, veterinarianName, vetOrigin } = body
 
     if (!farmerId || !animalId || !diseaseName || !diagnosedDate)
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       status: status || "Active",
       notes: notes || null,
       veterinarianName: veterinarianName || null,
+      vetOrigin: vetOrigin || null,
       createdAt: new Date(),
     }
 
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
-    const { id, animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate, status, notes, veterinarianName } = body
+    const { id, animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate, status, notes, veterinarianName, vetOrigin } = body
     if (!id) return NextResponse.json({ error: "Record ID required" }, { status: 400 })
 
     const client = await clientPromise
@@ -78,7 +79,7 @@ export async function PUT(req: NextRequest) {
 
     await db.collection("disease_records").updateOne(
       { _id: new ObjectId(id) },
-      { $set: { animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate: resolvedDate || null, status, notes, veterinarianName, updatedAt: new Date() } }
+      { $set: { animalId, animalName, diseaseName, symptoms, treatment, diagnosedDate, resolvedDate: resolvedDate || null, status, notes, veterinarianName, vetOrigin, updatedAt: new Date() } }
     )
 
     // If resolved, update the animal status back to Healthy
