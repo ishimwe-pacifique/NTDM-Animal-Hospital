@@ -254,13 +254,23 @@ export default function MilkProductionPage() {
 
       const cols = {
         date: { x: 18, width: 18 },
-        animal: { x: 38, width: 22 },
-        earTag: { x: 62, width: 18 },
-        insurance: { x: 82, width: 22 },
-        session: { x: 106, width: 14 },
-        liters: { x: 122, width: 10 },
-        consumed: { x: 134, width: 14 },
-        consumedVal: { x: 150, width: 18 },
+
+        animal: { x: 36, width: 22 },
+
+        earTag: { x: 58, width: 18 },
+
+        insurance: { x: 76, width: 20 },
+
+        session: { x: 96, width: 14 },
+
+        liters: { x: 110, width: 12 },
+
+        price: { x: 122, width: 16 },
+
+        consumed: { x: 138, width: 14 },
+
+        consumedVal: { x: 152, width: 18 },
+
         total: { x: 170, width: 22 }
       }
 
@@ -276,6 +286,7 @@ export default function MilkProductionPage() {
         doc.text("Insurance", cols.insurance.x, y)
         doc.text("Session", cols.session.x, y)
         doc.text("Liters", cols.liters.x, y)
+        doc.text("Price/L", cols.price.x, y)
         doc.text("Home use", cols.consumed.x, y)
         doc.text("Home.Val", cols.consumedVal.x, y)
         doc.text("Total (RWF)", cols.total.x, y)
@@ -332,14 +343,15 @@ export default function MilkProductionPage() {
         doc.rect(15, y - 4, 180, rowHeight)
 
         // Column separators
-        doc.line(36, y - 4, 36, y - 4 + rowHeight)
-        doc.line(60, y - 4, 60, y - 4 + rowHeight)
-        doc.line(80, y - 4, 80, y - 4 + rowHeight)
-        doc.line(104, y - 4, 104, y - 4 + rowHeight)
-        doc.line(120, y - 4, 120, y - 4 + rowHeight)
-        doc.line(132, y - 4, 132, y - 4 + rowHeight)
-        doc.line(148, y - 4, 148, y - 4 + rowHeight)
-        doc.line(168, y - 4, 168, y - 4 + rowHeight)
+        doc.line(36, y - 4, 36, y - 4 + rowHeight)   // date | animal
+        doc.line(58, y - 4, 58, y - 4 + rowHeight)   // animal | earTag
+        doc.line(76, y - 4, 76, y - 4 + rowHeight)   // earTag | insurance
+        doc.line(96, y - 4, 96, y - 4 + rowHeight)   // insurance | session
+        doc.line(110, y - 4, 110, y - 4 + rowHeight) // session | liters
+        doc.line(122, y - 4, 122, y - 4 + rowHeight) // liters | price
+        doc.line(138, y - 4, 138, y - 4 + rowHeight) // price | consumed
+        doc.line(152, y - 4, 152, y - 4 + rowHeight) // consumed | consumedVal
+        doc.line(170, y - 4, 170, y - 4 + rowHeight) // consumedVal | total
 
         doc.setTextColor(55, 65, 81)
         doc.text(new Date(r.date).toLocaleDateString(), cols.date.x, y)
@@ -349,11 +361,12 @@ export default function MilkProductionPage() {
         doc.text(r.session || "-", cols.session.x, y)
         doc.setTextColor(22, 163, 74)
         doc.text(`${Number(r.liters || 0).toFixed(1)}L`, cols.liters.x, y)
+        doc.text(r.pricePerLiter ? `RWF ${Number(r.pricePerLiter).toFixed(2)}` : "-", cols.price.x, y)
         doc.setTextColor(234, 88, 12)
         doc.text(r.homeConsumption ? `${r.homeConsumption}L` : "-", cols.consumed.x, y)
         doc.text(
           r.homeConsumption && r.pricePerLiter
-            ? (r.homeConsumption * r.pricePerLiter).toLocaleString()
+            ? `RWF ${(r.homeConsumption * r.pricePerLiter).toLocaleString()}`
             : "-",
           cols.consumedVal.x, y
         )
@@ -1043,181 +1056,181 @@ export default function MilkProductionPage() {
 
       {/* Details Dialog */}
       <Dialog open={!!detailRecord} onOpenChange={open => !open && setDetailRecord(null)}>
-  <DialogContent className="max-w-2xl p-6 rounded-2xl">
-    <DialogHeader>
-      <DialogTitle className="flex items-center gap-2">
-        <Eye className="h-5 w-5 text-sky-600" />
-        Milk Record Details
-      </DialogTitle>
-    </DialogHeader>
+        <DialogContent className="max-w-2xl p-6 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-sky-600" />
+              Milk Record Details
+            </DialogTitle>
+          </DialogHeader>
 
-    {detailRecord && (() => {
-      const sold =
-        detailRecord.soldLiters ??
-        Math.max(0, detailRecord.liters - (detailRecord.homeConsumption || 0))
+          {detailRecord && (() => {
+            const sold =
+              detailRecord.soldLiters ??
+              Math.max(0, detailRecord.liters - (detailRecord.homeConsumption || 0))
 
-      const consumedValue =
-        detailRecord.homeConsumption && detailRecord.pricePerLiter
-          ? (detailRecord.homeConsumption * detailRecord.pricePerLiter).toLocaleString()
-          : null
+            const consumedValue =
+              detailRecord.homeConsumption && detailRecord.pricePerLiter
+                ? (detailRecord.homeConsumption * detailRecord.pricePerLiter).toLocaleString()
+                : null
 
-      const animal = animals.find(a => a._id === detailRecord.cowId)
+            const animal = animals.find(a => a._id === detailRecord.cowId)
 
-      const Row = ({
-        label,
-        value,
-        color
-      }: {
-        label: string
-        value: React.ReactNode
-        color?: string
-      }) => (
-        <div className="flex items-start justify-between py-2 border-b border-gray-50 last:border-0">
-          <span className="text-sm text-gray-500 w-44 shrink-0">{label}</span>
-          <span className={`text-sm text-right ${color || 'text-gray-800'}`}>
-            {value}
-          </span>
-        </div>
-      )
+            const Row = ({
+              label,
+              value,
+              color
+            }: {
+              label: string
+              value: React.ReactNode
+              color?: string
+            }) => (
+              <div className="flex items-start justify-between py-2 border-b border-gray-50 last:border-0">
+                <span className="text-sm text-gray-500 w-44 shrink-0">{label}</span>
+                <span className={`text-sm text-right ${color || 'text-gray-800'}`}>
+                  {value}
+                </span>
+              </div>
+            )
 
-      const Section = ({
-        title,
-        children
-      }: {
-        title: string
-        children: React.ReactNode
-      }) => (
-        <div className="border rounded-lg p-4 space-y-1 bg-white">
-          <h3 className="text-xs uppercase tracking-wider text-gray-400 mb-2">
-            {title}
-          </h3>
-          {children}
-        </div>
-      )
+            const Section = ({
+              title,
+              children
+            }: {
+              title: string
+              children: React.ReactNode
+            }) => (
+              <div className="border rounded-lg p-4 space-y-1 bg-white">
+                <h3 className="text-xs uppercase tracking-wider text-gray-400 mb-2">
+                  {title}
+                </h3>
+                {children}
+              </div>
+            )
 
-      return (
-        <div className="space-y-4 pt-2 max-h-[70vh] overflow-y-auto pr-2">
+            return (
+              <div className="space-y-4 pt-2 max-h-[70vh] overflow-y-auto pr-2">
 
-          {/* ANIMAL */}
-          <Section title="Animal Information">
-            <Row label="Animal" value={detailRecord.cowName} />
-            <Row
-              label="Ear Tag ID"
-              value={
-                animal?.earTagId || (
-                  <span className="text-gray-400 italic">Not registered</span>
-                )
-              }
-            />
-            <Row
-              label="Insurance ID"
-              value={
-                animal?.insuranceId || (
-                  <span className="text-gray-400 italic">Not registered</span>
-                )
-              }
-            />
-          </Section>
+                {/* ANIMAL */}
+                <Section title="Animal Information">
+                  <Row label="Animal" value={detailRecord.cowName} />
+                  <Row
+                    label="Ear Tag ID"
+                    value={
+                      animal?.earTagId || (
+                        <span className="text-gray-400 italic">Not registered</span>
+                      )
+                    }
+                  />
+                  <Row
+                    label="Insurance ID"
+                    value={
+                      animal?.insuranceId || (
+                        <span className="text-gray-400 italic">Not registered</span>
+                      )
+                    }
+                  />
+                </Section>
 
-          {/* PRODUCTION */}
-          <Section title="Milk Production">
-            <Row label="Date" value={detailRecord.date} />
-            <Row
-              label="Time"
-              value={detailRecord.time || <span className="text-gray-400">—</span>}
-            />
-            <Row
-              label="Session"
-              value={
-                <Badge
-                  variant="outline"
-                  className={
-                    detailRecord.session === 'Morning'
-                      ? 'bg-amber-50 text-amber-700 border-amber-200'
-                      : 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                  }
-                >
-                  {detailRecord.session}
-                </Badge>
-              }
-            />
-            <Row
-              label="Total Milk (L)"
-              value={`${detailRecord.liters} L`}
-              color="text-emerald-700 font-semibold"
-            />
-            <Row
-              label="Home Consumed (L)"
-              value={
-                detailRecord.homeConsumption
-                  ? `${detailRecord.homeConsumption} L`
-                  : <span className="text-gray-400">—</span>
-              }
-              color="text-orange-600"
-            />
-            <Row
-              label="Sold (L)"
-              value={
-                sold > 0 ? `${sold.toFixed(1)} L` : <span className="text-gray-400">—</span>
-              }
-              color="text-sky-700 font-semibold"
-            />
-          </Section>
+                {/* PRODUCTION */}
+                <Section title="Milk Production">
+                  <Row label="Date" value={detailRecord.date} />
+                  <Row
+                    label="Time"
+                    value={detailRecord.time || <span className="text-gray-400">—</span>}
+                  />
+                  <Row
+                    label="Session"
+                    value={
+                      <Badge
+                        variant="outline"
+                        className={
+                          detailRecord.session === 'Morning'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                        }
+                      >
+                        {detailRecord.session}
+                      </Badge>
+                    }
+                  />
+                  <Row
+                    label="Total Milk (L)"
+                    value={`${detailRecord.liters} L`}
+                    color="text-emerald-700 font-semibold"
+                  />
+                  <Row
+                    label="Home Consumed (L)"
+                    value={
+                      detailRecord.homeConsumption
+                        ? `${detailRecord.homeConsumption} L`
+                        : <span className="text-gray-400">—</span>
+                    }
+                    color="text-orange-600"
+                  />
+                  <Row
+                    label="Sold (L)"
+                    value={
+                      sold > 0 ? `${sold.toFixed(1)} L` : <span className="text-gray-400">—</span>
+                    }
+                    color="text-sky-700 font-semibold"
+                  />
+                </Section>
 
-          {/* FINANCE */}
-          <Section title="Financial Summary">
-            <Row
-              label="Price per Liter (RWF)"
-              value={
-                detailRecord.pricePerLiter
-                  ? `RWF ${detailRecord.pricePerLiter}`
-                  : <span className="text-gray-400">—</span>
-              }
-            />
-            <Row
-              label="Consumed Value (RWF)"
-              value={
-                consumedValue ? `RWF ${consumedValue}` : <span className="text-gray-400">—</span>
-              }
-              color="text-orange-700"
-            />
-            <Row
-              label="Total Revenue (RWF)"
-              value={
-                detailRecord.totalAmount
-                  ? `RWF ${detailRecord.totalAmount.toLocaleString()}`
-                  : <span className="text-gray-400">—</span>
-              }
-              color="text-emerald-700 font-semibold"
-            />
-          </Section>
+                {/* FINANCE */}
+                <Section title="Financial Summary">
+                  <Row
+                    label="Price per Liter (RWF)"
+                    value={
+                      detailRecord.pricePerLiter
+                        ? `RWF ${detailRecord.pricePerLiter}`
+                        : <span className="text-gray-400">—</span>
+                    }
+                  />
+                  <Row
+                    label="Consumed Value (RWF)"
+                    value={
+                      consumedValue ? `RWF ${consumedValue}` : <span className="text-gray-400">—</span>
+                    }
+                    color="text-orange-700"
+                  />
+                  <Row
+                    label="Total Revenue (RWF)"
+                    value={
+                      detailRecord.totalAmount
+                        ? `RWF ${detailRecord.totalAmount.toLocaleString()}`
+                        : <span className="text-gray-400">—</span>
+                    }
+                    color="text-emerald-700 font-semibold"
+                  />
+                </Section>
 
-          {/* FEED */}
-          <Section title="Feed & Notes">
-            <Row
-              label="Water Intake (L)"
-              value={
-                detailRecord.waterLiters
-                  ? `${detailRecord.waterLiters} L`
-                  : <span className="text-gray-400">—</span>
-              }
-              color="text-sky-600"
-            />
-            <Row
-              label="Food Type"
-              value={detailRecord.foodType || <span className="text-gray-400">—</span>}
-            />
-            <Row
-              label="Notes"
-              value={detailRecord.notes || <span className="text-gray-400">—</span>}
-            />
-          </Section>
+                {/* FEED */}
+                <Section title="Feed & Notes">
+                  <Row
+                    label="Water Intake (L)"
+                    value={
+                      detailRecord.waterLiters
+                        ? `${detailRecord.waterLiters} L`
+                        : <span className="text-gray-400">—</span>
+                    }
+                    color="text-sky-600"
+                  />
+                  <Row
+                    label="Food Type"
+                    value={detailRecord.foodType || <span className="text-gray-400">—</span>}
+                  />
+                  <Row
+                    label="Notes"
+                    value={detailRecord.notes || <span className="text-gray-400">—</span>}
+                  />
+                </Section>
 
-        </div>
-      )
-    })()}
-  </DialogContent>
-</Dialog>
+              </div>
+            )
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>

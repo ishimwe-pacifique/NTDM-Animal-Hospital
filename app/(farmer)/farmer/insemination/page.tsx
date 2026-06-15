@@ -338,284 +338,153 @@ export default function InseminationPage() {
         earTag: { x: 80, width: 25 },
         inseminations: { x: 112, width: 20 },
         babies: { x: 145, width: 20 },
-        cost: { x: 170, width: 20 }
+        cost: { x: 170, width: 20 },
       }
 
       doc.setFillColor(22, 163, 74)
       doc.rect(15, y - 6, 180, 8, "F")
-
       doc.setTextColor(255, 255, 255)
-      doc.setFontSize(8)
-      doc.setFont("helvetica", "bold")
-
+      doc.setFontSize(8); doc.setFont("helvetica", "bold")
       doc.text("Animal", summaryCols.animal.x, y)
       doc.text("Insurance ID", summaryCols.insurance.x, y)
       doc.text("Ear Tag ID", summaryCols.earTag.x, y)
       doc.text("Inseminations", summaryCols.inseminations.x, y)
       doc.text("Babies", summaryCols.babies.x, y)
       doc.text("Cost", summaryCols.cost.x, y)
-
       doc.setFont("helvetica", "normal")
-
       y += 8
 
       cowSummary.forEach((c, i) => {
         const animal = animals.find(a => a.name === c.name)
 
-        const animalLines = doc.splitTextToSize(
-          c.name || "—",
-          summaryCols.animal.width
-        )
+        const animalLines = doc.splitTextToSize(c.name || "—", summaryCols.animal.width)
+        const insuranceLines = doc.splitTextToSize(animal?.insuranceId || "—", summaryCols.insurance.width)
+        const earTagLines = doc.splitTextToSize(animal?.earTagId || "—", summaryCols.earTag.width)
 
-        const insuranceLines = doc.splitTextToSize(
-          animal?.insuranceId || "—",
-          summaryCols.insurance.width
-        )
+        const rowHeight = Math.max(animalLines.length, insuranceLines.length, earTagLines.length, 1) * 5 + 4
 
-        const earTagLines = doc.splitTextToSize(
-          animal?.earTagId || "—",
-          summaryCols.earTag.width
-        )
+        if (y + rowHeight > 270) { doc.addPage(); y = 20 }
 
-        const rowHeight =
-          Math.max(
-            animalLines.length,
-            insuranceLines.length,
-            earTagLines.length,
-            1
-          ) * 5 + 4
-
-        if (y + rowHeight > 270) {
-          doc.addPage()
-          y = 20
-        }
-
-        if (i % 2 === 0) {
-          doc.setFillColor(248, 250, 252)
-          doc.rect(15, y - 4, 180, rowHeight, "F")
-        }
-
-        doc.setDrawColor(226, 232, 240)
-        doc.rect(15, y - 4, 180, rowHeight)
-
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 4, 180, rowHeight, "F") }
+        doc.setDrawColor(226, 232, 240); doc.rect(15, y - 4, 180, rowHeight)
         doc.setTextColor(55, 65, 81)
-
         doc.text(animalLines, summaryCols.animal.x, y)
         doc.text(insuranceLines, summaryCols.insurance.x, y)
         doc.text(earTagLines, summaryCols.earTag.x, y)
-
-        doc.text(
-          String(c.inseminations),
-          summaryCols.inseminations.x,
-          y
-        )
-
+        doc.text(String(c.inseminations), summaryCols.inseminations.x, y)
         doc.setTextColor(22, 163, 74)
-        doc.text(
-          String(c.babies),
-          summaryCols.babies.x,
-          y
-        )
-
+        doc.text(String(c.babies), summaryCols.babies.x, y)
         doc.setTextColor(55, 65, 81)
-        doc.text(
-          c.totalCost > 0
-            ? c.totalCost.toLocaleString()
-            : "—",
-          summaryCols.cost.x,
-          y
-        )
-
+        doc.text(c.totalCost > 0 ? c.totalCost.toLocaleString() : "—", summaryCols.cost.x, y)
         y += rowHeight
       })
 
       // Detailed records section
       y += 16
+      if (y > 240) { doc.addPage(); y = 20 }
 
-      if (y > 240) {
-        doc.addPage()
-        y = 20
-      }
-
+      // ── Column layout (narrowed to fit new "Days to Birth" column) ──
       const detailCols = {
-        date: { x: 18, width: 20 },
-        animal: { x: 40, width: 22 },
-        semen: { x: 64, width: 28 },
-        semenPrice: { x: 95, width: 18 },
-        vetPrice: { x: 118, width: 18 },
-        expectedBirth: { x: 140, width: 28 },
-        babies: { x: 175, width: 10 }
+        date: { x: 18, width: 18 },
+        animal: { x: 37, width: 20 },
+        semen: { x: 58, width: 26 },
+        semenPrice: { x: 86, width: 17 },
+        vetPrice: { x: 105, width: 15 },
+        expectedBirth: { x: 122, width: 24 },
+        babies: { x: 150, width: 10 },
+        daysToBirth: { x: 162, width: 33 }, // ← NEW
       }
 
-      doc.setFillColor(22, 163, 74)
-      doc.rect(15, y - 6, 180, 8, "F")
+      const drawDetailHeader = () => {
+        doc.setFillColor(22, 163, 74)
+        doc.rect(15, y - 6, 180, 8, "F")
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(8); doc.setFont("helvetica", "bold")
+        doc.text("Date", detailCols.date.x, y)
+        doc.text("Animal", detailCols.animal.x, y)
+        doc.text("Semen Type", detailCols.semen.x, y)
+        doc.text("Semen Price", detailCols.semenPrice.x, y)
+        doc.text("Vet Price", detailCols.vetPrice.x, y)
+        doc.text("Exp. Birth", detailCols.expectedBirth.x, y)
+        doc.text("Babies", detailCols.babies.x, y)
+        doc.text("Days to Birth", detailCols.daysToBirth.x, y) // ← NEW
+        doc.setFont("helvetica", "normal")
+        y += 8
+      }
 
-      doc.setTextColor(255, 255, 255)
-      doc.setFontSize(8)
-      doc.setFont("helvetica", "bold")
-
-      doc.text("Date", detailCols.date.x, y)
-      doc.text("Animal", detailCols.animal.x, y)
-      doc.text("Semen Type", detailCols.semen.x, y)
-      doc.text("Semen Price", detailCols.semenPrice.x, y)
-      doc.text("Vet Price", detailCols.vetPrice.x, y)
-      doc.text("Expected Birth", detailCols.expectedBirth.x, y)
-      doc.text("Babies", detailCols.babies.x, y)
-
-      doc.setFont("helvetica", "normal")
-
-      y += 8
+      drawDetailHeader()
 
       records.forEach((r, i) => {
-        const semenText = Array.isArray(r.semenTypes)
-          ? r.semenTypes.join(", ")
-          : r.semenTypes || "—"
+        const semenText = Array.isArray(r.semenTypes) ? r.semenTypes.join(", ") : r.semenTypes || "—"
+        const semenLines = doc.splitTextToSize(semenText, detailCols.semen.width)
+        const animalLines = doc.splitTextToSize(r.animalName || "General", detailCols.animal.width)
+        const rowHeight = Math.max(semenLines.length, animalLines.length, 1) * 5 + 4
 
-        const semenLines = doc.splitTextToSize(
-          semenText,
-          detailCols.semen.width
-        )
+        // ── Compute days to birth ──────────────────────────────────────
+        let daysToBirthText = "—"
+        let daysToBirthColor: [number, number, number] = [156, 163, 175] // gray
 
-        const animalLines = doc.splitTextToSize(
-          r.animalName || "General",
-          detailCols.animal.width
-        )
-
-        const rowHeight =
-          Math.max(
-            semenLines.length,
-            animalLines.length,
-            1
-          ) * 5 + 4
+        if (r.expectedBirthDate && r.deliveredBabies == null) {
+          const diffDays = Math.ceil(
+            (new Date(r.expectedBirthDate).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0))
+            / (1000 * 60 * 60 * 24)
+          )
+          if (diffDays > 7) {
+            daysToBirthText = `${diffDays}d remaining`
+            daysToBirthColor = [22, 163, 74]   // green
+          } else if (diffDays >= 0) {
+            daysToBirthText = diffDays === 0 ? "Due today!" : `${diffDays}d remaining`
+            daysToBirthColor = [217, 119, 6]   // amber
+          } else {
+            daysToBirthText = `${Math.abs(diffDays)}d overdue`
+            daysToBirthColor = [220, 38, 38]   // red
+          }
+        } else if (r.deliveredBabies != null) {
+          daysToBirthText = "Delivered"
+          daysToBirthColor = [100, 116, 139]   // slate
+        }
+        // ──────────────────────────────────────────────────────────────
 
         if (y + rowHeight > 270) {
           doc.addPage()
-
           y = 20
-
-          doc.setFillColor(22, 163, 74)
-          doc.rect(15, y - 6, 180, 8, "F")
-
-          doc.setTextColor(255, 255, 255)
-          doc.setFontSize(8)
-          doc.setFont("helvetica", "bold")
-
-          doc.text("Date", detailCols.date.x, y)
-          doc.text("Animal", detailCols.animal.x, y)
-          doc.text("Semen Type", detailCols.semen.x, y)
-          doc.text("Semen Price", detailCols.semenPrice.x, y)
-          doc.text("Vet Price", detailCols.vetPrice.x, y)
-          doc.text("Expected Birth", detailCols.expectedBirth.x, y)
-          doc.text("Babies", detailCols.babies.x, y)
-
-          doc.setFont("helvetica", "normal")
-
-          y += 8
+          drawDetailHeader()
         }
 
-        if (i % 2 === 0) {
-          doc.setFillColor(248, 250, 252)
-          doc.rect(15, y - 4, 180, rowHeight, "F")
-        }
-
-        doc.setDrawColor(226, 232, 240)
-        doc.rect(15, y - 4, 180, rowHeight)
+        if (i % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, y - 4, 180, rowHeight, "F") }
+        doc.setDrawColor(226, 232, 240); doc.rect(15, y - 4, 180, rowHeight)
 
         doc.setTextColor(55, 65, 81)
-
-        doc.text(
-          new Date(r.date).toLocaleDateString(),
-          detailCols.date.x,
-          y
-        )
-
-        doc.text(
-          animalLines,
-          detailCols.animal.x,
-          y
-        )
-
-        doc.text(
-          semenLines,
-          detailCols.semen.x,
-          y
-        )
-
-        doc.text(
-          r.semenPrice != null
-            ? r.semenPrice.toLocaleString()
-            : "—",
-          detailCols.semenPrice.x,
-          y
-        )
-
-        doc.text(
-          r.vetPrice != null
-            ? r.vetPrice.toLocaleString()
-            : "—",
-          detailCols.vetPrice.x,
-          y
-        )
-
-        doc.text(
-          r.expectedBirthDate || "—",
-          detailCols.expectedBirth.x,
-          y
-        )
+        doc.text(new Date(r.date).toLocaleDateString(), detailCols.date.x, y)
+        doc.text(animalLines, detailCols.animal.x, y)
+        doc.text(semenLines, detailCols.semen.x, y)
+        doc.text(r.semenPrice != null ? r.semenPrice.toLocaleString() : "—", detailCols.semenPrice.x, y)
+        doc.text(r.vetPrice != null ? r.vetPrice.toLocaleString() : "—", detailCols.vetPrice.x, y)
+        doc.text(r.expectedBirthDate || "—", detailCols.expectedBirth.x, y)
 
         doc.setTextColor(22, 163, 74)
+        doc.text(r.deliveredBabies != null ? String(r.deliveredBabies) : "—", detailCols.babies.x, y)
 
-        doc.text(
-          r.deliveredBabies != null
-            ? String(r.deliveredBabies)
-            : "—",
-          detailCols.babies.x,
-          y
-        )
+        // ── Render Days to Birth with its color ──
+        doc.setTextColor(...daysToBirthColor)
+        doc.text(daysToBirthText, detailCols.daysToBirth.x, y)
 
         y += rowHeight
       })
 
       // Footer
       const totalPages = doc.getNumberOfPages()
-
       for (let page = 1; page <= totalPages; page++) {
         doc.setPage(page)
-
         const pageWidth = doc.internal.pageSize.getWidth()
         const pageHeight = doc.internal.pageSize.getHeight()
-
-        // Footer background
         doc.setFillColor(248, 250, 252)
         doc.rect(0, pageHeight - 18, pageWidth, 18, "F")
-
-        // Top border line
         doc.setDrawColor(226, 232, 240)
-        doc.line(
-          0,
-          pageHeight - 18,
-          pageWidth,
-          pageHeight - 18
-        )
-
-        doc.setFontSize(7)
-        doc.setTextColor(107, 114, 128)
-
-        // Left side
-        doc.text(
-          `NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"
-          }`,
-          15,
-          pageHeight - 7
-        )
-
-        // Right side page number
-        doc.text(
-          `Page ${page} of ${totalPages}`,
-          pageWidth - 15,
-          pageHeight - 7,
-          { align: "right" }
-        )
+        doc.line(0, pageHeight - 18, pageWidth, pageHeight - 18)
+        doc.setFontSize(7); doc.setTextColor(107, 114, 128)
+        doc.text(`NTDM Animal Hospital | Generated by: ${user?.name || "Unknown"}`, 15, pageHeight - 7)
+        doc.text(`Page ${page} of ${totalPages}`, pageWidth - 15, pageHeight - 7, { align: "right" })
       }
 
       doc.save(`insemination-report-${today}.pdf`)
