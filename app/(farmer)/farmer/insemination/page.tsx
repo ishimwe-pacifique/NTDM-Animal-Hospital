@@ -572,7 +572,7 @@ export default function InseminationPage() {
         "Insurance ID": animals.find(a => a.name === c.name)?.insuranceId || "—",
         "Ear Tag ID": animals.find(a => a.name === c.name)?.earTagId || "—",
         "Total Inseminations": c.inseminations,
-        "Babies Born": c.babies,
+        "Calfs Born": c.babies,
         "Total Cost (RWF)": c.totalCost,
         "Last Insemination": c.lastDate,
       }))
@@ -673,7 +673,7 @@ export default function InseminationPage() {
         <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-blue-600 text-white">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-sky-100 uppercase font-medium">Babies Born</p>
+              <p className="text-xs text-sky-100 uppercase font-medium">Calf(s) Born</p>
               <p className="text-2xl font-bold">{totalBabies}</p>
             </div>
             <Baby className="h-8 w-8 text-white/40" />
@@ -1004,7 +1004,7 @@ export default function InseminationPage() {
                       <TableRow>
                         <TableHead>Animal</TableHead>
                         <TableHead>Inseminations</TableHead>
-                        <TableHead>Babies Born</TableHead>
+                        <TableHead>Calf(s) Born</TableHead>
                         <TableHead>Total Cost (RWF)</TableHead>
                         <TableHead>Last Date</TableHead>
                       </TableRow>
@@ -1033,7 +1033,7 @@ export default function InseminationPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                    Babies Born per Animal
+                    Calf(s) Born per Animal
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1042,7 +1042,7 @@ export default function InseminationPage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                      <Tooltip formatter={(v: any) => [v, "Babies Born"]} />
+                      <Tooltip formatter={(v: any) => [v, "Calfs Born"]} />
                       <Bar dataKey="babies" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -1090,7 +1090,7 @@ export default function InseminationPage() {
               <div className="text-sm space-y-1">
                 <p className="font-medium text-emerald-700">Preview</p>
                 <p className="text-gray-600">
-                  {records.length} records &bull; {totalBabies} babies born &bull; {cowSummary.length} animal(s)
+                  {records.length} records &bull; {totalBabies} calf(s) born &bull; {cowSummary.length} animal(s)
                 </p>
                 <p className="text-gray-600">Total cost: <strong className="text-emerald-700">RWF {totalCost.toLocaleString()}</strong></p>
               </div>
