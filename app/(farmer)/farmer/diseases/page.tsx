@@ -1117,7 +1117,7 @@ export default function DiseaseManagementPage() {
                         <SelectValue placeholder="Select disease case..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {records.map(r => (
+                        {records.filter(r => r.status === "Under Treatment").map(r => (
                           <SelectItem key={r._id} value={r._id}>
                             {r.animalName} — {r.diseaseName} ({r.status})
                           </SelectItem>
