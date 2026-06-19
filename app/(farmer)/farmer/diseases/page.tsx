@@ -575,7 +575,7 @@ export default function DiseaseManagementPage() {
 
       exportDoses.forEach((d, i) => {
         const medicineLines = (d.medicines && d.medicines.length > 0)
-          ? d.medicines.flatMap(m => doc.splitTextToSize(`${m.medicineName} (${m.doseCount} dose${m.doseCount !== 1 ? 's' : ''}${m.volumeMl ? `, ${m.volumeMl}mL` : ''})`, dCols.medicines.w))
+          ? d.medicines.flatMap(m => doc.splitTextToSize(`${m.medicineName} (${m.doseCount} dose${m.doseCount !== 1 ? 's' : ''}${m.volumeMl ? `, ${m.volumeMl}mL` : ''}${m.cost > 0 ? `, RWF ${m.cost.toLocaleString()}` : ''})`, dCols.medicines.w))
           : ['—']
         const cells = [
           doc.splitTextToSize(d.date || '—', dCols.date.w),
