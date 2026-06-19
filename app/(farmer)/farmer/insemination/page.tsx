@@ -705,7 +705,11 @@ export default function InseminationPage() {
                   <label className="text-sm font-medium text-gray-700">Animal *</label>
                   <Select value={animalId} onValueChange={handleAnimalChange} disabled={availableAnimals.length === 0}>
                     <SelectTrigger className={errors.animalId ? "border-red-500" : ""}>
-                      <SelectValue placeholder={availableAnimals.length === 0 ? "No animals available" : "Select animal..."} />
+                      <SelectValue placeholder={
+                        availableAnimals.length === 0
+                          ? (femaleAnimals.length === 0 ? "No animals registered" : "All animals are pregnant")
+                          : "Select animal..."
+                      } />
                     </SelectTrigger>
                     <SelectContent>
                       {availableAnimals.map(a => (
@@ -714,8 +718,11 @@ export default function InseminationPage() {
                     </SelectContent>
                   </Select>
                   {availableAnimals.length === 0
-                  ? <p className="text-xs text-red-500">Please register animals first</p>
-                    // ? <p className="text-xs text-red-500">All female animals are currently pregnant</p>
+                    ? (
+                      femaleAnimals.length === 0
+                        ? <p className="text-xs text-red-500">Please register animals first</p>
+                        : <p className="text-xs text-amber-600">All animals are pregnant</p>
+                    )
                     : pregnantAnimalIds.size > 0 && <p className="text-xs text-amber-600">{pregnantAnimalIds.size} animal(s) hidden — currently pregnant</p>
                   }
                   {animalId && !animals.find(a => a._id === animalId)?.gender && (

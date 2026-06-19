@@ -23,12 +23,20 @@ interface DiseaseRecord {
   diagnosedDate: string; resolvedDate: string | null
   status: string; notes: string | null; veterinarianName: string | null; vetOrigin?: string | null
 }
+interface Medicine {
+  medicineId?: string; medicineName: string; doseCount: number; volumeMl: number | null; cost: number
+}
 interface TreatmentDose {
   _id: string; diseaseRecordId: string; animalId: string; animalName: string | null
   diseaseName: string | null; date: string; session: string
-  doseCount: number; medicineName: string | null
-  medicineCost: number; vetCost: number; totalCost: number; notes: string | null
+  medicines: Medicine[]; vetCost: number; totalCost: number; notes: string | null
 }
+interface MedicineRow {
+  medicineId?: string; medicineName: string; doseCount: string; volumeMl: string; cost: string
+}
+const emptyMedicineRow = (): MedicineRow => ({ medicineName: "", doseCount: "1", volumeMl: "", cost: "" })
+const doseTotalCount = (d: TreatmentDose) => (d.medicines || []).reduce((s, m) => s + (m.doseCount || 0), 0)
+const doseMedicineCost = (d: TreatmentDose) => (d.medicines || []).reduce((s, m) => s + (m.cost || 0), 0)
 
 const STATUSES = ["Active", "Under Treatment", "Resolved"]
 const SESSIONS = ["Morning", "Evening"]
@@ -82,15 +90,19 @@ export default function DiseaseManagementPage() {
   const [doseRecordId, setDoseRecordId] = useState("")
   const [doseDate, setDoseDate] = useState(today)
   const [doseSession, setDoseSession] = useState("")
-  const [doseCount, setDoseCount] = useState("1")
-  const [medicineName, setMedicineName] = useState("")
-  const [medicineCost, setMedicineCost] = useState("")
+  const [medicines, setMedicines] = useState<MedicineRow[]>([emptyMedicineRow()])
   const [vetCost, setVetCost] = useState("")
   const [doseNotes, setDoseNotes] = useState("")
   const [doseErrors, setDoseErrors] = useState<Record<string, string>>({})
   const [editDose, setEditDose] = useState<TreatmentDose | null>(null)
   const [deleteDoseId, setDeleteDoseId] = useState<string | null>(null)
   const [savingDose, setSavingDose] = useState(false)
+
+  const addMedicineRow = () => setMedicines(prev => [...prev, emptyMedicineRow()])
+  const removeMedicineRow = (index: number) => setMedicines(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index))
+  const updateMedicineRow = (index: number, field: keyof MedicineRow, value: string) =>
+    setMedicines(prev => prev.map((m, i) => i === index ? { ...m, [field]: value } : m))
+  const medicinesTotalCost = useMemo(() => medicines.reduce((s, m) => s + (Number(m.cost) || 0), 0), [medicines])
 
   // Filters
   const [filterStatus, setFilterStatus] = useState("")
@@ -161,10 +173,10 @@ export default function DiseaseManagementPage() {
     const map: Record<string, { animalId: string; animalName: string; medicineCost: number; vetCost: number; total: number; doses: number }> = {}
     doses.forEach(d => {
       if (!map[d.animalId]) map[d.animalId] = { animalId: d.animalId, animalName: d.animalName || d.animalId, medicineCost: 0, vetCost: 0, total: 0, doses: 0 }
-      map[d.animalId].medicineCost += d.medicineCost
+      map[d.animalId].medicineCost += doseMedicineCost(d)
       map[d.animalId].vetCost += d.vetCost
       map[d.animalId].total += d.totalCost
-      map[d.animalId].doses += d.doseCount
+      map[d.animalId].doses += doseTotalCount(d)
     })
     return Object.values(map).sort((a, b) => b.total - a.total)
   }, [doses])
@@ -186,7 +198,11 @@ export default function DiseaseManagementPage() {
     if (!doseRecordId) e.doseRecordId = "Select a disease case"
     if (!doseSession) e.doseSession = "Select a session"
     if (!doseDate) e.doseDate = "Select a date"
-    if (!doseCount || Number(doseCount) < 1) e.doseCount = "Enter number of doses"
+    if (medicines.length === 0) {
+      e.medicines = "Add at least one medicine"
+    } else if (medicines.some(m => !m.medicineName.trim() || !m.doseCount || Number(m.doseCount) <= 0 || m.cost === "" || Number(m.cost) < 0)) {
+      e.medicines = "Each medicine needs a name, a dose count greater than 0, and a non-negative cost"
+    }
     setDoseErrors(e)
     return Object.keys(e).length === 0
   }
@@ -201,7 +217,7 @@ export default function DiseaseManagementPage() {
 
   const resetDoseForm = () => {
     setDoseRecordId(""); setDoseDate(today); setDoseSession("")
-    setDoseCount("1"); setMedicineName(""); setMedicineCost("")
+    setMedicines([emptyMedicineRow()])
     setVetCost(""); setDoseNotes("")
     setDoseErrors({}); setEditDose(null)
   }
@@ -239,7 +255,14 @@ export default function DiseaseManagementPage() {
       animalName: diseaseRecord?.animalName || null,
       diseaseName: diseaseRecord?.diseaseName || null,
       date: doseDate, session: doseSession,
-      doseCount, medicineName, medicineCost, vetCost, notes: doseNotes,
+      medicines: medicines.map(m => ({
+        ...(m.medicineId ? { medicineId: m.medicineId } : {}),
+        medicineName: m.medicineName.trim(),
+        doseCount: Number(m.doseCount) || 0,
+        volumeMl: m.volumeMl ? Number(m.volumeMl) : null,
+        cost: Number(m.cost) || 0,
+      })),
+      vetCost, notes: doseNotes,
     }
     if (editDose) {
       await fetch("/api/treatment-doses", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editDose._id, ...body }) })
@@ -274,9 +297,11 @@ export default function DiseaseManagementPage() {
     setDoseRecordId(d.diseaseRecordId)
     setDoseDate(d.date)
     setDoseSession(d.session)
-    setDoseCount(String(d.doseCount))
-    setMedicineName(d.medicineName || "")
-    setMedicineCost(d.medicineCost ? String(d.medicineCost) : "")
+    setMedicines(
+      d.medicines && d.medicines.length > 0
+        ? d.medicines.map(m => ({ medicineId: m.medicineId, medicineName: m.medicineName, doseCount: String(m.doseCount), volumeMl: m.volumeMl ? String(m.volumeMl) : "", cost: String(m.cost) }))
+        : [emptyMedicineRow()]
+    )
     setVetCost(d.vetCost ? String(d.vetCost) : "")
     setDoseNotes(d.notes || "")
   }
@@ -366,8 +391,8 @@ export default function DiseaseManagementPage() {
       const exportDoses = getExportDoses()
       const exportRecs = getExportRecords()
       const grandTotal = daily.length > 0 ? daily[daily.length - 1].runningTotal : 0
-      const totalDoses = exportDoses.reduce((s, d) => s + d.doseCount, 0)
-      const totalMedicineCost = exportDoses.reduce((s, d) => s + d.medicineCost, 0)
+      const totalDoses = exportDoses.reduce((s, d) => s + doseTotalCount(d), 0)
+      const totalMedicineCost = exportDoses.reduce((s, d) => s + doseMedicineCost(d), 0)
       const totalVetCost = exportDoses.reduce((s, d) => s + d.vetCost, 0)
 
       // landscape page width = 297mm
@@ -383,8 +408,8 @@ export default function DiseaseManagementPage() {
       })
       exportDoses.forEach(d => {
         if (!animalStats[d.animalId]) animalStats[d.animalId] = { doses: 0, medicineCost: 0, vetCost: 0, totalCost: 0, diagnosisCount: 0 }
-        animalStats[d.animalId].doses += d.doseCount
-        animalStats[d.animalId].medicineCost += d.medicineCost
+        animalStats[d.animalId].doses += doseTotalCount(d)
+        animalStats[d.animalId].medicineCost += doseMedicineCost(d)
         animalStats[d.animalId].vetCost += d.vetCost
         animalStats[d.animalId].totalCost += d.totalCost
       })
@@ -509,7 +534,7 @@ export default function DiseaseManagementPage() {
 
       // ─────────────────────────────────────────────────────────────
       // SECTION 2 — FULL TREATMENT DOSES TABLE
-      // Columns: Date | Session | Animal | Disease | Doses | Medicine | Med Cost | Vet Cost | Total | Notes
+      // Columns: Date | Session | Animal | Disease | Medicines | Med Cost | Vet Cost | Total | Notes
       // ─────────────────────────────────────────────────────────────
       y += 12
       if (y > 170) { doc.addPage(); y = 20 }
@@ -519,8 +544,7 @@ export default function DiseaseManagementPage() {
         session: { x: 37, w: 16 },
         animal: { x: 54, w: 26 },
         disease: { x: 81, w: 30 },
-        doses: { x: 112, w: 12 },
-        medicine: { x: 125, w: 34 },
+        medicines: { x: 112, w: 47 },
         medCost: { x: 160, w: 24 },
         vetCost: { x: 185, w: 24 },
         total: { x: 210, w: 26 },
@@ -538,8 +562,7 @@ export default function DiseaseManagementPage() {
         doc.text('Session', dCols.session.x, y)
         doc.text('Animal', dCols.animal.x, y)
         doc.text('Disease', dCols.disease.x, y)
-        doc.text('Doses', dCols.doses.x, y)
-        doc.text('Medicine', dCols.medicine.x, y)
+        doc.text('Medicines', dCols.medicines.x, y)
         doc.text('Med Cost(RWF)', dCols.medCost.x, y)
         doc.text('Vet Cost(RWF)', dCols.vetCost.x, y)
         doc.text('Total(RWF)', dCols.total.x, y)
@@ -551,14 +574,16 @@ export default function DiseaseManagementPage() {
       y += 8
 
       exportDoses.forEach((d, i) => {
+        const medicineLines = (d.medicines && d.medicines.length > 0)
+          ? d.medicines.flatMap(m => doc.splitTextToSize(`${m.medicineName} (${m.doseCount} dose${m.doseCount !== 1 ? 's' : ''}${m.volumeMl ? `, ${m.volumeMl}mL` : ''})`, dCols.medicines.w))
+          : ['—']
         const cells = [
           doc.splitTextToSize(d.date || '—', dCols.date.w),
           doc.splitTextToSize(d.session || '—', dCols.session.w),
           doc.splitTextToSize(d.animalName || '—', dCols.animal.w),
           doc.splitTextToSize(d.diseaseName || '—', dCols.disease.w),
-          doc.splitTextToSize(String(d.doseCount), dCols.doses.w),
-          doc.splitTextToSize(d.medicineName || '—', dCols.medicine.w),
-          doc.splitTextToSize(d.medicineCost > 0 ? d.medicineCost.toLocaleString() : '—', dCols.medCost.w),
+          medicineLines,
+          doc.splitTextToSize(doseMedicineCost(d) > 0 ? doseMedicineCost(d).toLocaleString() : '—', dCols.medCost.w),
           doc.splitTextToSize(d.vetCost > 0 ? d.vetCost.toLocaleString() : '—', dCols.vetCost.w),
           doc.splitTextToSize(d.totalCost > 0 ? d.totalCost.toLocaleString() : '—', dCols.total.w),
           doc.splitTextToSize(d.notes || '—', dCols.notes.w),
@@ -570,7 +595,7 @@ export default function DiseaseManagementPage() {
         if (i % 2 === 0) { doc.setFillColor(255, 251, 235); doc.rect(15, y - 4, PW - 30, rowH, 'F') }
         doc.setDrawColor(226, 232, 240); doc.rect(15, y - 4, PW - 30, rowH)
 
-          ;[35, 52, 79, 110, 123, 158, 183, 208, 235].forEach(sx =>
+          ;[35, 52, 79, 110, 158, 183, 208, 235].forEach(sx =>
             doc.line(sx, y - 4, sx, y - 4 + rowH))
 
         doc.setFontSize(6.5)
@@ -594,7 +619,6 @@ export default function DiseaseManagementPage() {
         doc.setDrawColor(234, 88, 12); doc.rect(15, y - 4, PW - 30, rowH)
         doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(234, 88, 12)
         doc.text('TOTALS', 16, y + 1)
-        doc.text(String(exportDoses.reduce((s, d) => s + d.doseCount, 0)), dCols.doses.x, y + 1)
         doc.setTextColor(37, 99, 235)
         doc.text(`RWF ${totalMedicineCost.toLocaleString()}`, dCols.medCost.x, y + 1)
         doc.setTextColor(234, 88, 12)
@@ -720,9 +744,9 @@ export default function DiseaseManagementPage() {
       y += 8
 
       daily.forEach((row, i) => {
-        const mDoses = row.morning.reduce((s, d) => s + d.doseCount, 0)
+        const mDoses = row.morning.reduce((s, d) => s + doseTotalCount(d), 0)
         const mCost = row.morning.reduce((s, d) => s + d.totalCost, 0)
-        const eDoses = row.evening.reduce((s, d) => s + d.doseCount, 0)
+        const eDoses = row.evening.reduce((s, d) => s + doseTotalCount(d), 0)
         const eCost = row.evening.reduce((s, d) => s + d.totalCost, 0)
 
         const cells = [
@@ -828,22 +852,24 @@ export default function DiseaseManagementPage() {
         Session: d.session,
         Animal: d.animalName || '—',
         Disease: d.diseaseName || '—',
-        'Number of Doses': d.doseCount,
-        Medicine: d.medicineName || '—',
-        'Medicine Cost (RWF)': d.medicineCost,
+        Medicines: (d.medicines && d.medicines.length > 0)
+          ? d.medicines.map(m => `${m.medicineName} (${m.doseCount} dose${m.doseCount !== 1 ? 's' : ''}${m.volumeMl ? `, ${m.volumeMl}mL` : ''}, RWF ${m.cost.toLocaleString()})`).join('; ')
+          : '—',
+        'Total Doses': doseTotalCount(d),
+        'Medicine Cost (RWF)': doseMedicineCost(d),
         'Vet Cost (RWF)': d.vetCost,
         'Total Cost (RWF)': d.totalCost,
         Notes: d.notes || '—',
       }))
       const ws2 = XLSX.utils.json_to_sheet(dosesData)
-      ws2['!cols'] = [14, 12, 20, 28, 16, 28, 20, 18, 18, 35].map(w => ({ wch: w }))
+      ws2['!cols'] = [14, 12, 20, 28, 45, 14, 20, 18, 18, 35].map(w => ({ wch: w }))
       XLSX.utils.book_append_sheet(wb, ws2, 'Treatment Doses')
 
       // Sheet 3 — Daily Cost Breakdown
       const dailyData = daily.map(row => {
-        const mDoses = row.morning.reduce((s, d) => s + d.doseCount, 0)
+        const mDoses = row.morning.reduce((s, d) => s + doseTotalCount(d), 0)
         const mCost = row.morning.reduce((s, d) => s + d.totalCost, 0)
-        const eDoses = row.evening.reduce((s, d) => s + d.doseCount, 0)
+        const eDoses = row.evening.reduce((s, d) => s + doseTotalCount(d), 0)
         const eCost = row.evening.reduce((s, d) => s + d.totalCost, 0)
         return {
           Date: row.date,
@@ -867,8 +893,8 @@ export default function DiseaseManagementPage() {
       })
       exportDoses.forEach(d => {
         if (!animalStats[d.animalId]) animalStats[d.animalId] = { doses: 0, medicineCost: 0, vetCost: 0, totalCost: 0, diagnosisCount: 0 }
-        animalStats[d.animalId].doses += d.doseCount
-        animalStats[d.animalId].medicineCost += d.medicineCost
+        animalStats[d.animalId].doses += doseTotalCount(d)
+        animalStats[d.animalId].medicineCost += doseMedicineCost(d)
         animalStats[d.animalId].vetCost += d.vetCost
         animalStats[d.animalId].totalCost += d.totalCost
       })
@@ -1148,23 +1174,28 @@ export default function DiseaseManagementPage() {
                     {doseErrors.doseSession && <p className="text-xs text-red-500">{doseErrors.doseSession}</p>}
                   </div>
 
-                  {/* Number of doses */}
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Number of Doses *</label>
-                    <Input type="number" min="1" placeholder="e.g. 2" value={doseCount} onChange={e => setDoseCount(e.target.value)} className={doseErrors.doseCount ? "border-red-500" : ""} />
-                    {doseErrors.doseCount && <p className="text-xs text-red-500">{doseErrors.doseCount}</p>}
-                  </div>
-
-                  {/* Medicine name */}
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Medicine <span className="text-gray-400 text-xs">optional</span></label>
-                    <Input placeholder="e.g. Oxytetracycline..." value={medicineName} onChange={e => setMedicineName(e.target.value)} />
-                  </div>
-
-                  {/* Medicine cost */}
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Medicine Cost (RWF) <span className="text-gray-400 text-xs">optional</span></label>
-                    <Input type="number" min="0" placeholder="0" value={medicineCost} onChange={e => setMedicineCost(e.target.value)} />
+                  {/* Medicines administered */}
+                  <div className="space-y-2 md:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-700">Medicines Administered *</label>
+                      <Button type="button" size="sm" variant="outline" onClick={addMedicineRow} className="h-7 text-xs gap-1 rounded-lg">
+                        <Plus className="h-3 w-3" /> Add Medicine
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {medicines.map((m, idx) => (
+                        <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_90px_110px_110px_36px] gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                          <Input placeholder="Medicine name, e.g. Oxytetracycline" value={m.medicineName} onChange={e => updateMedicineRow(idx, "medicineName", e.target.value)} />
+                          <Input type="number" min="1" placeholder="Doses" value={m.doseCount} onChange={e => updateMedicineRow(idx, "doseCount", e.target.value)} />
+                          <Input type="number" min="0" step="0.1" placeholder="Vol (mL)" value={m.volumeMl} onChange={e => updateMedicineRow(idx, "volumeMl", e.target.value)} />
+                          <Input type="number" min="0" placeholder="Cost (RWF)" value={m.cost} onChange={e => updateMedicineRow(idx, "cost", e.target.value)} />
+                          <Button type="button" size="sm" variant="ghost" onClick={() => removeMedicineRow(idx)} disabled={medicines.length === 1} className="h-9 w-9 p-0 hover:bg-red-50 disabled:opacity-30">
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    {doseErrors.medicines && <p className="text-xs text-red-500">{doseErrors.medicines}</p>}
                   </div>
 
                   {/* Vet cost */}
@@ -1176,7 +1207,7 @@ export default function DiseaseManagementPage() {
                   {/* Auto total */}
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700">Total Cost (RWF)</label>
-                    <Input readOnly value={((Number(medicineCost) || 0) + (Number(vetCost) || 0)).toLocaleString()} className="bg-emerald-50 font-semibold text-emerald-700" />
+                    <Input readOnly value={(medicinesTotalCost + (Number(vetCost) || 0)).toLocaleString()} className="bg-emerald-50 font-semibold text-emerald-700" />
                   </div>
 
                   {/* Notes */}
@@ -1227,8 +1258,7 @@ export default function DiseaseManagementPage() {
                         <TableHead>Session</TableHead>
                         <TableHead>Animal</TableHead>
                         <TableHead>Disease</TableHead>
-                        <TableHead>Doses</TableHead>
-                        <TableHead>Medicine</TableHead>
+                        <TableHead>Medicines</TableHead>
                         <TableHead>Med. Cost</TableHead>
                         <TableHead>Vet Cost</TableHead>
                         <TableHead>Total</TableHead>
@@ -1237,7 +1267,7 @@ export default function DiseaseManagementPage() {
                     </TableHeader>
                     <TableBody>
                       {filteredDoses.length === 0 ? (
-                        <TableRow><TableCell colSpan={10} className="text-center py-8 text-gray-400">No doses logged yet</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={9} className="text-center py-8 text-gray-400">No doses logged yet</TableCell></TableRow>
                       ) : filteredDoses.map(d => (
                         <TableRow key={d._id}>
                           <TableCell className="text-sm">{d.date}</TableCell>
@@ -1246,9 +1276,16 @@ export default function DiseaseManagementPage() {
                           </TableCell>
                           <TableCell className="font-medium">{d.animalName || "—"}</TableCell>
                           <TableCell className="text-sm text-gray-600">{d.diseaseName || "—"}</TableCell>
-                          <TableCell className="font-semibold text-center">{d.doseCount}</TableCell>
-                          <TableCell className="text-sm">{d.medicineName || <span className="text-gray-400">—</span>}</TableCell>
-                          <TableCell className="text-sm">{d.medicineCost > 0 ? d.medicineCost.toLocaleString() : "—"}</TableCell>
+                          <TableCell className="text-sm">
+                            {d.medicines && d.medicines.length > 0
+                              ? d.medicines.map((m, i) => (
+                                <div key={i} className="whitespace-nowrap">
+                                  {m.medicineName} <span className="text-gray-400">({m.doseCount} dose{m.doseCount !== 1 ? "s" : ""}{m.volumeMl ? `, ${m.volumeMl}mL` : ""}{m.cost > 0 ? `, RWF ${m.cost.toLocaleString()}` : ""})</span>
+                                </div>
+                              ))
+                              : <span className="text-gray-400">—</span>}
+                          </TableCell>
+                          <TableCell className="text-sm">{doseMedicineCost(d) > 0 ? doseMedicineCost(d).toLocaleString() : "—"}</TableCell>
                           <TableCell className="text-sm">{d.vetCost > 0 ? d.vetCost.toLocaleString() : "—"}</TableCell>
                           <TableCell className="font-semibold text-emerald-700">{d.totalCost > 0 ? d.totalCost.toLocaleString() : "—"}</TableCell>
                           <TableCell>
@@ -1270,8 +1307,8 @@ export default function DiseaseManagementPage() {
                 {/* Dose summary footer */}
                 {filteredDoses.length > 0 && (
                   <div className="mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-wrap gap-6 text-sm">
-                    <span className="text-gray-600">Total doses: <strong className="text-gray-900">{filteredDoses.reduce((s, d) => s + d.doseCount, 0)}</strong></span>
-                    <span className="text-gray-600">Medicine cost: <strong className="text-gray-900">RWF {filteredDoses.reduce((s, d) => s + d.medicineCost, 0).toLocaleString()}</strong></span>
+                    <span className="text-gray-600">Total doses: <strong className="text-gray-900">{filteredDoses.reduce((s, d) => s + doseTotalCount(d), 0)}</strong></span>
+                    <span className="text-gray-600">Medicine cost: <strong className="text-gray-900">RWF {filteredDoses.reduce((s, d) => s + doseMedicineCost(d), 0).toLocaleString()}</strong></span>
                     <span className="text-gray-600">Vet cost: <strong className="text-gray-900">RWF {filteredDoses.reduce((s, d) => s + d.vetCost, 0).toLocaleString()}</strong></span>
                     <span className="text-emerald-700 font-semibold">Total: RWF {filteredDoses.reduce((s, d) => s + d.totalCost, 0).toLocaleString()}</span>
                   </div>
@@ -1430,9 +1467,9 @@ export default function DiseaseManagementPage() {
                         </TableHeader>
                         <TableBody>
                           {dailyCostBreakdown.map((row, i) => {
-                            const mDoses = row.morning.reduce((s, d) => s + d.doseCount, 0)
+                            const mDoses = row.morning.reduce((s, d) => s + doseTotalCount(d), 0)
                             const mCost = row.morning.reduce((s, d) => s + d.totalCost, 0)
-                            const eDoses = row.evening.reduce((s, d) => s + d.doseCount, 0)
+                            const eDoses = row.evening.reduce((s, d) => s + doseTotalCount(d), 0)
                             const eCost = row.evening.reduce((s, d) => s + d.totalCost, 0)
                             return (
                               <TableRow key={i}>
@@ -1467,7 +1504,7 @@ export default function DiseaseManagementPage() {
                       <div>
                         <p className="text-gray-500 text-xs uppercase font-medium">Total Doses</p>
                         <p className="text-xl font-bold text-gray-900">
-                          {dailyCostBreakdown.reduce((s, r) => s + r.morning.reduce((a, d) => a + d.doseCount, 0) + r.evening.reduce((a, d) => a + d.doseCount, 0), 0)}
+                          {dailyCostBreakdown.reduce((s, r) => s + r.morning.reduce((a, d) => a + doseTotalCount(d), 0) + r.evening.reduce((a, d) => a + doseTotalCount(d), 0), 0)}
                         </p>
                       </div>
                       <div>
@@ -1617,7 +1654,7 @@ export default function DiseaseManagementPage() {
                   <div className="text-sm space-y-1">
                     <p className="font-medium text-red-700">Preview</p>
                     <p className="text-gray-600">
-                      {previewRecs.length} case{previewRecs.length !== 1 ? 's' : ''} &bull; {previewDoses.reduce((s, d) => s + d.doseCount, 0)} doses &bull; {previewDaily.length} treatment day{previewDaily.length !== 1 ? 's' : ''}
+                      {previewRecs.length} case{previewRecs.length !== 1 ? 's' : ''} &bull; {previewDoses.reduce((s, d) => s + doseTotalCount(d), 0)} doses &bull; {previewDaily.length} treatment day{previewDaily.length !== 1 ? 's' : ''}
                     </p>
                     <p className="text-gray-600">Total cost: <strong className="text-emerald-700">RWF {grandTotal.toLocaleString()}</strong></p>
                   </div>
