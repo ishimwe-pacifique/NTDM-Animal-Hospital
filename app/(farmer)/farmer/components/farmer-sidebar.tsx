@@ -45,12 +45,12 @@ export default function FarmerSidebar() {
   const navItems = [
     { href: "/farmer", label: t('farmer.dashboard'), icon: <Home className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/animals", label: t('farmer.animals'), icon: <User className="h-4 w-4 sm:h-5 sm:w-5" /> },
-    { href: "/farmer/milk", label: "Milk Production", icon: <Milk className="h-4 w-4 sm:h-5 sm:w-5" /> },
+    { href: "/farmer/milk", label: t('farmer.milk'), icon: <Milk className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/consultations", label: t('farmer.consultations'), icon: <Stethoscope className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/tracking", label: t('farmer.tracking'), icon: <Activity className="h-4 w-4 sm:h-5 sm:w-5" /> },
-    { href: "/farmer/waste", label: "Waste Management", icon: <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" /> },
-    { href: "/farmer/insemination", label: "Insemination", icon: <Syringe className="h-4 w-4 sm:h-5 sm:w-5" /> },
-    { href: "/farmer/diseases", label: "Disease Management", icon: <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5" /> },
+    { href: "/farmer/waste", label: t('farmer.waste'), icon: <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" /> },
+    { href: "/farmer/insemination", label: t('farmer.insemination'), icon: <Syringe className="h-4 w-4 sm:h-5 sm:w-5" /> },
+    { href: "/farmer/diseases", label: t('farmer.diseases'), icon: <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5" /> },
     { href: "/farmer/messages", label: t('farmer.messages'), icon: <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" /> },
   ];
 

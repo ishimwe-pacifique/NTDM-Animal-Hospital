@@ -14,6 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ShieldAlert, Plus, Pencil, Trash2, BarChart3, History, Activity, CheckCircle2, AlertCircle, Clock, Syringe, DollarSign, Download, FileText } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Animal { _id: string; name: string; type: string; insuranceId?: string | null; earTagId?: string | null }
 interface Doctor { _id: string; name: string; specialization: string }
@@ -60,6 +61,7 @@ const PIE_COLORS = ["#ef4444", "#f59e0b", "#16a34a"]
 const today = new Date().toISOString().split("T")[0]
 
 export default function DiseaseManagementPage() {
+  const { t } = useLanguage()
   const [user, setUser] = useState<any>(null)
   const [animals, setAnimals] = useState<Animal[]>([])
   const [doctors, setDoctors] = useState<Doctor[]>([])
@@ -938,7 +940,7 @@ export default function DiseaseManagementPage() {
           <ShieldAlert className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Disease Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('farmer.diseases')}</h1>
           <p className="text-sm text-gray-500">Track illnesses, treatment doses, and costs per animal</p>
         </div>
       </div>
