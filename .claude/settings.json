@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:3000/login --max-time 10)",
+      "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost:3000/ --max-time 8)",
+      "Bash(curl -s -o /dev/null -w \"login slash: %{http_code}\\\\n\" http://localhost:3000/login/ --max-time 8)"
+    ]
+  }
+}
