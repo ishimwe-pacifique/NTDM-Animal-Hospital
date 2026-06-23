@@ -36,13 +36,20 @@ export function decryptText(value: string | EncryptedEnvelope | null | undefined
   if (value === null || value === undefined) return ""
   if (typeof value === "string") return value
 
-  const decipher = createDecipheriv("aes-256-gcm", getKey(), Buffer.from(value.iv, "base64"))
-  decipher.setAuthTag(Buffer.from(value.tag, "base64"))
-  const plain = Buffer.concat([
-    decipher.update(Buffer.from(value.data, "base64")),
-    decipher.final(),
-  ])
-  return plain.toString("utf8")
+  // Never let a misconfigured/mismatched CHAT_ENCRYPTION_KEY crash a whole page
+  // render - log it server-side (visible in platform logs) and degrade visibly instead.
+  try {
+    const decipher = createDecipheriv("aes-256-gcm", getKey(), Buffer.from(value.iv, "base64"))
+    decipher.setAuthTag(Buffer.from(value.tag, "base64"))
+    const plain = Buffer.concat([
+      decipher.update(Buffer.from(value.data, "base64")),
+      decipher.final(),
+    ])
+    return plain.toString("utf8")
+  } catch (error) {
+    console.error("decryptText failed:", error)
+    return "[Unable to decrypt message]"
+  }
 }
 
 export function isEncryptedEnvelope(value: unknown): value is EncryptedEnvelope {
