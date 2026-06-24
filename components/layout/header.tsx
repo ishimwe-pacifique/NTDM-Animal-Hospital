@@ -79,10 +79,10 @@ export default function Header() {
             <div className="flex space-x-2 ml-4">
               <LanguageSwitcher />
               <Button asChild variant="outline" className="rounded-full">
-                <Link href="/login">{t('nav.login')}</Link>
+                <Link href="https://vettrack-ruddy.vercel.app/login">{t('nav.login')}</Link>
               </Button>
               <Button asChild className="rounded-full">
-                <Link href="/register">{t('nav.register')}</Link>
+                <Link href="https://vettrack-ruddy.vercel.app/register">{t('nav.register')}</Link>
               </Button>
             </div>
           </nav>
